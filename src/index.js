@@ -1,5 +1,5 @@
-require('dotenv').config();
+import { CONFIG } from './config';
 
-export const getToken = _ => process.env.BOT_TOKEN;
+export const getToken = _ => CONFIG.botToken;
 
 console.log('BOT_TOKEN', getToken());
