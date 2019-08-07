@@ -2,13 +2,10 @@
   "name": "more",
   "version": "1.0.0",
   "description": "MoreOver Real Experience bot",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "start": "nodemon --exec babel-node ./src/index.js",
-    "test": "mocha --require @babel/register src/**/*.spec.js",
-    "build": "babel src --out-dir ./dist --source-maps",
-    "serve": "node ./dist/index.js",
-    "debug": "node --inspect-brk ./dist/index.js"
+    "start": "nodemon --require ts-node/register src/index.ts",
+    "test": "mocha --require ts-node/register  src/**/*.spec.ts"
   },
   "repository": {
     "type": "git",
@@ -35,8 +32,15 @@
     "@babel/node": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
     "@babel/register": "^7.5.5",
+    "@types/chai": "^4.1.7",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.0",
     "chai": "^4.2.0",
+    "eslint": "^6.1.0",
+    "eslint-plugin-import": "^2.18.2",
     "mocha": "^6.2.0",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3"
   }
 }
