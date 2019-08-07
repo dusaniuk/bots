@@ -5,7 +5,19 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "nodemon --require ts-node/register src/index.ts",
-    "test": "mocha --require ts-node/register  src/**/*.spec.ts"
+    "test": "mocha --require ts-node/register  src/**/*.spec.ts",
+    "format": "prettier-eslint 'src/**/*.{ts,json}' --write"
+  },
+  "lint-staged": {
+    "**/*.ts": [
+      "yarn format",
+      "git add --all"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
   },
   "repository": {
     "type": "git",
@@ -35,11 +47,19 @@
     "@types/chai": "^4.1.7",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.0",
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
     "chai": "^4.2.0",
     "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-plugin-chai-expect": "^2.0.1",
     "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-promise": "^4.2.1",
+    "husky": "^3.0.2",
+    "lint-staged": "^9.2.1",
     "mocha": "^6.2.0",
     "nodemon": "^1.19.1",
+    "prettier-eslint-cli": "^5.0.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"
   }
