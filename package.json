@@ -5,7 +5,8 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "nodemon --require ts-node/register src/index.ts",
-    "test": "mocha --require ts-node/register  src/**/*.spec.ts",
+    "test": "mocha",
+    "tdd": "mocha --watch --recursive --extension ts",
     "format": "prettier-eslint 'src/**/*.{ts,json}' --write"
   },
   "lint-staged": {
