@@ -62,3 +62,8 @@ typings/
 
 # next.js build output
 .next
+
+# private stuff
+serviceAccountKey.json
+
+.DS_Store
