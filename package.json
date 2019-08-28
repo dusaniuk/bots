@@ -4,7 +4,7 @@
   "description": "MoreOver Real Experience bot",
   "main": "src/main.ts",
   "scripts": {
-    "start": "nodemon --require ts-node/register src/main.ts",
+    "start": "nodemon src/main.ts",
     "test": "mocha",
     "tdd": "mocha --watch --recursive --extension ts -R min",
     "format": "prettier-eslint 'src/**/*.{ts,json}' --write"

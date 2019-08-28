@@ -1,36 +1,23 @@
-import { firestore } from 'firebase';
-import { ContextMessageUpdate } from 'telegraf';
+import Telegraf, { ContextMessageUpdate } from 'telegraf';
 
 import CONFIG from './config';
 import { Hunter } from './models/hunter.model';
 import { createHunter, getHunterName } from './utils';
-
-import QuerySnapshot = firestore.QuerySnapshot;
-
-const Telegraf = require('telegraf');
-const admin = require('firebase-admin');
-const serviceAccount = require('../serviceAccountKey.json');
+import { UsersDatabase } from './interfaces/users.database';
+import { UsersService } from './services/users.service';
 
 const bot = new Telegraf(CONFIG.botToken);
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: CONFIG.firebase.databaseURL,
-});
-
-const db: firestore.Firestore = admin.firestore();
-const huntersRef = db.collection('hunters');
+const usersDb: UsersDatabase = new UsersService();
 
 bot.command('reg', async (ctx: ContextMessageUpdate) => {
-  const userFromChat = huntersRef.where('id', '==', ctx.from.id).where('chatId', '==', ctx.chat.id);
-
-  const querySnapshot: QuerySnapshot = await userFromChat.get();
-  if (querySnapshot.size > 0) {
+  const isUserInChat = await usersDb.isUserInChat(ctx.from.id, ctx.chat.id);
+  if (isUserInChat) {
     return ctx.reply("Hey, you're already in the game!");
   }
 
   const hunter: Hunter = createHunter(ctx);
-  await huntersRef.add(hunter);
+  await usersDb.addUserInChat(hunter, ctx.chat.id);
 
   const response = getHunterName(hunter);
 

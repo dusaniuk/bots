@@ -15,14 +15,12 @@ describe('main', () => {
           last_name: faker.name.lastName(),
           username: faker.internet.userName(),
         },
-        chat: { id: 1 },
       } as Context;
 
       const hunter: Hunter = createHunter(context);
 
       expect(hunter).to.eql({
         id: context.from.id,
-        chatId: context.chat.id,
         firstName: context.from.first_name,
         lastName: context.from.last_name,
         username: context.from.username,

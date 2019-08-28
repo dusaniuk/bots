@@ -3,7 +3,6 @@ import { Hunter } from './models/hunter.model';
 
 export const createHunter = ({ from, chat }: Context): Hunter => ({
   id: from.id,
-  chatId: chat.id,
   firstName: from.first_name,
   lastName: from.last_name || '',
   username: from.username || '',
