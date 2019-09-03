@@ -5,7 +5,7 @@ export const createHunter = ({ from, chat }: Context): Hunter => ({
   id: from.id,
   firstName: from.first_name,
   lastName: from.last_name || '',
-  username: from.username || '',
+  username: `@${from.username}` || '',
 });
 
 export const getHunterName = ({ username, firstName, lastName }: Hunter): string => {
