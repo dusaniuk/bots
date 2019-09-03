@@ -1,9 +1,8 @@
 import { credential, firestore, initializeApp } from 'firebase-admin';
 
 import { UsersDatabase } from '../interfaces/users.database';
-import { Hunter } from '../models/hunter.model';
-import CONFIG from '../config';
-import { CaptureRecord } from '../models/capture-record.model';
+import { CONFIG } from '../config';
+import { CaptureRecord, Hunter, User } from '../models';
 
 const serviceAccount = require('../../serviceAccountKey.json');
 
@@ -15,22 +14,19 @@ export class UsersService implements UsersDatabase {
   private pendingCapturesRef: firestore.CollectionReference;
 
   constructor() {
-    initializeApp({
+    const app = initializeApp({
       credential: credential.cert(serviceAccount),
       databaseURL: CONFIG.firebase.databaseURL,
     });
 
-    this.db = firestore();
+    this.db = app.firestore();
 
     this.huntersRef = this.db.collection('hunters');
     this.pendingCapturesRef = this.db.collection('pending');
   }
 
-  addUserInChat = async (user: Hunter, chatId: number): Promise<void> => {
-    await this.huntersRef.add({
-      ...user,
-      chatId,
-    });
+  addUserInChat = async (hunter: Hunter): Promise<void> => {
+    await this.huntersRef.add(hunter);
   };
 
   isUserInChat = async (userId: number, chatId: number): Promise<boolean> => {
@@ -41,21 +37,23 @@ export class UsersService implements UsersDatabase {
     return querySnapshot.size > 0;
   };
 
-  getAllUsersFromChat = async (chatId: number): Promise<Hunter[]> => {
+  getAllUsersFromChat = async (chatId: number): Promise<User[]> => {
     const usersFromChat = this.huntersRef.where('chatId', '==', chatId);
 
     const querySnapshot: firestore.QuerySnapshot = await usersFromChat.get();
 
-    const users: Hunter[] = [];
+    const users: User[] = [];
 
     querySnapshot.forEach((result) => {
-      users.push(result.data() as Hunter);
+      users.push(result.data() as User);
     });
 
     return users;
   };
 
   addCaptureRecord = async (record: CaptureRecord): Promise<void> => {
-    await this.pendingCapturesRef.add(record);
+    if (record.victims.length > 0) {
+      await this.pendingCapturesRef.add(record);
+    }
   };
 }

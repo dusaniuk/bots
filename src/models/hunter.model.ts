@@ -1,6 +1,5 @@
-export interface Hunter {
-  id: number;
-  firstName?: string;
-  lastName?: string;
-  username?: string;
+import { User } from './user.model';
+
+export interface Hunter extends User {
+  chatId: number;
 }

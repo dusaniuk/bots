@@ -1,9 +1,8 @@
-import { Hunter } from '../models/hunter.model';
-import { CaptureRecord } from '../models/capture-record.model';
+import { Hunter, User, CaptureRecord } from '../models';
 
 export interface UsersDatabase {
   isUserInChat(userId: number, chatId: number): Promise<boolean>;
-  addUserInChat(user: Hunter, chatId: number): Promise<void>;
-  getAllUsersFromChat(chatId: number): Promise<Hunter[]>;
+  addUserInChat(hunter: Hunter): Promise<void>;
+  getAllUsersFromChat(chatId: number): Promise<User[]>;
   addCaptureRecord(record: CaptureRecord): Promise<void>;
 }
