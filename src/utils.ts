@@ -1,6 +1,8 @@
 import { Context } from 'telegraf';
 import { IncomingMessage } from 'telegraf/typings/telegram-types';
-import { Hunter, Mention, User } from './models';
+import {
+  CaptureRecord, Hunter, Mention, User,
+} from './models';
 
 export const createHunter = ({ from, chat }: Context): Hunter => ({
   id: from.id,
@@ -59,3 +61,5 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
 
   return mentionedUsers;
 };
+
+export const getPoints = (record: CaptureRecord): number => record.victims.length * 4;
