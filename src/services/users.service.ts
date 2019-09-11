@@ -2,7 +2,7 @@ import { credential, firestore, initializeApp } from 'firebase-admin';
 
 import { UsersDatabase } from '../interfaces/users.database';
 import { CONFIG } from '../config';
-import { CaptureRecord, Hunter, User } from '../models';
+import { CaptureRecord, Hunter } from '../models';
 
 export class UsersService implements UsersDatabase {
   private db: firestore.Firestore;
@@ -13,7 +13,11 @@ export class UsersService implements UsersDatabase {
 
   constructor() {
     const app = initializeApp({
-      credential: credential.applicationDefault(),
+      credential: credential.cert({
+        privateKey: CONFIG.firebase.privateKey,
+        clientEmail: CONFIG.firebase.clientEmail,
+        projectId: CONFIG.firebase.projectId,
+      }),
       databaseURL: CONFIG.firebase.databaseURL,
     });
 
