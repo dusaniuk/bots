@@ -4,8 +4,6 @@ import { UsersDatabase } from '../interfaces/users.database';
 import { CONFIG } from '../config';
 import { CaptureRecord, Hunter, User } from '../models';
 
-const serviceAccount = require('../../serviceAccountKey.json');
-
 export class UsersService implements UsersDatabase {
   private db: firestore.Firestore;
 
@@ -15,7 +13,7 @@ export class UsersService implements UsersDatabase {
 
   constructor() {
     const app = initializeApp({
-      credential: credential.cert(serviceAccount),
+      credential: credential.applicationDefault(),
       databaseURL: CONFIG.firebase.databaseURL,
     });
 
