@@ -66,4 +66,7 @@ typings/
 # private stuff
 serviceAccountKey.json
 
+# dist
+dist/
+
 .DS_Store
