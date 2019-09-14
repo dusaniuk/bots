@@ -92,7 +92,10 @@ bot.on('callback_query', async (ctx: ContextMessageUpdate) => {
   return ctx.answerCbQuery('Catch has been handled!');
 });
 
-bot.launch();
+bot
+  .launch()
+  .then(() => console.log('Bot has been started'))
+  .catch(err => console.error(err));
 
 // startup a simple application so heroku won't shut down it
 const app = express();
@@ -106,3 +109,5 @@ const server = app.listen(process.env.PORT || '8080', () => {
 
   console.log('Web server started at http://%s:%s', host, port);
 });
+
+process.setMaxListeners(0);
