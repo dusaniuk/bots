@@ -77,7 +77,7 @@ bot.on('callback_query', async (ctx: ContextMessageUpdate) => {
     const points = utils.getPoints(record);
     const newPoints = (user.score || 0) + points;
 
-    userResponse = `${newPoints} points for ${userGreetingName}.`;
+    userResponse = `${points} points for ${userGreetingName}.`;
 
     await usersDb.updateUserPoints(id, newPoints);
   } else {
