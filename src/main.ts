@@ -1,4 +1,5 @@
 import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
+import { request } from 'https';
 import express from 'express';
 
 import { CONFIG } from './config';
@@ -7,8 +8,7 @@ import { UsersDatabase } from './interfaces/users.database';
 import { UsersService } from './services/users.service';
 import { Hunter, Mention } from './models';
 import { MessageService } from './services/message.service';
-
-const packageInfo = require('../package.json');
+import { Server } from './utils/server';
 
 const bot = new Telegraf(CONFIG.botToken);
 
@@ -98,16 +98,5 @@ bot
   .catch(err => console.error(err));
 
 // startup a simple application so heroku won't shut down it
-const app = express();
-
-app.get('/', (req, res) => {
-  res.json({ version: packageInfo.version });
-});
-
-const server = app.listen(process.env.PORT || '8080', () => {
-  const { address: host, port } = server.address();
-
-  console.log('Web server started at http://%s:%s', host, port);
-});
-
-process.setMaxListeners(0);
+const server = new Server();
+server.run();

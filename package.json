@@ -42,6 +42,7 @@
     "express": "^4.17.1",
     "firebase": "^6.3.5",
     "firebase-admin": "^8.3.0",
+    "request": "^2.88.0",
     "telegraf": "^3.32.0"
   },
   "devDependencies": {
