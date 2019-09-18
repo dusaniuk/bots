@@ -9,7 +9,7 @@ export const createHunter = ({ from, chat }: Context): Hunter => ({
   chatId: chat.id,
   firstName: from.first_name,
   lastName: from.last_name || '',
-  username: `@${from.username}` || '',
+  username: from.username ? `@${from.username}` : '',
 });
 
 export const getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
