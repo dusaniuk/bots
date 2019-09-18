@@ -54,9 +54,10 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
     const user = users.find(({ username }: User) => username === mention.username);
     if (user) {
       mentionedUsers.push(user);
-    } else {
-      mentionedUsers.push({ username: mention.username } as User);
     }
+    // else {
+    //   mentionedUsers.push({ username: mention.username } as User);
+    // }
   });
 
   return mentionedUsers;

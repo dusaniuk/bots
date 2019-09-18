@@ -29,6 +29,10 @@ bot.command('reg', async (ctx: ContextMessageUpdate) => {
 });
 
 bot.command('capture', async (ctx: ContextMessageUpdate) => {
+  if (ctx.chat.id === -1001144984487) {
+    return ctx.reply('дебажу команду. поки не працює');
+  }
+
   const mentions: Mention[] = utils.getMentions(ctx.message);
   const chatUsers: Hunter[] = await usersDb.getAllUsersFromChat(ctx.chat.id);
 
