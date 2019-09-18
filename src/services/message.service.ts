@@ -22,7 +22,7 @@ export class MessageService {
     return message.substring(0, message.length - 1);
   };
 
-  private getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
+  getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
     if (username) {
       return username;
     }

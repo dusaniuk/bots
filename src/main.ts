@@ -63,6 +63,25 @@ bot.command('capture', async (ctx: ContextMessageUpdate) => {
   return ctx.reply(message, { disable_notification: true });
 });
 
+bot.command('score', async (ctx: ContextMessageUpdate) => {
+  const users = await usersDb.getAllUsersFromChat(ctx.chat.id);
+
+  let msg = '';
+
+  users.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
+
+  users.forEach((user: Hunter, index: number) => {
+    let name = messagesService.getGreetingNameForUser(user);
+    if (name.startsWith('@')) {
+      name = name.substring(1);
+    }
+
+    msg += `${index + 1}) ${name}: ${user.score || 0} \n`;
+  });
+
+  return ctx.reply(msg);
+});
+
 bot.on('callback_query', async (ctx: ContextMessageUpdate) => {
   const { message, data } = ctx.update.callback_query;
   const [command, captureId] = data.split(' ');
