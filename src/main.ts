@@ -27,10 +27,6 @@ bot.command('reg', async (ctx: ContextMessageUpdate) => {
 });
 
 bot.command('capture', async (ctx: ContextMessageUpdate) => {
-  if (ctx.chat.id === -1001144984487) {
-    return ctx.replyWithSticker('CAADAgADdwEAAl56qRYDru4cgqib-BYE');
-  }
-
   const mentions: Mention[] = utils.getMentions(ctx.message);
   const chatUsers: Hunter[] = await usersDb.getAllUsersFromChat(ctx.chat.id);
 

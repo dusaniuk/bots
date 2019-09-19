@@ -47,17 +47,18 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
   mentions.forEach((mention: Mention) => {
     if (mention.id) {
       const user = users.find(({ id }: User) => id === mention.id);
-      mentionedUsers.push(user);
+      if (user) {
+        mentionedUsers.push(user);
+      }
       return;
     }
 
     const user = users.find(({ username }: User) => username === mention.username);
     if (user) {
       mentionedUsers.push(user);
+    } else {
+      mentionedUsers.push({ username: mention.username } as User);
     }
-    // else {
-    //   mentionedUsers.push({ username: mention.username } as User);
-    // }
   });
 
   return mentionedUsers;
