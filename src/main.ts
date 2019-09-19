@@ -1,6 +1,4 @@
 import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
-import { request } from 'https';
-import express from 'express';
 
 import { CONFIG } from './config';
 import * as utils from './utils';
@@ -30,7 +28,7 @@ bot.command('reg', async (ctx: ContextMessageUpdate) => {
 
 bot.command('capture', async (ctx: ContextMessageUpdate) => {
   if (ctx.chat.id === -1001144984487) {
-    return ctx.reply('дебажу команду. поки не працює');
+    return ctx.replyWithSticker('CAADAgADdwEAAl56qRYDru4cgqib-BYE');
   }
 
   const mentions: Mention[] = utils.getMentions(ctx.message);
