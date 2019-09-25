@@ -81,10 +81,7 @@ describe('utils', () => {
 
     it("should return an empty array if there's no mentions in messages entity", () => {
       const message: IncomingMessage = {
-        entities: [
-          { type: 'phone_number', offset: 0, length: 6 },
-          { type: 'email', offset: 7, length: 10 },
-        ],
+        entities: [{ type: 'phone_number', offset: 0, length: 6 }, { type: 'email', offset: 7, length: 10 }],
         text: `${faker.phone.phoneNumber()} ${faker.internet.exampleEmail()}`,
       } as IncomingMessage;
 

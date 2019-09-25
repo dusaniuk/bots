@@ -6,7 +6,7 @@
   "scripts": {
     "build-ts": "tsc",
     "postinstall": "npm run build-ts",
-    "start": "nodemon src/main.ts",
+    "start": "ENVIRONMENT=dev nodemon src/main.ts",
     "test": "mocha",
     "tdd": "mocha --watch --recursive --extension ts -R min",
     "format": "prettier-eslint 'src/**/*.{ts,json}' --write"

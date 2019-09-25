@@ -1,5 +1,8 @@
+/* eslint-disable no-console */
 import express from 'express';
 import { request } from 'https';
+
+import { CONFIG } from '../config';
 
 const packageInfo = require('../../package.json');
 
@@ -12,13 +15,21 @@ export class Server {
   }
 
   public run = (): void => {
+    if (CONFIG.environment === 'dev') {
+      console.log('suppress web server startup locally');
+      return;
+    }
+
     this.listenForPort();
     this.startCallingInterval();
   };
 
   private setRoutes = (): void => {
     this.app.get('/', (req, res) => {
-      res.json({ version: packageInfo.version });
+      res.send({
+        description: packageInfo.description,
+        version: packageInfo.version,
+      });
     });
   };
 
@@ -26,16 +37,14 @@ export class Server {
     const server = this.app.listen(process.env.PORT || '8080', () => {
       const { address: host, port } = server.address();
 
-      // eslint-disable-next-line no-console
-      console.log('Web server started at http://%s:%s', host, port);
+      console.log('web server started at http://%s:%s', host, port);
     });
   };
 
   private startCallingInterval = (): void => {
     setInterval(() => {
       request('https://moreover-real-experience.herokuapp.com/', () => {
-        // eslint-disable-next-line no-console
-        console.log('WAKE UP DYNO');
+        console.log('wake up dyno');
       });
     }, 1200000);
   };

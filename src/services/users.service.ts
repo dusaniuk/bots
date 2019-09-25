@@ -53,10 +53,7 @@ export class UsersService implements UsersDatabase {
     return users;
   };
 
-  getUserFromChat = async (
-    userId: number,
-    chatId: number,
-  ): Promise<{ id: string; user: Hunter }> => {
+  getUserFromChat = async (userId: number, chatId: number): Promise<{ id: string; user: Hunter }> => {
     const userFromChat = this.huntersRef.where('id', '==', userId).where('chatId', '==', chatId);
     const querySnapshot: firestore.QuerySnapshot = await userFromChat.get();
 

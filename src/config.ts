@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 export const CONFIG = {
+  environment: process.env.ENVIRONMENT,
   botToken: process.env.BOT_TOKEN,
   firebase: {
     clientEmail: process.env.CLIENT_EMAIL,
