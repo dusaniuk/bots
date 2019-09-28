@@ -4,7 +4,7 @@ import { UsersDatabase } from './interfaces/users.database';
 import { MessageService } from './services/message.service';
 
 import { Hunter, Mention } from './models';
-import * as utils from './utils';
+import * as utils from './utils/helpers';
 
 export class ActionsHandler {
   constructor(private usersDb: UsersDatabase, private messagesService: MessageService) {}

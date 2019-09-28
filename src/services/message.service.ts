@@ -1,5 +1,5 @@
 import { User } from '../models';
-import { getGreetingNameForUser } from '../utils';
+import { getGreetingNameForUser } from '../utils/helpers';
 
 export class MessageService {
   getAlreadyInGameMsg = (): string => "Hey, you're already in the game!";

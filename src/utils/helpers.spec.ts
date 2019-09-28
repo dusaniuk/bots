@@ -3,8 +3,8 @@ import { Context } from 'telegraf';
 import * as faker from 'faker';
 import { IncomingMessage } from 'telegraf/typings/telegram-types';
 
-import { createHunter, getGreetingNameForUser, getMentions } from './utils';
-import { Hunter, Mention, User } from './models';
+import { createHunter, getGreetingNameForUser, getMentions } from './helpers';
+import { Hunter, Mention, User } from '../models';
 
 describe('utils', () => {
   describe('createHunter', () => {
