@@ -2,17 +2,18 @@ import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
 
 import { UsersDatabase } from './interfaces/users.database';
 import { MessageService } from './services/message.service';
+import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Hunter, Mention } from './models';
 import * as utils from './utils/helpers';
 
 export class ActionsHandler {
-  constructor(private usersDb: UsersDatabase, private messagesService: MessageService) {}
+  constructor(private usersDb: UsersDatabase, private messagesService: MessageService, private telegrafResponse: TelegrafResponseService) {}
 
   public register = async (ctx: ContextMessageUpdate): Promise<any> => {
     const isUserInChat = await this.usersDb.isUserInChat(ctx.from.id, ctx.chat.id);
     if (isUserInChat) {
-      return ctx.reply(this.messagesService.getAlreadyInGameMsg());
+      return this.telegrafResponse.userAlreadyInGame(ctx);
     }
 
     const hunter: Hunter = utils.createHunter(ctx);
@@ -62,7 +63,7 @@ export class ActionsHandler {
     users.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
 
     users.forEach((user: Hunter, index: number) => {
-      let name = this.messagesService.getGreetingNameForUser(user);
+      let name = utils.getGreetingNameForUser(user);
       if (name.startsWith('@')) {
         name = name.substring(1);
       }
@@ -84,7 +85,7 @@ export class ActionsHandler {
 
     let userResponse;
     if (command === 'approve') {
-      const points = utils.getPoints(record);
+      const points = utils.calculateEarnedPoints(record);
       const newPoints = (user.score || 0) + points;
 
       userResponse = `${points} points for ${userGreetingName}.`;

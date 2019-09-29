@@ -4,6 +4,7 @@ import Telegraf, { ContextMessageUpdate } from 'telegraf';
 import { UsersDatabase } from './interfaces/users.database';
 import { UsersService } from './services/users.service';
 import { MessageService } from './services/message.service';
+import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Server } from './utils/server';
 import { ActionsHandler } from './bot';
@@ -12,15 +13,22 @@ import { CONFIG } from './config';
 const main = () => {
   const usersDb: UsersDatabase = new UsersService();
   const messagesService: MessageService = new MessageService();
+  const responseService: TelegrafResponseService = new TelegrafResponseService();
 
   const bot: Telegraf<ContextMessageUpdate> = new Telegraf(CONFIG.botToken);
-  const handler = new ActionsHandler(usersDb, messagesService);
+  const handler = new ActionsHandler(usersDb, messagesService, responseService);
 
   bot.command('reg', handler.register);
   bot.command('capture', handler.capture);
   bot.command('score', handler.getScore);
 
   bot.on('callback_query', handler.handleAdminAnswer(bot));
+
+  // TODO: switch bot to some kind of mock
+  // so I don't need to to this if
+  if (CONFIG.environment === 'test') {
+    return;
+  }
 
   bot
     .launch()

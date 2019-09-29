@@ -2,10 +2,8 @@ import { User } from '../models';
 import { getGreetingNameForUser } from '../utils/helpers';
 
 export class MessageService {
-  getAlreadyInGameMsg = (): string => "Hey, you're already in the game!";
-
   getNewUserGreetingMsg = (user: User): string => {
-    const userGreetingName = this.getGreetingNameForUser(user);
+    const userGreetingName = getGreetingNameForUser(user);
 
     return `Welcome, ${userGreetingName}. Fight for your points!`;
   };
@@ -20,18 +18,5 @@ export class MessageService {
     });
 
     return message.substring(0, message.length - 1);
-  };
-
-  getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
-    if (username) {
-      return username;
-    }
-
-    const name = [firstName];
-    if (lastName) {
-      name.push(lastName);
-    }
-
-    return name.join(' ');
   };
 }

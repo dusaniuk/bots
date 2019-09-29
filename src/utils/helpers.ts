@@ -1,16 +1,26 @@
 import { Context } from 'telegraf';
 import { IncomingMessage } from 'telegraf/typings/telegram-types';
 import {
-  CaptureRecord, Hunter, Mention, User,
+  CaptureRecord, Mention, Hunter, User,
 } from '../models';
 
-export const createHunter = ({ from, chat }: Context): Hunter => ({
-  id: from.id,
-  chatId: chat.id,
-  firstName: from.first_name,
-  lastName: from.last_name || '',
-  username: from.username ? `@${from.username}` : '',
-});
+export const createHunter = ({ from, chat }: Context): Hunter => {
+  const hunter: Hunter = {
+    id: from.id,
+    chatId: chat.id,
+    firstName: from.first_name,
+  };
+
+  if (from.username) {
+    hunter.username = `@${from.username}`;
+  }
+
+  if (from.last_name) {
+    hunter.lastName = from.last_name;
+  }
+
+  return hunter;
+};
 
 export const getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
   if (username) {
@@ -26,37 +36,35 @@ export const getGreetingNameForUser = ({ username, firstName, lastName }: User):
 };
 
 export const getMentions = (message: IncomingMessage): Mention[] => {
-  const mentionedUsers: Mention[] = [];
-
-  message.entities
+  return message.entities
     .filter(entity => entity.type.endsWith('mention'))
-    .forEach((mention) => {
-      if (mention.type === 'mention') {
-        mentionedUsers.push({ username: message.text.substr(mention.offset, mention.length) });
-      } else if (mention.type === 'text_mention') {
-        mentionedUsers.push({ id: mention.user.id });
+    .map((mention) => {
+      switch (mention.type) {
+        case 'mention':
+          return { username: message.text.substr(mention.offset, mention.length) };
+        case 'text_mention':
+          return { id: mention.user.id };
+        default:
+          throw new Error('telegram has added a new type of mention??');
       }
     });
-
-  return mentionedUsers;
 };
 
 export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] => {
   const mentionedUsers: User[] = [];
 
   mentions.forEach((mention: Mention) => {
-    if (mention.id) {
-      const user = users.find(({ id }: User) => id === mention.id);
-      if (user) {
-        mentionedUsers.push(user);
-      }
+    const user = users.find(({ id, username }: User) => {
+      return id === mention.id || username === mention.username;
+    });
+
+    if (user) {
+      mentionedUsers.push(user);
       return;
     }
 
-    const user = users.find(({ username }: User) => username === mention.username);
-    if (user) {
-      mentionedUsers.push(user);
-    } else {
+    // if user ain't in users list: just add it to an array for future tracking
+    if (mention.username) {
       mentionedUsers.push({ username: mention.username } as User);
     }
   });
@@ -64,4 +72,7 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
   return mentionedUsers;
 };
 
-export const getPoints = (record: CaptureRecord): number => record.victims.length * 4;
+// TODO: do the dynamic points - depends on the frequency of captures
+export const calculateEarnedPoints = (record: CaptureRecord): number => {
+  return record.victims.length * 4;
+};
