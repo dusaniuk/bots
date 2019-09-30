@@ -19,18 +19,20 @@ export class ActionsHandler {
     const hunter: Hunter = utils.createHunter(ctx);
     await this.usersDb.addUserInChat(hunter);
 
-    const message = this.messagesService.getNewUserGreetingMsg(hunter);
-    return ctx.reply(message);
+    return this.telegrafResponse.greetNewUser(ctx, hunter);
   };
 
   public capture = async (ctx: ContextMessageUpdate): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);
-    const chatUsers: Hunter[] = await this.usersDb.getAllUsersFromChat(ctx.chat.id);
+    if (mentions.length === 0) {
+      return this.telegrafResponse.showCaptureInstructions(ctx);
+    }
 
+    const chatUsers: Hunter[] = await this.usersDb.getAllUsersFromChat(ctx.chat.id);
     const mentionedUsers = utils.getMentionedUsers(mentions, chatUsers);
 
     if (mentionedUsers.length === 0) {
-      return ctx.reply("There's no users to capture");
+      return this.telegrafResponse.noUsersToCapture(ctx);
     }
 
     const captureId = await this.usersDb.addCaptureRecord({
@@ -45,8 +47,8 @@ export class ActionsHandler {
     const adminId = chatUsers.find(({ isAdmin }: Hunter) => isAdmin).id;
     await ctx.telegram.sendMessage(
       adminId,
-      `${message}. Approve or reject?`,
-      Markup.inlineKeyboard([Markup.callbackButton('Approve', `approve ${captureId}`), Markup.callbackButton('Reject', `reject ${captureId}`)])
+      `${message}. Ти апруваєш?`,
+      Markup.inlineKeyboard([Markup.callbackButton('Да', `approve ${captureId}`), Markup.callbackButton('Нєєє', `reject ${captureId}`)])
         .oneTime(true)
         .resize()
         .extra(),
@@ -56,22 +58,10 @@ export class ActionsHandler {
   };
 
   public getScore = async (ctx: ContextMessageUpdate): Promise<any> => {
-    const users = await this.usersDb.getAllUsersFromChat(ctx.chat.id);
+    const hunters = await this.usersDb.getAllUsersFromChat(ctx.chat.id);
+    hunters.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
 
-    let msg = '';
-
-    users.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
-
-    users.forEach((user: Hunter, index: number) => {
-      let name = utils.getGreetingNameForUser(user);
-      if (name.startsWith('@')) {
-        name = name.substring(1);
-      }
-
-      msg += `${index + 1}) ${name}: ${user.score || 0} \n`;
-    });
-
-    return ctx.reply(msg);
+    return this.telegrafResponse.getHuntersScore(ctx, hunters);
   };
 
   public handleAdminAnswer = (bot: Telegraf<ContextMessageUpdate>) => async (ctx: ContextMessageUpdate): Promise<any> => {
@@ -88,11 +78,11 @@ export class ActionsHandler {
       const points = utils.calculateEarnedPoints(record);
       const newPoints = (user.score || 0) + points;
 
-      userResponse = `${points} points for ${userGreetingName}.`;
+      userResponse = `${points} ти харооош. На тобі ${userGreetingName} балів.`;
 
       await this.usersDb.updateUserPoints(id, newPoints);
     } else {
-      userResponse = `${userGreetingName} catch has been rejected.`;
+      userResponse = `${userGreetingName} ти шо, хотів наїбати всіх тут? Відхилено!`;
     }
 
     await ctx.telegram.sendMessage(record.chatId, userResponse);
@@ -100,6 +90,6 @@ export class ActionsHandler {
     // delete message from admin's chat
     await bot.telegram.deleteMessage(message.chat.id, message.message_id);
 
-    return ctx.answerCbQuery('Catch has been handled!');
+    return ctx.answerCbQuery('Всьо гуд, обробив заявочку.');
   };
 }

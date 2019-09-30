@@ -2,12 +2,6 @@ import { User } from '../models';
 import { getGreetingNameForUser } from '../utils/helpers';
 
 export class MessageService {
-  getNewUserGreetingMsg = (user: User): string => {
-    const userGreetingName = getGreetingNameForUser(user);
-
-    return `Welcome, ${userGreetingName}. Fight for your points!`;
-  };
-
   getCapturedVictimsMsg = (hunter: User, victims: User[]): string => {
     const hunterName = getGreetingNameForUser(hunter);
 
