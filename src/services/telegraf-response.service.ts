@@ -46,7 +46,7 @@ export class TelegrafResponseService {
   makeCaptureVictimsMsg = (hunter: User, victims: User[]): string => {
     const hunterName = getGreetingNameForUser(hunter);
 
-    let message = `${hunterName} зловив пару покемонів: ${victims.length} `;
+    let message = `${hunterName} зловив ${victims.length} покемон(ів): `;
 
     victims.forEach((user) => {
       message += ` ${getGreetingNameForUser(user)},`;
