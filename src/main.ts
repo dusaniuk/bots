@@ -18,6 +18,7 @@ const main = () => {
 
   bot.command('reg', handler.register);
   bot.command('capture', handler.capture);
+  bot.command('c', handler.capture);
   bot.command('score', handler.getScore);
 
   bot.on('callback_query', handler.handleAdminAnswer(bot));
