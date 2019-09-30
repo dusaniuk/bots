@@ -1,14 +1,13 @@
 import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
 
 import { UsersDatabase } from './interfaces/users.database';
-import { MessageService } from './services/message.service';
 import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Hunter, Mention } from './models';
 import * as utils from './utils/helpers';
 
 export class ActionsHandler {
-  constructor(private usersDb: UsersDatabase, private messagesService: MessageService, private telegrafResponse: TelegrafResponseService) {}
+  constructor(private usersDb: UsersDatabase, private telegrafResponse: TelegrafResponseService) {}
 
   public register = async (ctx: ContextMessageUpdate): Promise<any> => {
     const isUserInChat = await this.usersDb.isUserInChat(ctx.from.id, ctx.chat.id);
@@ -42,19 +41,19 @@ export class ActionsHandler {
     });
 
     const hunter = chatUsers.find(({ id }) => id === ctx.from.id);
-    const message = this.messagesService.getCapturedVictimsMsg(hunter, mentionedUsers);
+    const msg = this.telegrafResponse.makeCaptureVictimsMsg(hunter, mentionedUsers);
 
     const adminId = chatUsers.find(({ isAdmin }: Hunter) => isAdmin).id;
     await ctx.telegram.sendMessage(
       adminId,
-      `${message}. Ти апруваєш?`,
+      `${msg}. Ти апруваєш?`,
       Markup.inlineKeyboard([Markup.callbackButton('Да', `approve ${captureId}`), Markup.callbackButton('Нєєє', `reject ${captureId}`)])
         .oneTime(true)
         .resize()
         .extra(),
     );
 
-    return ctx.reply(message, { disable_notification: true });
+    return ctx.reply(msg, { disable_notification: true });
   };
 
   public getScore = async (ctx: ContextMessageUpdate): Promise<any> => {

@@ -3,7 +3,6 @@ import Telegraf, { ContextMessageUpdate } from 'telegraf';
 
 import { UsersDatabase } from './interfaces/users.database';
 import { UsersService } from './services/users.service';
-import { MessageService } from './services/message.service';
 import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Server } from './utils/server';
@@ -12,11 +11,10 @@ import { CONFIG } from './config';
 
 const main = () => {
   const usersDb: UsersDatabase = new UsersService();
-  const messagesService: MessageService = new MessageService();
   const responseService: TelegrafResponseService = new TelegrafResponseService();
 
   const bot: Telegraf<ContextMessageUpdate> = new Telegraf(CONFIG.botToken);
-  const handler = new ActionsHandler(usersDb, messagesService, responseService);
+  const handler = new ActionsHandler(usersDb, responseService);
 
   bot.command('reg', handler.register);
   bot.command('capture', handler.capture);

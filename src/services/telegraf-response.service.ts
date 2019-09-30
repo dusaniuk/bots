@@ -1,5 +1,6 @@
 import { ContextMessageUpdate } from 'telegraf';
 import { MessageSticker, Message } from 'telegraf/typings/telegram-types';
+
 import { Hunter, User } from '../models';
 import { getGreetingNameForUser } from '../utils/helpers';
 
@@ -34,11 +35,23 @@ export class TelegrafResponseService {
     return ctx.reply(msg);
   };
 
-  showCaptureInstructions = (ctx: ContextMessageUpdate) => {
+  showCaptureInstructions = (ctx: ContextMessageUpdate): Promise<Message> => {
     return ctx.reply('Для того, шоб зловити покемонів, треба руцями написати "/capture @username" або "/c @username".');
   };
 
-  noUsersToCapture = (ctx: ContextMessageUpdate) => {
+  noUsersToCapture = (ctx: ContextMessageUpdate): Promise<Message> => {
     return ctx.reply('В команді немає ігроків з цього чату');
+  };
+
+  makeCaptureVictimsMsg = (hunter: User, victims: User[]): string => {
+    const hunterName = getGreetingNameForUser(hunter);
+
+    let message = `${hunterName} зловив пару покемонів: ${victims.length} `;
+
+    victims.forEach((user) => {
+      message += ` ${getGreetingNameForUser(user)},`;
+    });
+
+    return message.substring(0, message.length - 1);
   };
 }
