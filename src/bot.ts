@@ -77,7 +77,7 @@ export class ActionsHandler {
       const points = utils.calculateEarnedPoints(record);
       const newPoints = (user.score || 0) + points;
 
-      userResponse = `${points} ти харооош. На тобі ${userGreetingName} балів.`;
+      userResponse = `${userGreetingName} ти харооош. На тобі ${points} балів.`;
 
       await this.usersDb.updateUserPoints(id, newPoints);
     } else {
