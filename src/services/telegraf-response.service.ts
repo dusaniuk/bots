@@ -17,7 +17,7 @@ export class TelegrafResponseService {
 
   greetNewUser = (ctx: ContextMessageUpdate, user: User): Promise<Message> => {
     const greetName = getGreetingNameForUser(user);
-    return ctx.reply(`Старий Вояка ${greetName} приєднався до нас`);
+    return ctx.reply(`В нас тут новий покємон: ${greetName}.`);
   };
 
   getHuntersScore = (ctx: ContextMessageUpdate, hunters: Hunter[]): Promise<Message> => {
@@ -46,7 +46,8 @@ export class TelegrafResponseService {
   makeCaptureVictimsMsg = (hunter: User, victims: User[]): string => {
     const hunterName = getGreetingNameForUser(hunter);
 
-    let message = `${hunterName} зловив ${victims.length} покемон(ів): `;
+    // TODO: make private function for ending
+    let message = `${hunterName} зловив(ла): `;
 
     victims.forEach((user) => {
       message += ` ${getGreetingNameForUser(user)},`;

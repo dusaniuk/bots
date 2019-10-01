@@ -77,11 +77,11 @@ export class ActionsHandler {
       const points = utils.calculateEarnedPoints(record);
       const newPoints = (user.score || 0) + points;
 
-      userResponse = `${userGreetingName} ти харооош. На тобі ${points} балів.`;
+      userResponse = `${userGreetingName} харооош. Ти заробив(ла) цілу кучу балів: ${points}.`;
 
       await this.usersDb.updateUserPoints(id, newPoints);
     } else {
-      userResponse = `${userGreetingName} ти шо, хотів наїбати всіх тут? Відхилено!`;
+      userResponse = `${userGreetingName} ти шо, хотів(ла) наїбати всіх тут? Відхилено!`;
     }
 
     await ctx.telegram.sendMessage(record.chatId, userResponse);
