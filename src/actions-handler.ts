@@ -5,9 +5,14 @@ import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Hunter, Mention } from './models';
 import * as utils from './utils/helpers';
+import { Middleware } from './middleware';
 
 export class ActionsHandler {
-  constructor(private usersDb: UsersDatabase, private telegrafResponse: TelegrafResponseService) {}
+  public middleware: Middleware;
+
+  constructor(private usersDb: UsersDatabase, private telegrafResponse: TelegrafResponseService) {
+    this.middleware = new Middleware(telegrafResponse);
+  }
 
   public register = async (ctx: ContextMessageUpdate): Promise<any> => {
     const isUserInChat = await this.usersDb.isUserInChat(ctx.from.id, ctx.chat.id);

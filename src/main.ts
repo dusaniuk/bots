@@ -6,7 +6,7 @@ import { UsersService } from './services/users.service';
 import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Server } from './utils/server';
-import { ActionsHandler } from './bot';
+import { ActionsHandler } from './actions-handler';
 import { CONFIG } from './config';
 
 const main = () => {
@@ -15,6 +15,8 @@ const main = () => {
 
   const bot: Telegraf<ContextMessageUpdate> = new Telegraf(CONFIG.botToken);
   const handler = new ActionsHandler(usersDb, responseService);
+
+  bot.use(handler.middleware.verifyChatType);
 
   bot.command('reg', handler.register);
   bot.command('capture', handler.capture);

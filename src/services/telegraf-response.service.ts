@@ -55,4 +55,8 @@ export class TelegrafResponseService {
 
     return message.substring(0, message.length - 1);
   };
+
+  rejectPrivateChat = (ctx: ContextMessageUpdate) => {
+    return ctx.reply('Е нєнєнє, я на роботу в приватних чатах не підписувався');
+  };
 }
