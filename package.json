@@ -9,7 +9,8 @@
     "start": "ENVIRONMENT=dev nodemon src/main.ts",
     "test": "ENVIRONMENT=test mocha",
     "tdd": "yarn test --watch --recursive --extension ts -R min",
-    "format": "prettier-eslint 'src/**/*.{ts,json}' --write"
+    "format": "prettier-eslint 'src/**/*.{ts,json}' --write",
+    "lint": "./node_modules/.bin/eslint **/*.ts"
   },
   "lint-staged": {
     "**/*.ts": [
