@@ -6,7 +6,7 @@ import { UsersService } from './services/users.service';
 import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Server } from './utils/server';
-import { ActionsHandler } from './actions-handler';
+import { ActionsHandler } from './bot/actions-handler';
 import { CONFIG } from './config';
 
 const main = () => {

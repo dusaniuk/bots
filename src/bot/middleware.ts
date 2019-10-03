@@ -1,6 +1,6 @@
 import { ContextMessageUpdate } from 'telegraf';
 
-import { TelegrafResponseService } from './services/telegraf-response.service';
+import { TelegrafResponseService } from '../services/telegraf-response.service';
 
 export const enum ChatType {
   private = 'private',

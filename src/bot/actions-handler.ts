@@ -1,10 +1,10 @@
 import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
 
-import { UsersDatabase } from './interfaces/users.database';
-import { TelegrafResponseService } from './services/telegraf-response.service';
+import { UsersDatabase } from '../interfaces/users.database';
+import { TelegrafResponseService } from '../services/telegraf-response.service';
 
-import { Hunter, Mention } from './models';
-import * as utils from './utils/helpers';
+import { Hunter, Mention } from '../models';
+import * as utils from '../utils/helpers';
 import { Middleware } from './middleware';
 
 export class ActionsHandler {
