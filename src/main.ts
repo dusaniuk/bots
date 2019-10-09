@@ -20,9 +20,13 @@ const main = () => {
 
   bot.command('ping', handler.pong);
   bot.command('reg', handler.register);
+  bot.command('score', handler.getScore);
+
+  bot.command('help', handler.getHelp);
+  bot.command('halp', handler.getHelp);
+
   bot.command('capture', handler.capture);
   bot.command('c', handler.capture);
-  bot.command('score', handler.getScore);
 
   bot.on('callback_query', handler.handleAdminAnswer(bot));
 

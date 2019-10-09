@@ -1,11 +1,12 @@
 import { ContextMessageUpdate } from 'telegraf';
-import { MessageSticker, Message } from 'telegraf/typings/telegram-types';
+import { Message, MessageSticker } from 'telegraf/typings/telegram-types';
 
 import { Hunter, User } from '../models';
 import { getGreetingNameForUser } from '../utils/helpers';
 
 const enum MoreFacesStickers {
   whatDoYouWant = 'CAADAgADdwEAAl56qRYDru4cgqib-BYE', // хулі ти доїбався
+  ohMyGod = 'CAADAgADSAADXnqpFmUyRFH3_oQCFgQ', // о госпаді
 }
 
 export class TelegrafResponseService {
@@ -58,5 +59,19 @@ export class TelegrafResponseService {
 
   rejectPrivateChat = (ctx: ContextMessageUpdate) => {
     return ctx.reply('Е нєнєнє, я на роботу в приватних чатах не підписувався');
+  };
+
+  explainRulesToUser = async (ctx: ContextMessageUpdate) => {
+    await ctx.replyWithSticker(MoreFacesStickers.ohMyGod);
+
+    const msg = 'Ой блять, шо ж я вмію: я простенький бот, який тупо счітає бали в нашій грі.\n'
+      + 'В нас є адмен Вадем, який то всьо контролює.\n\n'
+      + 'Шоб приєднатись до гри, просто напиши "/reg" і всьо.\n\n'
+      + 'Шоб подивитись весь счьот - юзається команда "/score".\n\n'
+      + 'Ну і для того щоб зловити покемона, просто напиши "/capture @user1 @user2"'
+      + '(замість capture можна просто написати англіську c)\n\n'
+      + 'Ше в мене є така мінорна хня, як пінгування мене - просто напиши "/ping"';
+
+    return ctx.reply(msg);
   };
 }

@@ -100,4 +100,8 @@ export class ActionsHandler {
 
     return ctx.answerCbQuery('Всьо гуд, обробив заявочку.');
   };
+
+  public getHelp = (ctx: ContextMessageUpdate) => {
+    return this.telegrafResponse.explainRulesToUser(ctx);
+  };
 }
