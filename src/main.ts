@@ -16,8 +16,9 @@ const main = () => {
   const bot: Telegraf<ContextMessageUpdate> = new Telegraf(CONFIG.botToken);
   const handler = new ActionsHandler(usersDb, responseService);
 
-  bot.use(handler.middleware.verifyChatType);
+  // bot.use(handler.middleware.verifyChatType);
 
+  // commands for everyone
   bot.command('ping', handler.pong);
   bot.command('reg', handler.register);
   bot.command('score', handler.getScore);
@@ -27,6 +28,9 @@ const main = () => {
 
   bot.command('capture', handler.capture);
   bot.command('c', handler.capture);
+
+  // admin commands
+  bot.command('announce', handler.announce);
 
   bot.on('callback_query', handler.handleAdminAnswer(bot));
 

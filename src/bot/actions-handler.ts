@@ -104,4 +104,15 @@ export class ActionsHandler {
   public getHelp = (ctx: ContextMessageUpdate) => {
     return this.telegrafResponse.explainRulesToUser(ctx);
   };
+
+  public announce = async (ctx: ContextMessageUpdate) => {
+    if (ctx.message.from.id !== 288950149) {
+      return 'Маладєц, найшов сікрєтну команду. Но ти не можеш її юзати';
+    }
+
+    const chatIDs = await this.usersDb.getAllActiveChatsIDs();
+    await chatIDs.forEach((id: number) => ctx.telegram.sendMessage(id, ctx.message.text));
+
+    return ctx.reply(`Розіслано в наступні чати: ${chatIDs}`);
+  };
 }

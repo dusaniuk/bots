@@ -9,4 +9,6 @@ export interface UsersDatabase {
 
   addCaptureRecord(record: CaptureRecord): Promise<string>;
   getCaptureRecord(recordId: string): Promise<CaptureRecord>;
+
+  getAllActiveChatsIDs(): Promise<number[]>;
 }
