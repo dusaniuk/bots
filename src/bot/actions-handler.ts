@@ -111,7 +111,11 @@ export class ActionsHandler {
     }
 
     const chatIDs = await this.usersDb.getAllActiveChatsIDs();
-    await chatIDs.forEach((id: number) => ctx.telegram.sendMessage(id, ctx.message.text));
+
+    const botCommand = ctx.message.entities.find(entity => entity.type === 'bot_command');
+    const message = ctx.message.text.substring(botCommand.length);
+
+    await chatIDs.forEach((id: number) => ctx.telegram.sendMessage(id, message));
 
     return ctx.reply(`Розіслано в наступні чати: ${chatIDs}`);
   };
