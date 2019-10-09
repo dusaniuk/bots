@@ -18,6 +18,7 @@ const main = () => {
 
   bot.use(handler.middleware.verifyChatType);
 
+  bot.command('ping', handler.pong);
   bot.command('reg', handler.register);
   bot.command('capture', handler.capture);
   bot.command('c', handler.capture);

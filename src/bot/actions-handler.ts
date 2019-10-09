@@ -14,6 +14,10 @@ export class ActionsHandler {
     this.middleware = new Middleware(telegrafResponse);
   }
 
+  public pong = (ctx: ContextMessageUpdate) => {
+    return ctx.reply('pong');
+  };
+
   public register = async (ctx: ContextMessageUpdate): Promise<any> => {
     const isUserInChat = await this.usersDb.isUserInChat(ctx.from.id, ctx.chat.id);
     if (isUserInChat) {
