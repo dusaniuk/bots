@@ -1,14 +1,15 @@
-import { Hunter, User, CaptureRecord } from '../models';
+import { Hunter, CaptureRecord } from '../models';
 
 export interface UsersDatabase {
-  isUserInChat(userId: number, chatId: number): Promise<boolean>;
-  addUserInChat(hunter: Hunter): Promise<void>;
-  getAllUsersFromChat(chatId: number): Promise<Hunter[]>;
-  getUserFromChat(userId: number, chatId: number): Promise<{ id: string; user: Hunter }>;
-  updateUserPoints(id: string, score: number): Promise<void>;
+  addUserInChat(chatId: number, hunter: Hunter): Promise<void>;
+  isUserInChat(chatId: number, userId: number): Promise<boolean>;
 
-  addCaptureRecord(record: CaptureRecord): Promise<string>;
-  getCaptureRecord(recordId: string): Promise<CaptureRecord>;
+  getAllUsersFromChat(chatId: number): Promise<Hunter[]>;
+  getUserFromChat(userId: number, chatId: number): Promise<Hunter>;
+  updateUserPoints(chatId: number, id: number, score: number): Promise<void>;
+
+  addCaptureRecord(chatId: number, record: CaptureRecord): Promise<string>;
+  getCaptureRecord(chatId: number, recordId: string): Promise<CaptureRecord>;
 
   getAllActiveChatsIDs(): Promise<number[]>;
 }

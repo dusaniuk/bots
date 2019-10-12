@@ -19,13 +19,13 @@ export class ActionsHandler {
   };
 
   public register = async (ctx: ContextMessageUpdate): Promise<any> => {
-    const isUserInChat = await this.usersDb.isUserInChat(ctx.from.id, ctx.chat.id);
+    const isUserInChat = await this.usersDb.isUserInChat(ctx.chat.id, ctx.from.id);
     if (isUserInChat) {
       return this.telegrafResponse.userAlreadyInGame(ctx);
     }
 
     const hunter: Hunter = utils.createHunter(ctx);
-    await this.usersDb.addUserInChat(hunter);
+    await this.usersDb.addUserInChat(ctx.chat.id, hunter);
 
     return this.telegrafResponse.greetNewUser(ctx, hunter);
   };
@@ -43,10 +43,11 @@ export class ActionsHandler {
       return this.telegrafResponse.noUsersToCapture(ctx);
     }
 
-    const captureId = await this.usersDb.addCaptureRecord({
+    const captureId = await this.usersDb.addCaptureRecord(ctx.chat.id, {
+      approved: false,
       hunterId: ctx.from.id,
-      chatId: ctx.chat.id,
-      victims: mentionedUsers,
+      timestamp: new Date().getTime(),
+      victims: mentionedUsers.map(user => user.id),
     });
 
     const hunter = chatUsers.find(({ id }) => id === ctx.from.id);
@@ -56,7 +57,10 @@ export class ActionsHandler {
     await ctx.telegram.sendMessage(
       adminId,
       `${msg}. Ти апруваєш?`,
-      Markup.inlineKeyboard([Markup.callbackButton('Да', `approve ${captureId}`), Markup.callbackButton('Нєєє', `reject ${captureId}`)])
+      Markup.inlineKeyboard([
+        Markup.callbackButton('Да', `approve ${captureId} ${ctx.chat.id}`),
+        Markup.callbackButton('Нєєє', `reject ${captureId} ${ctx.chat.id}`),
+      ])
         .oneTime(true)
         .resize()
         .extra(),
@@ -74,11 +78,12 @@ export class ActionsHandler {
 
   public handleAdminAnswer = (bot: Telegraf<ContextMessageUpdate>) => async (ctx: ContextMessageUpdate): Promise<any> => {
     const { message, data } = ctx.update.callback_query;
-    const [command, captureId] = data.split(' ');
+    const [command, captureId, chatId] = data.split(' ');
 
     // get record by capture id
-    const record = await this.usersDb.getCaptureRecord(captureId);
-    const { id, user } = await this.usersDb.getUserFromChat(record.hunterId, record.chatId);
+    const record = await this.usersDb.getCaptureRecord(+chatId, captureId);
+    const user = await this.usersDb.getUserFromChat(record.hunterId, +chatId);
+
     const userGreetingName = utils.getGreetingNameForUser(user);
 
     let userResponse;
@@ -88,12 +93,12 @@ export class ActionsHandler {
 
       userResponse = `${userGreetingName} харооош. Ти заробив(ла) цілу кучу балів: ${points}.`;
 
-      await this.usersDb.updateUserPoints(id, newPoints);
+      await this.usersDb.updateUserPoints(+chatId, record.hunterId, newPoints);
     } else {
       userResponse = `${userGreetingName} ти шо, хотів(ла) наїбати всіх тут? Відхилено!`;
     }
 
-    await ctx.telegram.sendMessage(record.chatId, userResponse);
+    await ctx.telegram.sendMessage(chatId, userResponse);
 
     // delete message from admin's chat
     await bot.telegram.deleteMessage(message.chat.id, message.message_id);

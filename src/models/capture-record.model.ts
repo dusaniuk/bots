@@ -1,7 +1,6 @@
-import { User } from './user.model';
-
 export interface CaptureRecord {
+  approved?: boolean;
   hunterId: number;
-  chatId: number;
-  victims: User[];
+  timestamp: number;
+  victims: number[];
 }

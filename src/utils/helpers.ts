@@ -7,7 +7,6 @@ import {
 export const createHunter = ({ from, chat }: Context): Hunter => {
   const hunter: Hunter = {
     id: from.id,
-    chatId: chat.id,
     firstName: from.first_name,
   };
 

@@ -7,9 +7,7 @@ import { CaptureRecord, Hunter } from '../models';
 export class UsersService implements UsersDatabase {
   private db: firestore.Firestore;
 
-  private huntersRef: firestore.CollectionReference;
-
-  private pendingCapturesRef: firestore.CollectionReference;
+  private readonly chatRef: firestore.CollectionReference;
 
   constructor() {
     const app = initializeApp({
@@ -23,90 +21,95 @@ export class UsersService implements UsersDatabase {
 
     this.db = app.firestore();
 
-    this.huntersRef = this.db.collection('hunters');
-    this.pendingCapturesRef = this.db.collection('pending');
+    this.chatRef = this.db.collection('chat');
   }
 
-  addUserInChat = async (hunter: Hunter): Promise<void> => {
-    await this.huntersRef.add(hunter);
+  addUserInChat = async (chatId: number, hunter: Hunter): Promise<void> => {
+    const user = { ...hunter };
+    delete user.id;
+
+    await this.getUserRef(chatId, hunter.id).create(user);
   };
 
-  isUserInChat = async (userId: number, chatId: number): Promise<boolean> => {
-    const userFromChat = this.huntersRef.where('id', '==', userId).where('chatId', '==', chatId);
+  isUserInChat = async (chatId: number, userId: number): Promise<boolean> => {
+    const query = await this.getUserRef(chatId, userId).get();
 
-    const querySnapshot: firestore.QuerySnapshot = await userFromChat.get();
-
-    return querySnapshot.size > 0;
+    return query.exists;
   };
 
   getAllUsersFromChat = async (chatId: number): Promise<Hunter[]> => {
-    const usersFromChat = this.huntersRef.where('chatId', '==', chatId);
-
-    const querySnapshot: firestore.QuerySnapshot = await usersFromChat.get();
+    const usersRef = this.getUsersListRef(chatId);
+    const query = await usersRef.get();
 
     const users: Hunter[] = [];
-
-    querySnapshot.forEach((result) => {
-      users.push(result.data() as Hunter);
+    query.forEach((result: firestore.QueryDocumentSnapshot) => {
+      users.push({
+        ...(result.data() as Hunter),
+        id: +result.id,
+      });
     });
 
     return users;
   };
 
   getAllActiveChatsIDs = async (): Promise<number[]> => {
-    const users = this.huntersRef;
+    const query = await this.chatRef.get();
 
-    const querySnapshot: firestore.QuerySnapshot = await users.get();
-
-    const ids: number[] = [];
-
-    querySnapshot.forEach((result) => {
-      const hunter = result.data() as Hunter;
-      ids.push(hunter.chatId);
+    const chatKeys: number[] = [];
+    query.forEach(({ id }: firestore.QueryDocumentSnapshot) => {
+      if (+id < 0) {
+        chatKeys.push(+id);
+      }
     });
 
-    const chatIDs = ids.filter((id: number) => id < 0);
-
-    return [...new Set(chatIDs)];
+    // filter out private chats
+    return chatKeys;
   };
 
-  getUserFromChat = async (userId: number, chatId: number): Promise<{ id: string; user: Hunter }> => {
-    const userFromChat = this.huntersRef.where('id', '==', userId).where('chatId', '==', chatId);
-    const querySnapshot: firestore.QuerySnapshot = await userFromChat.get();
+  getUserFromChat = async (userId: number, chatId: number): Promise<Hunter> => {
+    const query = await this.getUserRef(chatId, userId).get();
 
-    if (querySnapshot.size !== 1) {
-      throw new Error('Found a few users with same Id');
-    }
-
-    let userMap: { id: string; user: Hunter } = null;
-
-    querySnapshot.forEach((record) => {
-      userMap = {
-        id: record.id,
-        user: record.data() as Hunter,
-      };
-    });
-
-    return userMap;
+    return {
+      ...(query.data() as Hunter),
+      id: +query.id,
+    };
   };
 
-  addCaptureRecord = async (record: CaptureRecord): Promise<string> => {
-    const result = await this.pendingCapturesRef.add(record);
+  addCaptureRecord = async (chatId: number, record: CaptureRecord): Promise<string> => {
+    const capturesRef = this.getCapturesListRef(chatId);
+    const result = await capturesRef.add(record);
 
     return result.id;
   };
 
-  getCaptureRecord = async (recordId: string): Promise<CaptureRecord> => {
-    const querySnapshot = await this.pendingCapturesRef.doc(recordId).get();
+  getCaptureRecord = async (chatId: number, recordId: string): Promise<CaptureRecord> => {
+    const query = await this.getCaptureRef(chatId, recordId).get();
 
-    return querySnapshot.data() as CaptureRecord;
+    return query.data() as CaptureRecord;
   };
 
-  updateUserPoints = async (id: string, score: number): Promise<void> => {
+  updateUserPoints = async (chatId: number, userId: number, score: number): Promise<void> => {
     const batch = this.db.batch();
 
-    batch.update(this.huntersRef.doc(id), { score });
+    const userRef = this.getUserRef(chatId, userId);
+    batch.update(userRef, { score });
 
     await batch.commit();
+  };
+
+  private getUsersListRef = (chatId: number): firestore.CollectionReference => {
+    return this.chatRef.doc(chatId.toString()).collection('users');
+  };
+
+  private getUserRef = (chatId: number, userId: number): FirebaseFirestore.DocumentReference => {
+    return this.getUsersListRef(chatId).doc(userId.toString());
+  };
+
+  private getCapturesListRef = (chatId: number): firestore.CollectionReference => {
+    return this.chatRef.doc(chatId.toString()).collection('captures');
+  };
+
+  private getCaptureRef = (chatId: number, captureId: string): FirebaseFirestore.DocumentReference => {
+    return this.getCapturesListRef(chatId).doc(captureId.toString());
   };
 }

@@ -10,7 +10,7 @@ import {
   CaptureRecord, Mention, Hunter, User,
 } from '../models';
 
-describe('utils', () => {
+describe('heplers', () => {
   describe('createHunter', () => {
     it('should create hunter', () => {
       const context: Context = {
@@ -20,16 +20,12 @@ describe('utils', () => {
           last_name: faker.name.lastName(),
           username: faker.internet.userName(),
         },
-        chat: {
-          id: faker.random.number(),
-        },
       } as Context;
 
       const hunter: Hunter = helpers.createHunter(context);
 
       expect(hunter).to.eql({
         id: context.from.id,
-        chatId: context.chat.id,
         firstName: context.from.first_name,
         lastName: context.from.last_name,
         username: `@${context.from.username}`,
