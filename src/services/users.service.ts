@@ -41,29 +41,16 @@ export class UsersService implements UsersDatabase {
     const usersRef = this.getUsersListRef(chatId);
     const query = await usersRef.get();
 
-    const users: Hunter[] = [];
-    query.forEach((result: firestore.QueryDocumentSnapshot) => {
-      users.push({
-        ...(result.data() as Hunter),
-        id: +result.id,
-      });
-    });
-
-    return users;
+    return query.docs.map((doc: firestore.QueryDocumentSnapshot) => ({
+      ...(doc.data() as Hunter),
+      id: +doc.id,
+    }));
   };
 
   getAllActiveChatsIDs = async (): Promise<number[]> => {
-    const query = await this.chatRef.get();
+    const query = await this.db.collection('chat').get();
 
-    const chatKeys: number[] = [];
-    query.forEach(({ id }: firestore.QueryDocumentSnapshot) => {
-      if (+id < 0) {
-        chatKeys.push(+id);
-      }
-    });
-
-    // filter out private chats
-    return chatKeys;
+    return query.docs.map(({ id }: firestore.QueryDocumentSnapshot) => +id).filter(id => id < 0);
   };
 
   getUserFromChat = async (userId: number, chatId: number): Promise<Hunter> => {
