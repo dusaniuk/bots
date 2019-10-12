@@ -10,6 +10,7 @@ export interface UsersDatabase {
 
   addCaptureRecord(chatId: number, record: CaptureRecord): Promise<string>;
   getCaptureRecord(chatId: number, recordId: string): Promise<CaptureRecord>;
+  approveCaptureRecord(chatId: number, recordId: string): Promise<void>;
 
   getAllActiveChatsIDs(): Promise<number[]>;
 }

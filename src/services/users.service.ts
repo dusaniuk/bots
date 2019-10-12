@@ -84,6 +84,15 @@ export class UsersService implements UsersDatabase {
     await batch.commit();
   };
 
+  approveCaptureRecord = async (chatId: number, recordId: string): Promise<void> => {
+    const batch = this.db.batch();
+
+    const captureRef = this.getCaptureRef(chatId, recordId);
+    batch.update(captureRef, { approved: true });
+
+    await batch.commit();
+  };
+
   private getUsersListRef = (chatId: number): firestore.CollectionReference => {
     return this.chatRef.doc(chatId.toString()).collection('users');
   };

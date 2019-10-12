@@ -93,6 +93,7 @@ export class ActionsHandler {
 
       userResponse = `${userGreetingName} харооош. Ти заробив(ла) цілу кучу балів: ${points}.`;
 
+      await this.usersDb.approveCaptureRecord(+chatId, captureId);
       await this.usersDb.updateUserPoints(+chatId, record.hunterId, newPoints);
     } else {
       userResponse = `${userGreetingName} ти шо, хотів(ла) наїбати всіх тут? Відхилено!`;
