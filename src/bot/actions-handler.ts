@@ -3,9 +3,13 @@ import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
 import { UsersDatabase } from '../interfaces/users.database';
 import { TelegrafResponseService } from '../services/telegraf-response.service';
 
-import { Hunter, Mention } from '../models';
+import { CaptureRecord, Hunter, Mention } from '../models';
 import * as utils from '../utils/helpers';
 import { Middleware } from './middleware';
+
+const enum CallbackQueryType {
+  capture = 'capture',
+}
 
 export class ActionsHandler {
   public middleware: Middleware;
@@ -14,11 +18,11 @@ export class ActionsHandler {
     this.middleware = new Middleware(telegrafResponse);
   }
 
-  public pong = (ctx: ContextMessageUpdate) => {
+  pong = (ctx: ContextMessageUpdate) => {
     return ctx.reply('pong');
   };
 
-  public register = async (ctx: ContextMessageUpdate): Promise<any> => {
+  register = async (ctx: ContextMessageUpdate): Promise<any> => {
     const isUserInChat = await this.usersDb.isUserInChat(ctx.chat.id, ctx.from.id);
     if (isUserInChat) {
       return this.telegrafResponse.userAlreadyInGame(ctx);
@@ -30,7 +34,7 @@ export class ActionsHandler {
     return this.telegrafResponse.greetNewUser(ctx, hunter);
   };
 
-  public capture = async (ctx: ContextMessageUpdate): Promise<any> => {
+  capture = async (ctx: ContextMessageUpdate): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);
     if (mentions.length === 0) {
       return this.telegrafResponse.showCaptureInstructions(ctx);
@@ -48,6 +52,7 @@ export class ActionsHandler {
       hunterId: ctx.from.id,
       timestamp: new Date().getTime(),
       victims: mentionedUsers.map(user => user.id),
+      points: mentionedUsers.length * 4, // TODO: change this logic in future
     });
 
     const hunter = chatUsers.find(({ id }) => id === ctx.from.id);
@@ -58,8 +63,8 @@ export class ActionsHandler {
       adminId,
       `${msg}. Ти апруваєш?`,
       Markup.inlineKeyboard([
-        Markup.callbackButton('Да', `approve ${captureId} ${ctx.chat.id}`),
-        Markup.callbackButton('Нєєє', `reject ${captureId} ${ctx.chat.id}`),
+        Markup.callbackButton('Да', `${CallbackQueryType.capture} approve ${captureId} ${ctx.chat.id}`),
+        Markup.callbackButton('Нєєє', `${CallbackQueryType.capture} reject ${captureId} ${ctx.chat.id}`),
       ])
         .oneTime(true)
         .resize()
@@ -69,49 +74,29 @@ export class ActionsHandler {
     return ctx.reply(msg, { disable_notification: true });
   };
 
-  public getScore = async (ctx: ContextMessageUpdate): Promise<any> => {
+  getScore = async (ctx: ContextMessageUpdate): Promise<any> => {
     const hunters = await this.usersDb.getAllUsersFromChat(ctx.chat.id);
     hunters.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
 
     return this.telegrafResponse.getHuntersScore(ctx, hunters);
   };
 
-  public handleAdminAnswer = (bot: Telegraf<ContextMessageUpdate>) => async (ctx: ContextMessageUpdate): Promise<any> => {
-    const { message, data } = ctx.update.callback_query;
-    const [command, captureId, chatId] = data.split(' ');
+  handleAdminAnswer = (bot: Telegraf<ContextMessageUpdate>) => async (ctx: ContextMessageUpdate): Promise<any> => {
+    const answerType: string = ctx.update.callback_query.data.split(' ')[0];
 
-    // get record by capture id
-    const record = await this.usersDb.getCaptureRecord(+chatId, captureId);
-    const user = await this.usersDb.getUserFromChat(record.hunterId, +chatId);
-
-    const userGreetingName = utils.getGreetingNameForUser(user);
-
-    let userResponse;
-    if (command === 'approve') {
-      const points = utils.calculateEarnedPoints(record);
-      const newPoints = (user.score || 0) + points;
-
-      userResponse = `${userGreetingName} харооош. Ти заробив(ла) цілу кучу балів: ${points}.`;
-
-      await this.usersDb.approveCaptureRecord(+chatId, captureId);
-      await this.usersDb.updateUserPoints(+chatId, record.hunterId, newPoints);
-    } else {
-      userResponse = `${userGreetingName} ти шо, хотів(ла) наїбати всіх тут? Відхилено!`;
+    switch (answerType) {
+      case CallbackQueryType.capture:
+        return this.handleHunterCapture(bot, ctx);
+      default:
+        throw new Error('unsupported callback query');
     }
-
-    await ctx.telegram.sendMessage(chatId, userResponse);
-
-    // delete message from admin's chat
-    await bot.telegram.deleteMessage(message.chat.id, message.message_id);
-
-    return ctx.answerCbQuery('Всьо гуд, обробив заявочку.');
   };
 
-  public getHelp = (ctx: ContextMessageUpdate) => {
+  getHelp = (ctx: ContextMessageUpdate): Promise<any> => {
     return this.telegrafResponse.explainRulesToUser(ctx);
   };
 
-  public announce = async (ctx: ContextMessageUpdate) => {
+  announce = async (ctx: ContextMessageUpdate): Promise<any> => {
     if (ctx.message.from.id !== 288950149) {
       return 'Маладєц, найшов сікрєтну команду. Но ти не можеш її юзати';
     }
@@ -124,5 +109,36 @@ export class ActionsHandler {
     await chatIDs.forEach((id: number) => ctx.telegram.sendMessage(id, message));
 
     return ctx.reply(`Розіслано в наступні чати: ${chatIDs}`);
+  };
+
+  private handleHunterCapture = async (bot: Telegraf<ContextMessageUpdate>, ctx: ContextMessageUpdate): Promise<any> => {
+    const { message, data } = ctx.update.callback_query;
+    const [, command, captureId, chatId] = data.split(' ');
+
+    // delete message from admin's chat
+    await bot.telegram.deleteMessage(message.chat.id, message.message_id);
+
+    // get record by capture id
+    const record: CaptureRecord = await this.usersDb.getCaptureRecord(+chatId, captureId);
+    const user = await this.usersDb.getUserFromChat(record.hunterId, +chatId);
+
+    const userGreetingName = utils.getGreetingNameForUser(user);
+
+    let userResponse;
+    if (command === 'approve') {
+      await this.usersDb.approveCaptureRecord(+chatId, captureId);
+
+      // TODO: remove this 2 lines after I'll migrate to gathering score from capture records
+      const newPoints = (user.score || 0) + record.points;
+      await this.usersDb.updateUserPoints(+chatId, record.hunterId, newPoints);
+
+      userResponse = `${userGreetingName} харооош. Ти заробив(ла) цілу кучу балів: ${record.points}.`;
+    } else {
+      userResponse = `${userGreetingName} ти шо, хотів(ла) наїбати всіх тут? Відхилено!`;
+    }
+
+    await ctx.telegram.sendMessage(chatId, userResponse);
+
+    return ctx.answerCbQuery('Всьо гуд, обробив заявочку.');
   };
 }

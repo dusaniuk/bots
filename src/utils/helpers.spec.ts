@@ -189,30 +189,4 @@ describe('heplers', () => {
       expect(mentionedUsers[0]).to.eql({ username });
     });
   });
-
-  describe('calculateEarnedPoints', () => {
-    it('should return 4 just for one victim', () => {
-      const record: CaptureRecord = { victims: [{}] } as CaptureRecord;
-
-      const points = helpers.calculateEarnedPoints(record);
-
-      expect(points).to.eq(4);
-    });
-
-    it('should return 12 for 3 victims', () => {
-      const record: CaptureRecord = { victims: [{}, {}, {}] } as CaptureRecord;
-
-      const points = helpers.calculateEarnedPoints(record);
-
-      expect(points).to.eq(12);
-    });
-
-    it('should return 0 if no victims are in the array', () => {
-      const record: CaptureRecord = { victims: [] } as CaptureRecord;
-
-      const points = helpers.calculateEarnedPoints(record);
-
-      expect(points).to.eq(0);
-    });
-  });
 });

@@ -3,4 +3,5 @@ export interface CaptureRecord {
   hunterId: number;
   timestamp: number;
   victims: number[];
+  points?: number;
 }

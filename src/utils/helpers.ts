@@ -70,8 +70,3 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
 
   return mentionedUsers;
 };
-
-// TODO: do the dynamic points - depends on the frequency of captures
-export const calculateEarnedPoints = (record: CaptureRecord): number => {
-  return record.victims.length * 4;
-};
