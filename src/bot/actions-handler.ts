@@ -1,6 +1,6 @@
 import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
 
-import { UsersDatabase } from '../interfaces/users.database';
+import { Database } from '../interfaces/database';
 import { TelegrafResponseService } from '../services/telegraf-response.service';
 
 import { CaptureRecord, Hunter, Mention } from '../models';
@@ -14,7 +14,7 @@ const enum CallbackQueryType {
 export class ActionsHandler {
   public middleware: Middleware;
 
-  constructor(private usersDb: UsersDatabase, private telegrafResponse: TelegrafResponseService) {
+  constructor(private db: Database, private telegrafResponse: TelegrafResponseService) {
     this.middleware = new Middleware(telegrafResponse);
   }
 
@@ -23,13 +23,13 @@ export class ActionsHandler {
   };
 
   register = async (ctx: ContextMessageUpdate): Promise<any> => {
-    const isUserInChat = await this.usersDb.isUserInChat(ctx.chat.id, ctx.from.id);
+    const isUserInChat = await this.db.isUserInChat(ctx.chat.id, ctx.from.id);
     if (isUserInChat) {
       return this.telegrafResponse.userAlreadyInGame(ctx);
     }
 
     const hunter: Hunter = utils.createHunter(ctx);
-    await this.usersDb.addUserInChat(ctx.chat.id, hunter);
+    await this.db.addUserInChat(ctx.chat.id, hunter);
 
     return this.telegrafResponse.greetNewUser(ctx, hunter);
   };
@@ -40,14 +40,14 @@ export class ActionsHandler {
       return this.telegrafResponse.showCaptureInstructions(ctx);
     }
 
-    const chatUsers: Hunter[] = await this.usersDb.getAllUsersFromChat(ctx.chat.id);
+    const chatUsers: Hunter[] = await this.db.getAllUsersFromChat(ctx.chat.id);
     const mentionedUsers = utils.getMentionedUsers(mentions, chatUsers);
 
     if (mentionedUsers.length === 0) {
       return this.telegrafResponse.noUsersToCapture(ctx);
     }
 
-    const captureId = await this.usersDb.addCaptureRecord(ctx.chat.id, {
+    const captureId = await this.db.addCaptureRecord(ctx.chat.id, {
       approved: false,
       hunterId: ctx.from.id,
       timestamp: new Date().getTime(),
@@ -75,7 +75,7 @@ export class ActionsHandler {
   };
 
   getScore = async (ctx: ContextMessageUpdate): Promise<any> => {
-    const hunters = await this.usersDb.getAllUsersFromChat(ctx.chat.id);
+    const hunters = await this.db.getAllUsersFromChat(ctx.chat.id);
     hunters.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
 
     return this.telegrafResponse.getHuntersScore(ctx, hunters);
@@ -101,7 +101,7 @@ export class ActionsHandler {
       return 'Маладєц, найшов сікрєтну команду. Но ти не можеш її юзати';
     }
 
-    const chatIDs = await this.usersDb.getAllActiveChatsIDs();
+    const chatIDs = await this.db.getAllActiveChatsIDs();
 
     const botCommand = ctx.message.entities.find(entity => entity.type === 'bot_command');
     const message = ctx.message.text.substring(botCommand.length);
@@ -119,18 +119,18 @@ export class ActionsHandler {
     await bot.telegram.deleteMessage(message.chat.id, message.message_id);
 
     // get record by capture id
-    const record: CaptureRecord = await this.usersDb.getCaptureRecord(+chatId, captureId);
-    const user = await this.usersDb.getUserFromChat(record.hunterId, +chatId);
+    const record: CaptureRecord = await this.db.getCaptureRecord(+chatId, captureId);
+    const user = await this.db.getUserFromChat(record.hunterId, +chatId);
 
     const userGreetingName = utils.getGreetingNameForUser(user);
 
     let userResponse;
     if (command === 'approve') {
-      await this.usersDb.approveCaptureRecord(+chatId, captureId);
+      await this.db.approveCaptureRecord(+chatId, captureId);
 
       // TODO: remove this 2 lines after I'll migrate to gathering score from capture records
       const newPoints = (user.score || 0) + record.points;
-      await this.usersDb.updateUserPoints(+chatId, record.hunterId, newPoints);
+      await this.db.updateUserPoints(+chatId, record.hunterId, newPoints);
 
       userResponse = `${userGreetingName} харооош. Ти заробив(ла) цілу кучу балів: ${record.points}.`;
     } else {

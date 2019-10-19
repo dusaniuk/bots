@@ -1,16 +1,16 @@
 /* eslint-disable no-console */
 import Telegraf, { ContextMessageUpdate } from 'telegraf';
 
-import { UsersDatabase } from './interfaces/users.database';
-import { UsersService } from './services/users.service';
+import { Database } from './interfaces/database';
 import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { Server } from './utils/server';
 import { ActionsHandler } from './bot/actions-handler';
 import { CONFIG } from './config';
+import { FirestoreDatabase } from './database';
 
 const main = () => {
-  const usersDb: UsersDatabase = new UsersService();
+  const usersDb: Database = new FirestoreDatabase();
   const responseService: TelegrafResponseService = new TelegrafResponseService();
 
   const bot: Telegraf<ContextMessageUpdate> = new Telegraf(CONFIG.botToken);
