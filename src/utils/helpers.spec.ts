@@ -1,14 +1,9 @@
-/* eslint-disable no-unused-expressions */
-import { expect } from 'chai';
 import { Context } from 'telegraf';
 import * as faker from 'faker';
 
 import { IncomingMessage } from 'telegraf/typings/telegram-types';
-
 import * as helpers from './helpers';
-import {
-  CaptureRecord, Mention, Hunter, User,
-} from '../models';
+import { Hunter, Mention, User } from '../models';
 
 describe('heplers', () => {
   describe('createHunter', () => {
@@ -24,7 +19,7 @@ describe('heplers', () => {
 
       const hunter: Hunter = helpers.createHunter(context);
 
-      expect(hunter).to.eql({
+      expect(hunter).toEqual({
         id: context.from.id,
         firstName: context.from.first_name,
         lastName: context.from.last_name,
@@ -37,7 +32,7 @@ describe('heplers', () => {
 
       const hunter: Hunter = helpers.createHunter(context);
 
-      expect(hunter.username).to.be.undefined;
+      expect(hunter.username).toBeUndefined();
     });
 
     it('should create hunter without last name', () => {
@@ -45,7 +40,7 @@ describe('heplers', () => {
 
       const hunter: Hunter = helpers.createHunter(context);
 
-      expect(hunter.lastName).to.be.undefined;
+      expect(hunter.lastName).toBeUndefined();
     });
   });
 
@@ -58,7 +53,7 @@ describe('heplers', () => {
 
       const name = helpers.getGreetingNameForUser(hunter);
 
-      expect(name).to.eq(hunter.username);
+      expect(name).toEqual(hunter.username);
     });
 
     it("should return user's first name if username is not set", () => {
@@ -68,7 +63,7 @@ describe('heplers', () => {
 
       const name = helpers.getGreetingNameForUser(hunter);
 
-      expect(name).to.eq(hunter.firstName);
+      expect(name).toEqual(hunter.firstName);
     });
 
     it("should return user's first and last names if last name is provided", () => {
@@ -79,7 +74,7 @@ describe('heplers', () => {
 
       const name = helpers.getGreetingNameForUser(hunter);
 
-      expect(name).to.eq(`${hunter.firstName} ${hunter.lastName}`);
+      expect(name).toEqual(`${hunter.firstName} ${hunter.lastName}`);
     });
   });
 
@@ -92,7 +87,7 @@ describe('heplers', () => {
 
       const mentionedUsers: Mention[] = helpers.getMentions(message);
 
-      expect(mentionedUsers).to.eql([]);
+      expect(mentionedUsers).toEqual([]);
     });
 
     it("should return an empty array if there's no mentions in messages entity", () => {
@@ -103,7 +98,7 @@ describe('heplers', () => {
 
       const mentionedUsers: Mention[] = helpers.getMentions(message);
 
-      expect(mentionedUsers).to.eql([]);
+      expect(mentionedUsers).toEqual([]);
     });
 
     it('should return one entity with username provided', () => {
@@ -116,8 +111,8 @@ describe('heplers', () => {
 
       const mentionedUsers: Mention[] = helpers.getMentions(message);
 
-      expect(mentionedUsers).to.have.lengthOf(1);
-      expect(mentionedUsers[0].username).to.eq(username);
+      expect(mentionedUsers).toHaveLength(1);
+      expect(mentionedUsers[0].username).toEqual(username);
     });
 
     it('should return one entity with id provided', () => {
@@ -130,8 +125,8 @@ describe('heplers', () => {
 
       const mentionedUsers: Mention[] = helpers.getMentions(message);
 
-      expect(mentionedUsers).to.have.lengthOf(1);
-      expect(mentionedUsers[0].id).to.eq(id);
+      expect(mentionedUsers).toHaveLength(1);
+      expect(mentionedUsers[0].id).toEqual(id);
     });
 
     it('should throw an error if sometime telegram would add new type of mention', () => {
@@ -139,7 +134,7 @@ describe('heplers', () => {
         entities: [{ type: 'just_fake_mention' }],
       } as IncomingMessage;
 
-      expect(() => helpers.getMentions(message)).to.throw;
+      expect(() => helpers.getMentions(message)).toThrowError();
     });
   });
 
@@ -152,8 +147,8 @@ describe('heplers', () => {
 
       const mentionedUsers = helpers.getMentionedUsers(mentions, users);
 
-      expect(mentionedUsers).to.have.lengthOf(1);
-      expect(mentionedUsers[0]).to.eq(users[0]);
+      expect(mentionedUsers).toHaveLength(1);
+      expect(mentionedUsers[0]).toEqual(users[0]);
     });
 
     it("shouldn't return mentioned by id if it isn't in db", () => {
@@ -162,7 +157,7 @@ describe('heplers', () => {
 
       const mentionedUsers = helpers.getMentionedUsers(mentions, users);
 
-      expect(mentionedUsers).to.have.lengthOf(0);
+      expect(mentionedUsers).toHaveLength(0);
     });
 
     it("should return mentioned username id if it's in db", () => {
@@ -173,8 +168,8 @@ describe('heplers', () => {
 
       const mentionedUsers = helpers.getMentionedUsers(mentions, users);
 
-      expect(mentionedUsers).to.have.lengthOf(1);
-      expect(mentionedUsers[0]).to.eq(users[0]);
+      expect(mentionedUsers).toHaveLength(1);
+      expect(mentionedUsers[0]).toEqual(users[0]);
     });
 
     it("should return mentioned username id if it isn't in db", () => {
@@ -185,8 +180,8 @@ describe('heplers', () => {
 
       const mentionedUsers = helpers.getMentionedUsers(mentions, users);
 
-      expect(mentionedUsers).to.have.lengthOf(1);
-      expect(mentionedUsers[0]).to.eql({ username });
+      expect(mentionedUsers).toHaveLength(1);
+      expect(mentionedUsers[0]).toEqual({ username });
     });
   });
 });

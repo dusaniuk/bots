@@ -1,7 +1,6 @@
 {
   "extends": [
-    "airbnb-base",
-    "plugin:mocha/recommended"
+    "airbnb-base"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -10,12 +9,10 @@
   },
   "env": {
     "node": true,
-    "mocha": true
+    "jest": true
   },
   "plugins": [
-    "promise",
-    "chai-expect",
-    "mocha"
+    "promise"
   ],
   "settings": {
     "import/resolver": {
@@ -38,7 +35,6 @@
     "promise/no-promise-in-callback": "error",
     "promise/no-callback-in-promise": "error",
     "promise/no-return-in-finally": "error",
-    "mocha/no-mocha-arrows": "off",
     "prefer-arrow-callback": "error",
     "arrow-body-style": "off",
     "no-unused-vars": "off",
