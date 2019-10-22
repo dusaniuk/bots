@@ -3,7 +3,9 @@ import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
 import { Database } from '../interfaces/database';
 import { TelegrafResponseService } from '../services/telegraf-response.service';
 
-import { CaptureRecord, Hunter, Mention } from '../models';
+import {
+  CaptureRecord, Hunter, Mention, User,
+} from '../models';
 import * as utils from '../utils/helpers';
 import { Middleware } from './middleware';
 
@@ -43,7 +45,33 @@ export class ActionsHandler {
     const chatUsers: Hunter[] = await this.db.getAllUsersFromChat(ctx.chat.id);
     const mentionedUsers = utils.getMentionedUsers(mentions, chatUsers);
 
-    if (mentionedUsers.length === 0) {
+    const isMentionedHimself: boolean = mentionedUsers.some(u => u.id === ctx.from.id);
+    if (isMentionedHimself) {
+      return this.telegrafResponse.rejectSelfCapture(ctx);
+    }
+
+    const validUsers: User[] = [];
+    const unverifiedUsers: User[] = [];
+
+    mentionedUsers.forEach((user: User) => {
+      if (user.id) {
+        validUsers.push(user);
+        return;
+      }
+
+      unverifiedUsers.push(user);
+    });
+
+    if (unverifiedUsers.length > 0) {
+      let msg = 'Хммм, тут в нас є юзери, яких немєа в базі. Одмен перевір пліз цих камєрунців: ';
+      unverifiedUsers.forEach((user) => {
+        msg += ` ${user.username}`;
+      });
+
+      await ctx.reply(msg);
+    }
+
+    if (validUsers.length === 0) {
       return this.telegrafResponse.noUsersToCapture(ctx);
     }
 
@@ -51,12 +79,12 @@ export class ActionsHandler {
       approved: false,
       hunterId: ctx.from.id,
       timestamp: new Date().getTime(),
-      victims: mentionedUsers.map(user => user.id),
-      points: mentionedUsers.length * 4, // TODO: change this logic in future
+      victims: validUsers.filter(user => user.id !== null).map(user => user.id),
+      points: validUsers.length * 4, // TODO: change this logic in future
     });
 
     const hunter = chatUsers.find(({ id }) => id === ctx.from.id);
-    const msg = this.telegrafResponse.makeCaptureVictimsMsg(hunter, mentionedUsers);
+    const msg = this.telegrafResponse.makeCaptureVictimsMsg(hunter, validUsers);
 
     const adminId = chatUsers.find(({ isAdmin }: Hunter) => isAdmin).id;
     await ctx.telegram.sendMessage(

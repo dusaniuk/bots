@@ -41,7 +41,11 @@ export class TelegrafResponseService {
   };
 
   noUsersToCapture = (ctx: ContextMessageUpdate): Promise<Message> => {
-    return ctx.reply('В команді немає ігроків з цього чату');
+    return ctx.reply('В capture команді немає зареєстрованих ігроків з цього чату. Перевір і попробуй ше раз');
+  };
+
+  rejectSelfCapture = (ctx: ContextMessageUpdate): Promise<Message> => {
+    return ctx.reply('Нєє, ну ти канєшно знатно ахєрєл - сам себе ловити... Пшов вон!');
   };
 
   makeCaptureVictimsMsg = (hunter: User, victims: User[]): string => {
