@@ -64,6 +64,7 @@ export class ActionsHandler {
 
     if (unverifiedUsers.length > 0) {
       let msg = 'Хммм, тут в нас є юзери, яких немєа в базі. Одмен перевір пліз цих камєрунців: ';
+
       unverifiedUsers.forEach((user) => {
         msg += ` ${user.username}`;
       });
