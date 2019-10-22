@@ -16,7 +16,7 @@ const main = () => {
   const bot: Telegraf<ContextMessageUpdate> = new Telegraf(CONFIG.botToken);
   const handler = new ActionsHandler(usersDb, responseService);
 
-  // bot.use(handler.middleware.verifyChatType);
+  bot.use(handler.middleware.verifyChatType);
 
   // commands for everyone
   bot.command('ping', handler.pong);
