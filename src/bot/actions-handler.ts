@@ -54,6 +54,11 @@ export class ActionsHandler {
     const unverifiedUsers: User[] = [];
 
     mentionedUsers.forEach((user: User) => {
+      // don't allow to push 2 same users
+      if (validUsers.some(u => u.id === user.id)) {
+        return;
+      }
+
       if (user.id) {
         validUsers.push(user);
         return;
