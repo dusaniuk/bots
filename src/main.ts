@@ -45,12 +45,7 @@ const main = () => {
     .then(() => console.log('bot has been started'))
     .catch(err => console.error(err));
 
-  if (CONFIG.environment === 'dev') {
-    console.log('suppress web server startup locally');
-    return;
-  }
-
-  const server = new Server();
+  const server: Server = new Server();
   server.run();
 };
 

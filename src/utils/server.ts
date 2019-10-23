@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import express from 'express';
-import { request } from 'https';
 
 import { CONFIG } from '../config';
 
@@ -14,14 +13,12 @@ export class Server {
     this.setRoutes();
   }
 
-  public run = (): void => {
-    if (CONFIG.environment === 'dev') {
-      console.log('suppress web server startup locally');
-      return;
-    }
+  run = (): void => {
+    const port = this.getPort();
 
-    this.listenForPort();
-    this.startCallingInterval();
+    this.app.listen(port, () => {
+      console.log(`web server started at port ${port}`);
+    });
   };
 
   private setRoutes = (): void => {
@@ -33,19 +30,5 @@ export class Server {
     });
   };
 
-  private listenForPort = (): void => {
-    const server = this.app.listen(process.env.PORT || '8080', () => {
-      const { address: host, port } = server.address();
-
-      console.log('web server started at http://%s:%s', host, port);
-    });
-  };
-
-  private startCallingInterval = (): void => {
-    setInterval(() => {
-      request('https://moreover-real-experience.herokuapp.com/', () => {
-        console.log('wake up dyno');
-      });
-    }, 1200000);
-  };
+  private getPort = (): string => CONFIG.port || '8080';
 }
