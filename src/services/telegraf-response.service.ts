@@ -78,4 +78,8 @@ export class TelegrafResponseService {
 
     return ctx.reply(msg);
   };
+
+  aveMaks = (ctx: ContextMessageUpdate): Promise<Message> => {
+    return ctx.reply('Аве Макс!!!');
+  };
 }

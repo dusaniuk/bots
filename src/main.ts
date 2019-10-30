@@ -29,10 +29,13 @@ const main = () => {
   bot.command('capture', handler.capture);
   bot.command('c', handler.capture);
 
+  bot.on('callback_query', handler.handleAdminAnswer(bot));
+
   // admin commands
   bot.command('announce', handler.announce);
 
-  bot.on('callback_query', handler.handleAdminAnswer(bot));
+  // other
+  bot.hears(/макс/i, handler.aveMaks);
 
   // TODO: switch bot to some kind of mock
   // so I don't need to to this if

@@ -130,6 +130,10 @@ export class ActionsHandler {
     return this.telegrafResponse.explainRulesToUser(ctx);
   };
 
+  aveMaks = (ctx: ContextMessageUpdate): Promise<any> => {
+    return this.telegrafResponse.aveMaks(ctx);
+  };
+
   announce = async (ctx: ContextMessageUpdate): Promise<any> => {
     if (ctx.message.from.id !== 288950149) {
       return 'Маладєц, найшов сікрєтну команду. Но ти не можеш її юзати';
