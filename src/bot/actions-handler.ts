@@ -7,24 +7,24 @@ import {
   CaptureRecord, Hunter, Mention, User,
 } from '../models';
 import * as utils from '../utils/helpers';
-import { Middleware } from './middleware';
+import { ChatType } from '../models/chatType';
 
 const enum CallbackQueryType {
   capture = 'capture',
 }
 
 export class ActionsHandler {
-  public middleware: Middleware;
-
-  constructor(private db: Database, private telegrafResponse: TelegrafResponseService) {
-    this.middleware = new Middleware(telegrafResponse);
-  }
+  constructor(private db: Database, private telegrafResponse: TelegrafResponseService) {}
 
   pong = (ctx: ContextMessageUpdate) => {
     return ctx.reply('pong');
   };
 
   register = async (ctx: ContextMessageUpdate): Promise<any> => {
+    if (ctx.chat.type === ChatType.private) {
+      return this.telegrafResponse.rejectPrivateChat(ctx);
+    }
+
     const isUserInChat = await this.db.isUserInChat(ctx.chat.id, ctx.from.id);
     if (isUserInChat) {
       return this.telegrafResponse.userAlreadyInGame(ctx);
