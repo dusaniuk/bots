@@ -1,10 +1,8 @@
 import { Context } from 'telegraf';
 import { IncomingMessage } from 'telegraf/typings/telegram-types';
-import {
-  CaptureRecord, Mention, Hunter, User,
-} from '../models';
+import { Hunter, Mention, User } from '../models';
 
-export const createHunter = ({ from, chat }: Context): Hunter => {
+export const createHunter = ({ from }: Context): Hunter => {
   const hunter: Hunter = {
     id: from.id,
     firstName: from.first_name,

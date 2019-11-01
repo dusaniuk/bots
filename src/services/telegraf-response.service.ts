@@ -10,6 +10,8 @@ const enum MoreFacesStickers {
 }
 
 export class TelegrafResponseService {
+  pong = (ctx: ContextMessageUpdate): Promise<Message> => ctx.reply('pong');
+
   userAlreadyInGame = async (ctx: ContextMessageUpdate): Promise<MessageSticker> => {
     await ctx.reply('Ти вже і так в грі!!');
 

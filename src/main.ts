@@ -27,7 +27,7 @@ const main = () => {
   bot.command('capture', handler.capture);
   bot.command('c', handler.capture);
 
-  bot.on('callback_query', handler.handleAdminAnswer(bot));
+  bot.on('callback_query', handler.handleAdminAnswer);
 
   // admin commands
   bot.command('announce', handler.announce);

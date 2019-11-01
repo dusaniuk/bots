@@ -26,7 +26,7 @@
   },
   "rules": {
     "no-console": "warn",
-    "promise/always-return": "error",
+    "promise/always-return": "off",
     "promise/no-return-wrap": "error",
     "promise/param-names": "error",
     "promise/catch-or-return": "error",

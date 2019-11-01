@@ -1,4 +1,5 @@
-import Telegraf, { ContextMessageUpdate, Markup } from 'telegraf';
+import { ContextMessageUpdate, Markup } from 'telegraf';
+import { Message } from 'telegraf/typings/telegram-types';
 
 import { Database } from '../interfaces/database';
 import { TelegrafResponseService } from '../services/telegraf-response.service';
@@ -14,32 +15,32 @@ const enum CallbackQueryType {
 }
 
 export class ActionsHandler {
-  constructor(private db: Database, private telegrafResponse: TelegrafResponseService) {}
+  constructor(private db: Database, private response: TelegrafResponseService) {}
 
-  pong = (ctx: ContextMessageUpdate) => {
-    return ctx.reply('pong');
+  pong = (ctx: ContextMessageUpdate): Promise<Message> => {
+    return this.response.pong(ctx);
   };
 
   register = async (ctx: ContextMessageUpdate): Promise<any> => {
     if (ctx.chat.type === ChatType.private) {
-      return this.telegrafResponse.rejectPrivateChat(ctx);
+      return this.response.rejectPrivateChat(ctx);
     }
 
     const isUserInChat = await this.db.isUserInChat(ctx.chat.id, ctx.from.id);
     if (isUserInChat) {
-      return this.telegrafResponse.userAlreadyInGame(ctx);
+      return this.response.userAlreadyInGame(ctx);
     }
 
     const hunter: Hunter = utils.createHunter(ctx);
     await this.db.addUserInChat(ctx.chat.id, hunter);
 
-    return this.telegrafResponse.greetNewUser(ctx, hunter);
+    return this.response.greetNewUser(ctx, hunter);
   };
 
   capture = async (ctx: ContextMessageUpdate): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);
     if (mentions.length === 0) {
-      return this.telegrafResponse.showCaptureInstructions(ctx);
+      return this.response.showCaptureInstructions(ctx);
     }
 
     const chatUsers: Hunter[] = await this.db.getAllUsersFromChat(ctx.chat.id);
@@ -47,7 +48,7 @@ export class ActionsHandler {
 
     const isMentionedHimself: boolean = mentionedUsers.some(u => u.id === ctx.from.id);
     if (isMentionedHimself) {
-      return this.telegrafResponse.rejectSelfCapture(ctx);
+      return this.response.rejectSelfCapture(ctx);
     }
 
     const validUsers: User[] = [];
@@ -78,7 +79,7 @@ export class ActionsHandler {
     }
 
     if (validUsers.length === 0) {
-      return this.telegrafResponse.noUsersToCapture(ctx);
+      return this.response.noUsersToCapture(ctx);
     }
 
     const captureId = await this.db.addCaptureRecord(ctx.chat.id, {
@@ -90,7 +91,7 @@ export class ActionsHandler {
     });
 
     const hunter = chatUsers.find(({ id }) => id === ctx.from.id);
-    const msg = this.telegrafResponse.makeCaptureVictimsMsg(hunter, validUsers);
+    const msg = this.response.makeCaptureVictimsMsg(hunter, validUsers);
 
     const adminId = chatUsers.find(({ isAdmin }: Hunter) => isAdmin).id;
     await ctx.telegram.sendMessage(
@@ -112,31 +113,31 @@ export class ActionsHandler {
     const hunters = await this.db.getAllUsersFromChat(ctx.chat.id);
     hunters.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
 
-    return this.telegrafResponse.getHuntersScore(ctx, hunters);
+    return this.response.getHuntersScore(ctx, hunters);
   };
 
-  handleAdminAnswer = (bot: Telegraf<ContextMessageUpdate>) => async (ctx: ContextMessageUpdate): Promise<any> => {
-    const answerType: string = ctx.update.callback_query.data.split(' ')[0];
+  handleAdminAnswer = async (ctx: ContextMessageUpdate): Promise<any> => {
+    const answerType: string = ctx.callbackQuery.data.split(' ')[0];
 
     switch (answerType) {
       case CallbackQueryType.capture:
-        return this.handleHunterCapture(bot, ctx);
+        return this.handleHunterCapture(ctx);
       default:
         throw new Error('unsupported callback query');
     }
   };
 
-  getHelp = (ctx: ContextMessageUpdate): Promise<any> => {
-    return this.telegrafResponse.explainRulesToUser(ctx);
+  getHelp = (ctx: ContextMessageUpdate): Promise<Message> => {
+    return this.response.explainRulesToUser(ctx);
   };
 
   aveMaks = (ctx: ContextMessageUpdate): Promise<any> => {
-    return this.telegrafResponse.aveMaks(ctx);
+    return this.response.aveMaks(ctx);
   };
 
   announce = async (ctx: ContextMessageUpdate): Promise<any> => {
     if (ctx.message.from.id !== 288950149) {
-      return 'Маладєц, найшов сікрєтну команду. Но ти не можеш її юзати';
+      return ctx.reply('Маладєц, найшов сікрєтну команду. Но ти не можеш її юзати');
     }
 
     const chatIDs = await this.db.getAllActiveChatsIDs();
@@ -149,12 +150,12 @@ export class ActionsHandler {
     return ctx.reply(`Розіслано в наступні чати: ${chatIDs}`);
   };
 
-  private handleHunterCapture = async (bot: Telegraf<ContextMessageUpdate>, ctx: ContextMessageUpdate): Promise<any> => {
-    const { message, data } = ctx.update.callback_query;
+  private handleHunterCapture = async (ctx: ContextMessageUpdate): Promise<any> => {
+    const { message, data } = ctx.callbackQuery;
     const [, command, captureId, chatId] = data.split(' ');
 
     // delete message from admin's chat
-    await bot.telegram.deleteMessage(message.chat.id, message.message_id);
+    await ctx.telegram.deleteMessage(message.chat.id, message.message_id);
 
     // get record by capture id
     const record: CaptureRecord = await this.db.getCaptureRecord(+chatId, captureId);
