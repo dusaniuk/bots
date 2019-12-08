@@ -6,7 +6,7 @@
   "scripts": {
     "build-ts": "tsc",
     "postinstall": "npm run build-ts",
-    "start": "nodemon src/main.ts",
+    "start": "nodemon",
     "test": "ENVIRONMENT=test jest",
     "coverage": "yarn test --collectCoverage",
     "tdd": "yarn test --watch",
@@ -68,7 +68,7 @@
     "nodemon": "^1.19.1",
     "prettier-eslint-cli": "^5.0.0",
     "ts-jest": "^24.1.0",
-    "ts-node": "^8.3.0",
+    "ts-node": "^8.5.4",
     "typescript": "^3.5.3"
   }
 }
