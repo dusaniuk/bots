@@ -1,5 +1,5 @@
 import { credential, firestore, initializeApp } from 'firebase-admin';
-import { CONFIG } from '../config';
+import { CONFIG } from '../../config';
 import { Database } from '../interfaces/database';
 import { UsersService } from './users.service';
 import { CapturesService } from './captures.service';

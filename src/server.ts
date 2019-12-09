@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
 import express from 'express';
 
-import { CONFIG } from '../config';
+import { CONFIG } from './config';
 
-const packageInfo = require('../../package.json');
+const packageInfo = require('../package.json');
 
 export class Server {
   private app;
