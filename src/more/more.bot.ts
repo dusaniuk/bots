@@ -2,13 +2,13 @@
 import Telegraf, { ContextMessageUpdate } from 'telegraf';
 
 import { CONFIG } from '../config';
+import { Bot } from '../shared/bot';
 
 import { Database } from './interfaces/database';
 import { TelegrafResponseService } from './services/telegraf-response.service';
 
 import { ActionsHandler } from './bot/actions-handler';
 import { FirestoreDatabase } from './database';
-import { Bot } from '../shared/bot';
 
 export class MoreBot implements Bot {
   private readonly telegrafBot: Telegraf<ContextMessageUpdate>;
@@ -33,7 +33,7 @@ export class MoreBot implements Bot {
 
     this.telegrafBot
       .launch()
-      .then(() => console.log('bot has been started'))
+      .then(() => console.log('more bot has been started'))
       .catch((err) => {
         console.error(err);
         this.isRunning = false;

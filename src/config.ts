@@ -8,6 +8,9 @@ export const CONFIG = {
   more: {
     botToken: process.env.MORE_BOT_TOKEN,
   },
+  nbr: {
+    botToken: process.env.NBR_BOT_TOKEN,
+  },
   firebase: {
     clientEmail: process.env.CLIENT_EMAIL,
     privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, '\n'),
