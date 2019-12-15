@@ -3,7 +3,7 @@ import Telegraf, { SceneContextMessageUpdate, session, Stage } from 'telegraf';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
-import { genGreeterScene } from './scenes/greeter';
+import { GreeterScene } from './scenes/greeter.scene';
 
 export class NbrBot implements Bot {
   private readonly bot: Telegraf<SceneContextMessageUpdate>;
@@ -39,7 +39,7 @@ export class NbrBot implements Bot {
   };
 
   private useGreeterScene = () => {
-    const greeter = genGreeterScene();
-    this.stage.register(greeter);
+    const { scene } = new GreeterScene();
+    this.stage.register(scene);
   };
 }
