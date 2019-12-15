@@ -1,29 +1,17 @@
-import { credential, firestore, initializeApp } from 'firebase-admin';
-import { CONFIG } from '../../config';
+import { firestore } from 'firebase-admin';
+
 import { Database } from '../interfaces/database';
 import { UsersService } from './users.service';
 import { CapturesService } from './captures.service';
 import { CaptureRecord, Hunter } from '../models';
 
 export class FirestoreDatabase implements Database {
-  private readonly db: firestore.Firestore;
-
   private readonly chatRef: firestore.CollectionReference;
 
   private usersService: UsersService;
   private capturesService: CapturesService;
 
-  constructor() {
-    const app = initializeApp({
-      credential: credential.cert({
-        privateKey: CONFIG.firebase.privateKey,
-        clientEmail: CONFIG.firebase.clientEmail,
-        projectId: CONFIG.firebase.projectId,
-      }),
-      databaseURL: CONFIG.firebase.databaseURL,
-    });
-
-    this.db = app.firestore();
+  constructor(private db: firestore.Firestore) {
     this.chatRef = this.db.collection('chat');
 
     this.usersService = new UsersService(this.db);

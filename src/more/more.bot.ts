@@ -1,14 +1,14 @@
 /* eslint-disable no-console */
 import Telegraf, { ContextMessageUpdate } from 'telegraf';
+import { firestore } from 'firebase-admin';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
 
-import { Database } from './interfaces/database';
-import { TelegrafResponseService } from './services/telegraf-response.service';
-
-import { ActionsHandler } from './bot/actions-handler';
 import { FirestoreDatabase } from './database';
+import { Database } from './interfaces/database';
+import { ActionsHandler } from './bot/actions-handler';
+import { TelegrafResponseService } from './services/telegraf-response.service';
 
 export class MoreBot implements Bot {
   private readonly telegrafBot: Telegraf<ContextMessageUpdate>;
@@ -17,9 +17,9 @@ export class MoreBot implements Bot {
 
   private isRunning: boolean = false;
 
-  constructor() {
+  constructor(private db: firestore.Firestore) {
     this.telegrafBot = new Telegraf(CONFIG.more.botToken);
-    this.usersDb = new FirestoreDatabase();
+    this.usersDb = new FirestoreDatabase(this.db);
 
     const responseService: TelegrafResponseService = new TelegrafResponseService();
     this.handler = new ActionsHandler(this.usersDb, responseService);
