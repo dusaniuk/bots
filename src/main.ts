@@ -10,7 +10,7 @@ const nbrBot: Bot = new NbrBot();
 
 if (CONFIG.environment !== 'test') {
   nbrBot.start();
-  moreBot.start();
+  // moreBot.start();
 
   const server: Server = new Server();
   server.run();

@@ -1,20 +1,33 @@
 /* eslint-disable no-console */
-import Telegraf, { ContextMessageUpdate } from 'telegraf';
+import Telegraf, { SceneContextMessageUpdate, session, Stage } from 'telegraf';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
+import { genGreeterScene } from './scenes/greeter';
 
 export class NbrBot implements Bot {
-  private readonly bot: Telegraf<ContextMessageUpdate>;
+  private readonly bot: Telegraf<SceneContextMessageUpdate>;
+  private readonly stage: Stage<SceneContextMessageUpdate>;
 
   private isRunning: boolean = false;
 
   constructor() {
     this.bot = new Telegraf(CONFIG.nbr.botToken);
+    this.stage = new Stage([]);
   }
 
   start = () => {
-    this.bindPublicCommands();
+    this.bot.use(session());
+    this.bot.use(this.stage.middleware());
+
+    this.useGreeterScene();
+
+    this.bot.command('start', async (ctx: SceneContextMessageUpdate) => {
+      await ctx.replyWithMarkdown(`Привіт, *${ctx.from.first_name}!*\nЯ буду сповіщати тебе про найближчі події в NBR клубі 🤓`);
+      await ctx.scene.enter('greeter', {
+        activities: [],
+      });
+    });
 
     this.bot
       .launch()
@@ -25,11 +38,8 @@ export class NbrBot implements Bot {
       });
   };
 
-  stop = () => {};
-
-  private bindPublicCommands = () => {
-    this.bot.command('ping', (ctx: ContextMessageUpdate) => {
-      return ctx.reply('pong');
-    });
+  private useGreeterScene = () => {
+    const greeter = genGreeterScene();
+    this.stage.register(greeter);
   };
 }
