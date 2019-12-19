@@ -15,12 +15,17 @@ export class UsersService {
   }
 
   saveUser = async (user: TelegramUser): Promise<void> => {
-    await this.getMemgersRef()
-      .doc(user.id)
-      .create(user);
+    const userRef = await this.getMembersRef().doc(user.id);
+
+    const query = await userRef.get();
+    if (query.exists) {
+      return;
+    }
+
+    await userRef.create(user);
   };
 
-  private getMemgersRef = (): firestore.CollectionReference => {
+  private getMembersRef = (): firestore.CollectionReference => {
     return this.nbrRef.doc('group').collection('members');
   };
 }
