@@ -6,21 +6,21 @@ import { ACTIVITIES } from '../constants/titles';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { BookmarkedActivitiesService } from '../services/bookmarkedActivities.service';
 
-interface GreeterState {
+interface ActivitiesState {
   activities: string[];
 }
 
-export class GreeterScene {
+export class ActivitiesScene {
   private readonly activitiesService: BookmarkedActivitiesService;
 
-  public static ID: string = 'greeter';
+  public static ID: string = 'activities';
 
   public scene: BaseScene<SceneContextMessageUpdate>;
 
   constructor(private db: firestore.Firestore) {
     this.activitiesService = new BookmarkedActivitiesService(db);
 
-    this.scene = new BaseScene(GreeterScene.ID);
+    this.scene = new BaseScene(ActivitiesScene.ID);
     this.scene.hears('abort', Stage.leave());
 
     this.attachHookListeners();
@@ -82,8 +82,8 @@ export class GreeterScene {
     await ctx.editMessageText('Вибери з меню активності, які тебе цікавлять', keyboard);
   };
 
-  private getState = (ctx: SceneContextMessageUpdate): GreeterState => {
-    return ctx.scene.state as GreeterState;
+  private getState = (ctx: SceneContextMessageUpdate): ActivitiesState => {
+    return ctx.scene.state as ActivitiesState;
   };
 
   private dropState = (ctx: SceneContextMessageUpdate): void => {

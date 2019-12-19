@@ -4,7 +4,7 @@ import { firestore } from 'firebase-admin';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
-import { GreeterScene } from './scenes/greeter.scene';
+import { ActivitiesScene } from './scenes/activities.scene';
 
 export class NbrBot implements Bot {
   private readonly bot: Telegraf<SceneContextMessageUpdate>;
@@ -21,11 +21,11 @@ export class NbrBot implements Bot {
     this.bot.use(session());
     this.bot.use(this.stage.middleware());
 
-    this.useGreeterScene();
+    this.useActivitiesScene();
 
     this.bot.command('start', async (ctx: SceneContextMessageUpdate) => {
       await ctx.replyWithMarkdown(`Привіт, *${ctx.from.first_name}!*\nЯ буду сповіщати тебе про найближчі події в NBR клубі 🤓`);
-      await ctx.scene.enter('greeter', {
+      await ctx.scene.enter(ActivitiesScene.ID, {
         activities: [],
       });
     });
@@ -39,8 +39,8 @@ export class NbrBot implements Bot {
       });
   };
 
-  private useGreeterScene = () => {
-    const { scene } = new GreeterScene(this.db);
+  private useActivitiesScene = () => {
+    const { scene } = new ActivitiesScene(this.db);
     this.stage.register(scene);
   };
 }
