@@ -11,7 +11,7 @@ import { createDatabase } from './shared/firestore.database';
 const db: firestore.Firestore = createDatabase();
 
 const moreBot: Bot = new MoreBot(db);
-const nbrBot: Bot = new NbrBot();
+const nbrBot: Bot = new NbrBot(db);
 
 if (CONFIG.environment !== 'test') {
   nbrBot.start();

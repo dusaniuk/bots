@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import Telegraf, { SceneContextMessageUpdate, session, Stage } from 'telegraf';
+import { firestore } from 'firebase-admin';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
@@ -11,7 +12,7 @@ export class NbrBot implements Bot {
 
   private isRunning: boolean = false;
 
-  constructor() {
+  constructor(private db: firestore.Firestore) {
     this.bot = new Telegraf(CONFIG.nbr.botToken);
     this.stage = new Stage([]);
   }
@@ -39,7 +40,7 @@ export class NbrBot implements Bot {
   };
 
   private useGreeterScene = () => {
-    const { scene } = new GreeterScene();
+    const { scene } = new GreeterScene(this.db);
     this.stage.register(scene);
   };
 }

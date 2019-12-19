@@ -1,19 +1,25 @@
 import { BaseScene, SceneContextMessageUpdate, Stage } from 'telegraf';
+import { firestore } from 'firebase-admin';
 
-import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { Actions } from '../constants/enums';
 import { ACTIVITIES } from '../constants/titles';
+import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
+import { BookmarkedActivitiesService } from '../services/bookmarkedActivities.service';
 
 interface GreeterState {
   activities: string[];
 }
 
 export class GreeterScene {
+  private readonly activitiesService: BookmarkedActivitiesService;
+
   public static ID: string = 'greeter';
 
   public scene: BaseScene<SceneContextMessageUpdate>;
 
-  constructor() {
+  constructor(private db: firestore.Firestore) {
+    this.activitiesService = new BookmarkedActivitiesService(db);
+
     this.scene = new BaseScene(GreeterScene.ID);
     this.scene.hears('abort', Stage.leave());
 
@@ -50,6 +56,12 @@ export class GreeterScene {
     const activitiesMsg = this.getSelectedActivitiesMsg(activities);
 
     await ctx.replyWithMarkdown(`Твої вибрані активності: *${activitiesMsg}*.`);
+
+    const tmpMsg = await ctx.reply('Зберігаю налаштування...');
+
+    await this.activitiesService.save(ctx.from.id, activities);
+
+    await ctx.telegram.deleteMessage(tmpMsg.chat.id, tmpMsg.message_id);
     await ctx.reply('Налаштування успішно збережені');
 
     await ctx.scene.leave();

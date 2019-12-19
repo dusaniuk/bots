@@ -1,4 +1,4 @@
-export const enum Activity {
+export enum Activity {
   Run = 'run',
   Swim = 'swim',
   Stretch = 'stretch',
