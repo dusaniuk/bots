@@ -40,6 +40,12 @@ export class AnnounceScene {
   };
 
   private enter = async (ctx: SceneContextMessageUpdate) => {
+    if (ctx.chat.type !== 'private') {
+      await ctx.reply('Нєнє, я не підписувався на роботу в чатах, пиши мені в ЛС 😉');
+      await ctx.scene.leave();
+      return;
+    }
+
     this.dropState(ctx);
 
     await ctx.replyWithMarkdown(`Маєш що сказати, *${ctx.from.first_name}?* 🙃`);
