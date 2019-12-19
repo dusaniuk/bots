@@ -1,4 +1,6 @@
-import { BaseScene, SceneContextMessageUpdate, Stage } from 'telegraf';
+import {
+  BaseScene, Context, SceneContextMessageUpdate, Stage,
+} from 'telegraf';
 import { firestore } from 'firebase-admin';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { Actions } from '../constants/enums';
@@ -80,7 +82,10 @@ export class AnnounceScene {
     await ctx.reply(`Розпочинаю розсилку наступній кількості людей: ${normalizedUserIdsList.length}`);
 
     await normalizedUserIdsList.forEach((userId: number) => {
-      return ctx.telegram.sendMessage(userId, state.message);
+      const header = this.getUserTitle(ctx);
+      const message = `${header}:\n${state.message}`;
+
+      return ctx.telegram.sendMessage(userId, message);
     });
 
     await ctx.reply('Повідомлення успішно розіслано ✅');
@@ -115,6 +120,20 @@ export class AnnounceScene {
     const keyboard = getApproveKeyboard();
 
     await ctx.replyWithMarkdown(`Окєй, моя задача відправити всім людям з: *${activitiesText}* наступне повідомлення:\n${state.message}`, keyboard);
+  };
+
+  private getUserTitle = ({ from }: Context): string => {
+    let message = `Повідомлення від ${from.first_name}`;
+
+    if (from.last_name) {
+      message += ` ${from.last_name}`;
+    }
+
+    if (from.username) {
+      message += ` (@${from.username})`;
+    }
+
+    return message;
   };
 
   private getState = (ctx: SceneContextMessageUpdate): AnnounceState => {
