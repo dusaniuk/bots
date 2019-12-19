@@ -4,21 +4,21 @@ import { firestore } from 'firebase-admin';
 import { Actions } from '../constants/enums';
 import { ACTIVITIES } from '../constants/titles';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
-import { BookmarkedActivitiesService } from '../services/bookmarkedActivities.service';
+import { ActivitiesService } from '../services/activities.service';
 
 interface ActivitiesState {
   activities: string[];
 }
 
 export class ActivitiesScene {
-  private readonly activitiesService: BookmarkedActivitiesService;
+  private readonly activitiesService: ActivitiesService;
 
   public static ID: string = 'activities';
 
   public scene: BaseScene<SceneContextMessageUpdate>;
 
   constructor(private db: firestore.Firestore) {
-    this.activitiesService = new BookmarkedActivitiesService(db);
+    this.activitiesService = new ActivitiesService(db);
 
     this.scene = new BaseScene(ActivitiesScene.ID);
     this.scene.hears('abort', Stage.leave());

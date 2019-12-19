@@ -9,7 +9,7 @@ export interface ActivitiesData {
   [Activity.Sketch]: number[];
 }
 
-export class BookmarkedActivitiesService {
+export class ActivitiesService {
   private readonly nbrRef: firestore.CollectionReference;
 
   constructor(private db: firestore.Firestore) {
