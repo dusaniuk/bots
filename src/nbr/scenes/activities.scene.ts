@@ -2,9 +2,9 @@ import { BaseScene, SceneContextMessageUpdate, Stage } from 'telegraf';
 import { firestore } from 'firebase-admin';
 
 import { Actions } from '../constants/enums';
-import { ACTIVITIES } from '../constants/titles';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { ActivitiesService } from '../services/activities.service';
+import { getNormalizedActivities } from '../utils/activities.utils';
 
 interface ActivitiesState {
   activities: string[];
@@ -28,7 +28,7 @@ export class ActivitiesScene {
 
   private attachHookListeners = () => {
     this.scene.enter(this.enter);
-    this.scene.action(Actions.Save, this.saveActivities);
+    this.scene.action(Actions.Next, this.saveActivities);
     this.scene.action(Actions.Approve, this.approveSelectedActivities);
     this.scene.action(Actions.Restart, this.restartActivitiesSelection);
     this.scene.action(/^.*$/, this.handleActivitySelection);
@@ -43,7 +43,7 @@ export class ActivitiesScene {
     await ctx.deleteMessage();
 
     const { activities } = this.getState(ctx);
-    const activitiesMsg = this.getSelectedActivitiesMsg(activities);
+    const activitiesMsg = getNormalizedActivities(activities);
 
     const keyboard = getApproveKeyboard();
     await ctx.replyWithMarkdown(`Твої вибрані активності: *${activitiesMsg}*.`, keyboard);
@@ -53,7 +53,7 @@ export class ActivitiesScene {
     await ctx.deleteMessage();
 
     const { activities } = this.getState(ctx);
-    const activitiesMsg = this.getSelectedActivitiesMsg(activities);
+    const activitiesMsg = getNormalizedActivities(activities);
 
     await ctx.replyWithMarkdown(`Твої вибрані активності: *${activitiesMsg}*.`);
 
@@ -90,12 +90,5 @@ export class ActivitiesScene {
     ctx.scene.state = {
       activities: [],
     };
-  };
-
-  private getSelectedActivitiesMsg = (activities: string[] = []): string => {
-    return activities.reduce((msg, activity) => {
-      const normalizedActivity = ACTIVITIES[activity].split(' ')[0];
-      return msg === '' ? normalizedActivity : `${msg}, ${normalizedActivity}`;
-    }, '');
   };
 }

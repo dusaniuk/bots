@@ -15,8 +15,8 @@ export const getActivitiesKeyboard = (activities: string[] = []): ExtraReplyMess
     buttons.push([Markup.callbackButton(ACTIVITIES[key], key)]);
   });
 
-  const save: Actions = Actions.Save;
-  buttons.push([Markup.callbackButton(ACTIONS[save], save)]);
+  const next: Actions = Actions.Next;
+  buttons.push([Markup.callbackButton(ACTIONS[next], next)]);
 
   return Markup.inlineKeyboard(buttons)
     .resize()

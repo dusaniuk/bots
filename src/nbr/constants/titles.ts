@@ -9,7 +9,7 @@ export const ACTIVITIES = {
 };
 
 export const ACTIONS = {
-  [Actions.Save]: 'Зберегти ➡',
+  [Actions.Next]: 'Далі ➡',
   [Actions.Approve]: 'Підтвердити ✅',
   [Actions.Restart]: 'Повторити вибір 🔁',
 };

@@ -7,7 +7,7 @@ export enum Activity {
 }
 
 export const enum Actions {
-  Save = 'save',
+  Next = 'save',
   Approve = 'approve',
   Restart = 'restart',
 }
