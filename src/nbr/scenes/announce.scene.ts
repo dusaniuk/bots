@@ -89,7 +89,8 @@ export class AnnounceScene {
 
     await normalizedUserIdsList.forEach((userId: number) => {
       const header = this.getUserTitle(ctx);
-      const message = `${header}:\n${state.message}`;
+      const categories = getNormalizedActivities(state.activities);
+      const message = `${header} для активностей: ${categories}\n\n${state.message}`;
 
       return ctx.telegram.sendMessage(userId, message);
     });
@@ -129,7 +130,7 @@ export class AnnounceScene {
   };
 
   private getUserTitle = ({ from }: Context): string => {
-    let message = `Повідомлення від ${from.first_name}`;
+    let message = `Анонс від ${from.first_name}`;
 
     if (from.last_name) {
       message += ` ${from.last_name}`;
