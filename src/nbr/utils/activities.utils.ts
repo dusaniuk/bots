@@ -1,8 +1,9 @@
-import { ACTIVITIES } from '../constants/titles';
+import { AppContext } from '../models/appContext';
+import { getTitle } from './title.utils';
 
-export const getNormalizedActivities = (activities: string[] = []): string => {
+export const getNormalizedActivities = (ctx: AppContext, activities: string[] = []): string => {
   return activities.reduce((msg, activity) => {
-    const normalizedActivity = ACTIVITIES[activity].split(' ')[0];
-    return msg === '' ? normalizedActivity : `${msg}, ${normalizedActivity}`;
+    const activityTitle = getTitle(ctx, activity);
+    return msg === '' ? activityTitle : `${msg}, ${activityTitle}`;
   }, '');
 };

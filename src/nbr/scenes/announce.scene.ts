@@ -50,7 +50,7 @@ export class AnnounceScene {
 
     await ctx.replyWithMarkdown(ctx.i18n.t('announce.intro'));
 
-    const keyboard = getActivitiesKeyboard();
+    const keyboard = getActivitiesKeyboard(ctx);
     await ctx.reply(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
@@ -72,10 +72,10 @@ export class AnnounceScene {
       return [...acc, ...activitiesData[activity]];
     }, []);
 
-    // const userIdsSet: Set<number> = new Set(userIds);
-    // userIdsSet.delete(ctx.from.id);
+    const userIdsSet: Set<number> = new Set(userIds);
+    userIdsSet.delete(ctx.from.id);
 
-    const userIdsSet = [ctx.from.id];
+    // const userIdsSet = [ctx.from.id];
 
     const normalizedUserIdsList: number[] = Array.from(userIdsSet);
 
@@ -95,7 +95,7 @@ export class AnnounceScene {
       const resourceKey: string = ctx.from.username ? 'announce.message2' : 'announce.message';
       const message: string = ctx.i18n.t(resourceKey, {
         user: `${ctx.from.first_name} ${ctx.from.last_name || ''}`,
-        activities: getNormalizedActivities(state.activities),
+        activities: getNormalizedActivities(ctx, state.activities),
         message: state.message,
       });
 
@@ -119,7 +119,7 @@ export class AnnounceScene {
     const { activities } = this.getState(ctx);
     activities.push(ctx.callbackQuery.data);
 
-    const keyboard = getActivitiesKeyboard(activities);
+    const keyboard = getActivitiesKeyboard(ctx, activities);
     await ctx.editMessageText(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
@@ -132,7 +132,7 @@ export class AnnounceScene {
     state.message = ctx.message.text;
     state.isListeningForMessage = false;
 
-    const activitiesText = getNormalizedActivities(state.activities);
+    const activitiesText = getNormalizedActivities(ctx, state.activities);
     const keyboard = getApproveKeyboard();
 
     const msg: string = ctx.i18n.t('announce.confirmRequest', {

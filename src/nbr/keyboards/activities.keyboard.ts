@@ -1,22 +1,24 @@
 import { CallbackButton, Markup } from 'telegraf';
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 
-import { ACTIONS, ACTIVITIES } from '../constants/titles';
-import { Actions } from '../constants/enums';
+import { Actions, Activity } from '../constants/enums';
+import { AppContext } from '../models/appContext';
+import { getTitleWithEmoji } from '../utils/title.utils';
 
-export const getActivitiesKeyboard = (activities: string[] = []): ExtraReplyMessage => {
+export const getActivitiesKeyboard = (ctx: AppContext, activities: string[] = []): ExtraReplyMessage => {
   const buttons: CallbackButton[][] = [];
 
-  Object.keys(ACTIVITIES).forEach((key: string) => {
-    if (activities.includes(key)) {
+  Object.keys(Activity).forEach((key: string) => {
+    const value = Activity[key];
+    if (activities.includes(value)) {
       return;
     }
 
-    buttons.push([Markup.callbackButton(ACTIVITIES[key], key)]);
+    buttons.push([Markup.callbackButton(getTitleWithEmoji(ctx, value), value)]);
   });
 
   const next: Actions = Actions.Next;
-  buttons.push([Markup.callbackButton(ACTIONS[next], next)]);
+  buttons.push([Markup.callbackButton(getTitleWithEmoji(ctx, next), next)]);
 
   return Markup.inlineKeyboard(buttons)
     .resize()

@@ -38,7 +38,7 @@ export class ActivitiesScene {
   private enter = async (ctx: AppContext) => {
     this.dropState(ctx);
 
-    const keyboard = await getActivitiesKeyboard();
+    const keyboard = await getActivitiesKeyboard(ctx);
     await ctx.reply(ctx.i18n.t('activities.intro'), keyboard);
   };
 
@@ -46,7 +46,7 @@ export class ActivitiesScene {
     await ctx.deleteMessage();
 
     const { activities } = this.getState(ctx);
-    const activitiesMsg = getNormalizedActivities(activities);
+    const activitiesMsg = getNormalizedActivities(ctx, activities);
 
     const keyboard = getApproveKeyboard();
 
@@ -61,7 +61,7 @@ export class ActivitiesScene {
     await ctx.deleteMessage();
 
     const { activities } = this.getState(ctx);
-    const activitiesMsg = getNormalizedActivities(activities);
+    const activitiesMsg = getNormalizedActivities(ctx, activities);
 
     const msg = ctx.i18n.t('activities.selectedSummary', {
       activities: activitiesMsg,
@@ -88,7 +88,7 @@ export class ActivitiesScene {
     const { activities } = this.getState(ctx);
     activities.push(ctx.callbackQuery.data);
 
-    const keyboard = getActivitiesKeyboard(activities);
+    const keyboard = getActivitiesKeyboard(ctx, activities);
     await ctx.editMessageText(ctx.i18n.t('activities.intro'), keyboard);
   };
 
