@@ -1,11 +1,11 @@
-import {
-  BaseScene, Context, SceneContextMessageUpdate, Stage,
-} from 'telegraf';
+import { BaseScene, Context, Stage } from 'telegraf';
 import { firestore } from 'firebase-admin';
+
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { Actions } from '../constants/enums';
 import { getNormalizedActivities } from '../utils/activities.utils';
 import { ActivitiesService } from '../services/activities.service';
+import { AppContext } from '../models/appContext';
 
 interface AnnounceState {
   activities: string[];
@@ -18,7 +18,7 @@ export class AnnounceScene {
 
   public static ID: string = 'announce';
 
-  public scene: BaseScene<SceneContextMessageUpdate>;
+  public scene: BaseScene<AppContext>;
 
   constructor(private db: firestore.Firestore) {
     this.activitiesService = new ActivitiesService(db);
@@ -39,31 +39,31 @@ export class AnnounceScene {
     this.scene.action(/^.*$/, this.handleActivitySelection);
   };
 
-  private enter = async (ctx: SceneContextMessageUpdate) => {
+  private enter = async (ctx: AppContext) => {
     if (ctx.chat.type !== 'private') {
-      await ctx.reply('Нєнє, я не підписувався на роботу в чатах, пиши мені в ЛС 😉');
+      await ctx.reply(ctx.i18n.t('error.nonPrivateChat'));
       await ctx.scene.leave();
       return;
     }
 
     this.dropState(ctx);
 
-    await ctx.replyWithMarkdown(`Маєш що сказати, *${ctx.from.first_name}?* 🙃`);
+    await ctx.replyWithMarkdown(ctx.i18n.t('announce.intro'));
 
     const keyboard = getActivitiesKeyboard();
-    await ctx.reply('Ну добре, вибери активності, кому має прийти твоє повідомлення:', keyboard);
+    await ctx.reply(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
-  private listenForMessage = async (ctx: SceneContextMessageUpdate) => {
+  private listenForMessage = async (ctx: AppContext) => {
     await ctx.deleteMessage();
-    await ctx.reply('Напиши текст самого повідомлення (де/на скільки буде збір, певні умови, відміна івенту, тд):');
+    await ctx.reply(ctx.i18n.t('announce.requestMessage'));
 
     this.getState(ctx).isListeningForMessage = true;
   };
 
-  private approveSelectedActivities = async (ctx: SceneContextMessageUpdate) => {
+  private approveSelectedActivities = async (ctx: AppContext) => {
     await ctx.deleteMessage();
-    await ctx.reply('Шукаю всіх людей...');
+    await ctx.reply(ctx.i18n.t('announce.looking'));
 
     const activitiesData = await this.activitiesService.getAll();
     const state: AnnounceState = this.getState(ctx);
@@ -75,46 +75,54 @@ export class AnnounceScene {
     const userIdsSet: Set<number> = new Set(userIds);
     userIdsSet.delete(ctx.from.id);
 
+    // const userIdsSet = [ctx.from.id];
+
     const normalizedUserIdsList: number[] = Array.from(userIdsSet);
 
     if (normalizedUserIdsList.length === 0) {
-      await ctx.reply('На превеликий жаль, у вибраних тобою категоріях не знайшлось людей... 😢');
-      await ctx.reply("Якщо ти думаєш що це помилка - зв'яжись з адміністратором бота, він спробує розібратись в чому біда");
-
+      await ctx.reply(ctx.i18n.t('error.usersNotFound'));
       await ctx.scene.leave();
       return;
     }
 
-    await ctx.reply(`Розпочинаю розсилку наступній кількості людей: ${normalizedUserIdsList.length}`);
+    await ctx.reply(
+      ctx.i18n.t('announce.startSending', {
+        usersCount: normalizedUserIdsList.length,
+      }),
+    );
 
     await normalizedUserIdsList.forEach((userId: number) => {
-      const header = this.getUserTitle(ctx);
-      const categories = getNormalizedActivities(state.activities);
-      const message = `${header} для активностей: ${categories}\n\n${state.message}`;
+      const message: string = ctx.i18n.t('announce.message', {
+        user: this.getUserTitle(ctx),
+        activities: getNormalizedActivities(state.activities),
+        message: state.message,
+      });
 
-      return ctx.telegram.sendMessage(userId, message);
+      return ctx.telegram.sendMessage(userId, message, {
+        parse_mode: 'Markdown',
+      });
     });
 
-    await ctx.reply('Повідомлення успішно розіслано ✅');
+    await ctx.reply(ctx.i18n.t('announce.sent'));
     await ctx.scene.leave();
   };
 
-  private restartActivitiesSelection = async (ctx: SceneContextMessageUpdate) => {
+  private restartActivitiesSelection = async (ctx: AppContext) => {
     this.dropState(ctx);
 
     await ctx.deleteMessage();
     await ctx.scene.reenter();
   };
 
-  private handleActivitySelection = async (ctx: SceneContextMessageUpdate) => {
+  private handleActivitySelection = async (ctx: AppContext) => {
     const { activities } = this.getState(ctx);
     activities.push(ctx.callbackQuery.data);
 
     const keyboard = getActivitiesKeyboard(activities);
-    await ctx.editMessageText('Ну добре, вибери активності, кому має прийти твоє повідомлення:', keyboard);
+    await ctx.editMessageText(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
-  private onMessage = async (ctx: SceneContextMessageUpdate) => {
+  private onMessage = async (ctx: AppContext) => {
     const state: AnnounceState = this.getState(ctx);
     if (!state.isListeningForMessage) {
       return;
@@ -126,11 +134,15 @@ export class AnnounceScene {
     const activitiesText = getNormalizedActivities(state.activities);
     const keyboard = getApproveKeyboard();
 
-    await ctx.replyWithMarkdown(`Окєй, моя задача відправити всім людям з: *${activitiesText}* наступне повідомлення:\n${state.message}`, keyboard);
+    const msg: string = ctx.i18n.t('announce.confirmRequest', {
+      activities: activitiesText,
+      message: state.message,
+    });
+    await ctx.replyWithMarkdown(msg, keyboard);
   };
 
   private getUserTitle = ({ from }: Context): string => {
-    let message = `Анонс від ${from.first_name}`;
+    let message = from.first_name;
 
     if (from.last_name) {
       message += ` ${from.last_name}`;
@@ -143,11 +155,11 @@ export class AnnounceScene {
     return message;
   };
 
-  private getState = (ctx: SceneContextMessageUpdate): AnnounceState => {
+  private getState = (ctx: AppContext): AnnounceState => {
     return ctx.scene.state as AnnounceState;
   };
 
-  private dropState = (ctx: SceneContextMessageUpdate): void => {
+  private dropState = (ctx: AppContext): void => {
     ctx.scene.state = {
       activities: [],
       isListeningForMessage: false,

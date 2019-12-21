@@ -2,7 +2,9 @@
 import Telegraf, {
   Context, SceneContextMessageUpdate, session, Stage,
 } from 'telegraf';
+import I18n from 'telegraf-i18n';
 import { firestore } from 'firebase-admin';
+import * as path from 'path';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
@@ -10,6 +12,7 @@ import { Bot } from '../shared/bot';
 import { ActivitiesScene } from './scenes/activities.scene';
 import { AnnounceScene } from './scenes/announce.scene';
 import { TelegramUser, UsersService } from './services/users.service';
+import { AppContext } from './models/appContext';
 
 export class NbrBot implements Bot {
   private readonly usersService: UsersService;
@@ -27,17 +30,22 @@ export class NbrBot implements Bot {
   }
 
   start = () => {
+    const i18n = new I18n({
+      defaultLanguage: 'ua',
+      allowMissing: false,
+      directory: path.resolve(__dirname, 'locales'),
+    });
+
     this.bot.use(session());
+    this.bot.use(i18n.middleware());
     this.bot.use(this.stage.middleware());
 
     this.useActivitiesScene();
     this.useAnnounceScene();
 
-    this.bot.command('start', async (ctx: SceneContextMessageUpdate) => {
-      await ctx.replyWithMarkdown(`Привіт, *${ctx.from.first_name}!*\nЯ буду сповіщати тебе про найближчі події в NBR клубі 🤓`);
-      await ctx.scene.enter(ActivitiesScene.ID, {
-        activities: [],
-      });
+    this.bot.command('start', async (ctx: AppContext) => {
+      await ctx.replyWithMarkdown(ctx.i18n.t('start.greeting'));
+      await ctx.scene.enter(ActivitiesScene.ID);
 
       await this.saveTelegrafUser(ctx);
     });

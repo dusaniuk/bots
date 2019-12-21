@@ -44,6 +44,7 @@
     "firebase-admin": "^8.3.0",
     "nodemon": "^2.0.1",
     "telegraf": "^3.34.1",
+    "telegraf-i18n": "^6.6.0",
     "ts-node": "^8.5.4",
     "typescript": "^3.7.3"
   },
