@@ -6,6 +6,7 @@ import { Actions } from '../constants/enums';
 import { getNormalizedActivities } from '../utils/activities.utils';
 import { ActivitiesService } from '../services/activities.service';
 import { AppContext } from '../models/appContext';
+import { CONFIG } from '../../config';
 
 interface AnnounceState {
   activities: string[];
@@ -75,7 +76,10 @@ export class AnnounceScene {
     const userIdsSet: Set<number> = new Set(userIds);
     userIdsSet.delete(ctx.from.id);
 
-    // const userIdsSet = [ctx.from.id];
+    if (CONFIG.environment === 'dev') {
+      userIdsSet.clear();
+      userIdsSet.add(ctx.from.id);
+    }
 
     const normalizedUserIdsList: number[] = Array.from(userIdsSet);
 

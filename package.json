@@ -5,6 +5,7 @@
   "main": "src/main.ts",
   "scripts": {
     "start": "nodemon",
+    "start:dev": "ENVIRONMENT=dev nodemon",
     "test": "ENVIRONMENT=test jest",
     "coverage": "yarn test --collectCoverage",
     "tdd": "yarn test --watch",
