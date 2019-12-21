@@ -13,6 +13,7 @@ import { ActivitiesScene } from './scenes/activities.scene';
 import { AnnounceScene } from './scenes/announce.scene';
 import { TelegramUser, UsersService } from './services/users.service';
 import { AppContext } from './models/appContext';
+import { onlyPrivate } from './middleware/chat.middleware';
 
 export class NbrBot implements Bot {
   private readonly usersService: UsersService;
@@ -39,6 +40,7 @@ export class NbrBot implements Bot {
     this.bot.use(session());
     this.bot.use(i18n.middleware());
     this.bot.use(this.stage.middleware());
+    this.bot.use(onlyPrivate());
 
     this.useActivitiesScene();
     this.useAnnounceScene();

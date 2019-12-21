@@ -41,12 +41,6 @@ export class AnnounceScene {
   };
 
   private enter = async (ctx: AppContext) => {
-    if (ctx.chat.type !== 'private') {
-      await ctx.reply(ctx.i18n.t('error.nonPrivateChat'));
-      await ctx.scene.leave();
-      return;
-    }
-
     this.dropState(ctx);
 
     await ctx.replyWithMarkdown(ctx.i18n.t('announce.intro'));
