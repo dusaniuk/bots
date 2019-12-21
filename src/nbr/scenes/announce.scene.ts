@@ -1,4 +1,4 @@
-import { BaseScene, Context, Stage } from 'telegraf';
+import { BaseScene, Stage } from 'telegraf';
 import { firestore } from 'firebase-admin';
 
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
@@ -72,10 +72,10 @@ export class AnnounceScene {
       return [...acc, ...activitiesData[activity]];
     }, []);
 
-    const userIdsSet: Set<number> = new Set(userIds);
-    userIdsSet.delete(ctx.from.id);
+    // const userIdsSet: Set<number> = new Set(userIds);
+    // userIdsSet.delete(ctx.from.id);
 
-    // const userIdsSet = [ctx.from.id];
+    const userIdsSet = [ctx.from.id];
 
     const normalizedUserIdsList: number[] = Array.from(userIdsSet);
 
@@ -92,8 +92,9 @@ export class AnnounceScene {
     );
 
     await normalizedUserIdsList.forEach((userId: number) => {
-      const message: string = ctx.i18n.t('announce.message', {
-        user: this.getUserTitle(ctx),
+      const resourceKey: string = ctx.from.username ? 'announce.message2' : 'announce.message';
+      const message: string = ctx.i18n.t(resourceKey, {
+        user: `${ctx.from.first_name} ${ctx.from.last_name || ''}`,
         activities: getNormalizedActivities(state.activities),
         message: state.message,
       });
@@ -139,20 +140,6 @@ export class AnnounceScene {
       message: state.message,
     });
     await ctx.replyWithMarkdown(msg, keyboard);
-  };
-
-  private getUserTitle = ({ from }: Context): string => {
-    let message = from.first_name;
-
-    if (from.last_name) {
-      message += ` ${from.last_name}`;
-    }
-
-    if (from.username) {
-      message += ` (@${from.username})`;
-    }
-
-    return message;
   };
 
   private getState = (ctx: AppContext): AnnounceState => {
