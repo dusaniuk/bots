@@ -89,7 +89,9 @@ export class ActivitiesScene {
   private handleAllActivitySelection = async (ctx: AppContext) => {
     const { activities } = this.getState(ctx);
     activities.length = 0;
-    activities.push(ctx.callbackQuery.data);
+
+    const activitiesList: string[] = Object.keys(Activity).map(k => Activity[k]);
+    activities.push(...activitiesList);
 
     await this.saveActivities(ctx);
   };
