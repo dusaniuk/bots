@@ -2,7 +2,7 @@ import { BaseScene, Stage } from 'telegraf';
 import { firestore } from 'firebase-admin';
 
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
-import { Actions } from '../constants/enums';
+import { Actions, Activity } from '../constants/enums';
 import { getNormalizedActivities } from '../utils/activities.utils';
 import { ActivitiesService } from '../services/activities.service';
 import { AppContext } from '../models/appContext';
@@ -37,6 +37,8 @@ export class AnnounceScene {
     this.scene.action(Actions.Next, this.listenForMessage);
     this.scene.action(Actions.Approve, this.approveSelectedActivities);
     this.scene.action(Actions.Restart, this.restartActivitiesSelection);
+
+    this.scene.action(Activity.All, this.handleAllSelection);
     this.scene.action(/^.*$/, this.handleActivitySelection);
   };
 
@@ -113,6 +115,14 @@ export class AnnounceScene {
     await ctx.scene.reenter();
   };
 
+  private handleAllSelection = async (ctx: AppContext) => {
+    const { activities } = this.getState(ctx);
+    activities.length = 0;
+    activities.push(ctx.callbackQuery.data);
+
+    await this.listenForMessage(ctx);
+  };
+
   private handleActivitySelection = async (ctx: AppContext) => {
     const { activities } = this.getState(ctx);
 
@@ -139,7 +149,10 @@ export class AnnounceScene {
     const activitiesText = getNormalizedActivities(ctx, state.activities);
     const keyboard = getApproveKeyboard(ctx);
 
-    const msg: string = ctx.i18n.t('announce.confirmRequest', {
+    const isAnnouncingForAllMembers = state.activities.length === 1 && state.activities[0] === Activity.All;
+    const msgKey = isAnnouncingForAllMembers ? 'confirmRequestToAll' : 'confirmRequest';
+
+    const msg: string = ctx.i18n.t(`announce.${msgKey}`, {
       activities: activitiesText,
       message: state.message,
     });

@@ -7,6 +7,7 @@ export interface ActivitiesData {
   [Activity.Stretch]: number[];
   [Activity.Climb]: number[];
   [Activity.Sketch]: number[];
+  [Activity.All]: number[];
 }
 
 export class ActivitiesService {
@@ -29,7 +30,7 @@ export class ActivitiesService {
     const activitiesList: string[] = Object.keys(Activity).map(k => Activity[k]);
 
     activitiesList.forEach((activity: string) => {
-      const userIDs = new Set([...activitiesData[activity], userId]);
+      const userIDs = new Set([...(activitiesData[activity] || []), userId]);
 
       if (!newActivities.includes(activity)) {
         userIDs.delete(userId);
