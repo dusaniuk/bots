@@ -14,6 +14,7 @@ import { AnnounceScene } from './scenes/announce.scene';
 import { TelegramUser, UsersService } from './services/users.service';
 import { AppContext } from './models/appContext';
 import { onlyPrivate } from './middleware/chat.middleware';
+import { getChatsKeyboard } from './keyboards/chats.keyboard';
 
 export class NbrBot implements Bot {
   private readonly usersService: UsersService;
@@ -54,6 +55,12 @@ export class NbrBot implements Bot {
 
     this.bot.command('announce', async (ctx: SceneContextMessageUpdate) => {
       await ctx.scene.enter(AnnounceScene.ID);
+    });
+
+    this.bot.command('chats', async (ctx: AppContext) => {
+      const keyboard = getChatsKeyboard(ctx);
+
+      await ctx.reply(ctx.i18n.t('chats.intro'), keyboard);
     });
 
     this.bot
