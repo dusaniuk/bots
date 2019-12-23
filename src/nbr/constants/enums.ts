@@ -4,6 +4,7 @@ export enum Activity {
   Stretch = 'stretch',
   Climb = 'climb',
   Sketch = 'sketch',
+  Cycling = 'cycling',
   All = 'all',
 }
 
