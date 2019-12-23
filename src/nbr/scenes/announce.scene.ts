@@ -131,7 +131,7 @@ export class AnnounceScene {
     state.isListeningForMessage = false;
 
     const activitiesText = getNormalizedActivities(ctx, state.activities);
-    const keyboard = getApproveKeyboard();
+    const keyboard = getApproveKeyboard(ctx);
 
     const msg: string = ctx.i18n.t('announce.confirmRequest', {
       activities: activitiesText,

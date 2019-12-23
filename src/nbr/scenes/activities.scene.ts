@@ -48,7 +48,7 @@ export class ActivitiesScene {
     const { activities } = this.getState(ctx);
     const activitiesMsg = getNormalizedActivities(ctx, activities);
 
-    const keyboard = getApproveKeyboard();
+    const keyboard = getApproveKeyboard(ctx);
 
     const msg = ctx.i18n.t('activities.selectedSummary', {
       activities: activitiesMsg,
