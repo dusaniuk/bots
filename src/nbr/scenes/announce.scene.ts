@@ -115,7 +115,13 @@ export class AnnounceScene {
 
   private handleActivitySelection = async (ctx: AppContext) => {
     const { activities } = this.getState(ctx);
-    activities.push(ctx.callbackQuery.data);
+
+    const newActivity = ctx.callbackQuery.data;
+    if (activities.includes(newActivity)) {
+      activities.splice(activities.indexOf(newActivity), 1);
+    } else {
+      activities.push(newActivity);
+    }
 
     const keyboard = getActivitiesKeyboard(ctx, activities);
     await ctx.editMessageText(ctx.i18n.t('announce.chooseActivities'), keyboard);

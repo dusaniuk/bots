@@ -10,11 +10,13 @@ export const getActivitiesKeyboard = (ctx: AppContext, activities: string[] = []
 
   Object.keys(Activity).forEach((key: string) => {
     const value = Activity[key];
+    let title = getTitleWithEmoji(ctx, value);
+
     if (activities.includes(value)) {
-      return;
+      title = `✅ ${title}`;
     }
 
-    buttons.push([Markup.callbackButton(getTitleWithEmoji(ctx, value), value)]);
+    buttons.push([Markup.callbackButton(title, value)]);
   });
 
   const next: Actions = Actions.Next;
