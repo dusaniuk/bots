@@ -91,11 +91,13 @@ export class AnnounceScene {
       }),
     );
 
+    const activities: string[] = state.activities.includes(Activity.All) ? [Activity.All] : state.activities;
+
     await normalizedUserIdsList.forEach((userId: number) => {
       const resourceKey: string = ctx.from.username ? 'announce.message2' : 'announce.message';
       const message: string = ctx.i18n.t(resourceKey, {
         user: `${ctx.from.first_name} ${ctx.from.last_name || ''}`,
-        activities: getNormalizedActivities(ctx, state.activities),
+        activities: getNormalizedActivities(ctx, activities),
         message: state.message,
       });
 
@@ -148,16 +150,15 @@ export class AnnounceScene {
     state.message = ctx.message.text;
     state.isListeningForMessage = false;
 
-    const activitiesText = getNormalizedActivities(ctx, state.activities);
-    const keyboard = getApproveKeyboard(ctx);
-
-    const isAnnouncingForAllMembers = state.activities.length === 1 && state.activities[0] === Activity.All;
+    const isAnnouncingForAllMembers = state.activities.includes(Activity.All);
     const msgKey = isAnnouncingForAllMembers ? 'confirmRequestToAll' : 'confirmRequest';
 
     const msg: string = ctx.i18n.t(`announce.${msgKey}`, {
-      activities: activitiesText,
+      activities: getNormalizedActivities(ctx, state.activities),
       message: state.message,
     });
+
+    const keyboard = getApproveKeyboard(ctx);
     await ctx.replyWithMarkdown(msg, keyboard);
   };
 
