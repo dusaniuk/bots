@@ -7,6 +7,7 @@ import { getNormalizedActivities } from '../utils/activities.utils';
 import { ActivitiesService } from '../services/activities.service';
 import { AppContext } from '../models/appContext';
 import { CONFIG } from '../../config';
+import { UsersService } from '../services/users.service';
 
 interface AnnounceState {
   activities: string[];
@@ -16,6 +17,7 @@ interface AnnounceState {
 
 export class AnnounceScene {
   private readonly activitiesService: ActivitiesService;
+  private readonly usersService: UsersService;
 
   public static ID: string = 'announce';
 
@@ -23,6 +25,7 @@ export class AnnounceScene {
 
   constructor(private db: firestore.Firestore) {
     this.activitiesService = new ActivitiesService(db);
+    this.usersService = new UsersService(db);
 
     this.scene = new BaseScene(AnnounceScene.ID);
     this.scene.hears('abort', Stage.leave());
@@ -44,6 +47,12 @@ export class AnnounceScene {
 
   private enter = async (ctx: AppContext) => {
     this.dropState(ctx);
+
+    if (!this.isAllowedToAnnounce(ctx.from.id)) {
+      await ctx.reply(ctx.i18n.t('announce.prohibited'));
+      await ctx.scene.leave();
+      return;
+    }
 
     await ctx.replyWithMarkdown(ctx.i18n.t('announce.intro'));
 
@@ -160,6 +169,12 @@ export class AnnounceScene {
 
     const keyboard = getApproveKeyboard(ctx);
     await ctx.replyWithMarkdown(msg, keyboard);
+  };
+
+  private isAllowedToAnnounce = async (userId: number): Promise<boolean> => {
+    const user = await this.usersService.getUser(userId.toString());
+
+    return !!user.allowedToAnnounce;
   };
 
   private getState = (ctx: AppContext): AnnounceState => {

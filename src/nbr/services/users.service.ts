@@ -5,6 +5,7 @@ export interface TelegramUser {
   firstName: string;
   lastName?: string;
   username?: string;
+  allowedToAnnounce?: boolean;
 }
 
 export class UsersService {
@@ -14,18 +15,26 @@ export class UsersService {
     this.nbrRef = this.db.collection('nbr');
   }
 
-  saveUser = async (user: TelegramUser): Promise<void> => {
-    const userRef = await this.getMembersRef().doc(user.id);
+  getUser = async (userId: string): Promise<TelegramUser> => {
+    const query = await this.getMemberRef(userId).get();
 
-    const query = await userRef.get();
-    if (query.exists) {
+    return query.exists ? (query.data() as TelegramUser) : null;
+  };
+
+  saveUser = async (user: TelegramUser): Promise<void> => {
+    const dbUser = await this.getUser(user.id);
+    if (dbUser !== null) {
       return;
     }
 
-    await userRef.create(user);
+    await this.getMemberRef(user.id).create(user);
   };
 
   private getMembersRef = (): firestore.CollectionReference => {
     return this.nbrRef.doc('group').collection('members');
+  };
+
+  private getMemberRef = (memberId: string): firestore.DocumentReference => {
+    return this.getMembersRef().doc(memberId);
   };
 }
