@@ -1,5 +1,6 @@
 export enum Activity {
   Run = 'run',
+  OCR = 'ocr',
   Swim = 'swim',
   Stretch = 'stretch',
   Climb = 'climb',

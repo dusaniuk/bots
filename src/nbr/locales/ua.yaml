@@ -47,6 +47,7 @@ chats:
 # all title should be with emoji in the end in order not to break buttons
 title:
   run: 'Біг 🏃‍'
+  ocr: 'OCR 🧗🏾‍'
   runPro: 'Run - Next lvl 🏃‍‍'
   swim: 'Плавання 🏊‍'
   stretch: 'Стрейчінг 🤸‍'

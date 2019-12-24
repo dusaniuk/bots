@@ -3,6 +3,7 @@ import { Activity } from '../constants/enums';
 
 export interface ActivitiesData {
   [Activity.Run]: number[];
+  [Activity.OCR]: number[];
   [Activity.Swim]: number[];
   [Activity.Stretch]: number[];
   [Activity.Climb]: number[];
