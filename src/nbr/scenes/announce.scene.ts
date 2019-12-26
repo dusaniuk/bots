@@ -34,18 +34,18 @@ export class AnnounceScene {
   }
 
   private attachHookListeners = () => {
-    this.scene.enter(this.enter);
+    this.scene.enter(this.onEnterScene);
     this.scene.on('message', this.onMessage);
 
-    this.scene.action(Actions.Next, this.listenForMessage);
-    this.scene.action(Actions.Approve, this.approveSelectedActivities);
-    this.scene.action(Actions.Restart, this.restartActivitiesSelection);
+    this.scene.action(Actions.Next, this.onNext);
+    this.scene.action(Actions.Approve, this.onApprove);
+    this.scene.action(Actions.Restart, this.onRestart);
 
-    this.scene.action(Activity.All, this.handleAllSelection);
-    this.scene.action(/^.*$/, this.handleActivitySelection);
+    this.scene.action(Activity.All, this.onSelectAll);
+    this.scene.action(/^.*$/, this.onSelectActivity);
   };
 
-  private enter = async (ctx: AppContext) => {
+  private onEnterScene = async (ctx: AppContext): Promise<void> => {
     this.dropState(ctx);
 
     if (!this.isAllowedToAnnounce(ctx.from.id)) {
@@ -60,83 +60,7 @@ export class AnnounceScene {
     await ctx.reply(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
-  private listenForMessage = async (ctx: AppContext) => {
-    await ctx.deleteMessage();
-    await ctx.reply(ctx.i18n.t('announce.requestMessage'));
-
-    this.getState(ctx).isListeningForMessage = true;
-  };
-
-  private approveSelectedActivities = async (ctx: AppContext) => {
-    await ctx.deleteMessage();
-    await ctx.reply(ctx.i18n.t('announce.looking'));
-
-    const activitiesData = await this.activitiesService.getAll();
-    const state: AnnounceState = this.getState(ctx);
-
-    const userIds: number[] = state.activities.reduce((acc: number[], activity: string) => {
-      return [...acc, ...activitiesData[activity]];
-    }, []);
-
-    const userIdsSet: Set<number> = new Set(userIds);
-    userIdsSet.delete(ctx.from.id);
-
-    if (CONFIG.environment === 'dev') {
-      userIdsSet.clear();
-      userIdsSet.add(ctx.from.id);
-    }
-
-    const normalizedUserIdsList: number[] = Array.from(userIdsSet);
-
-    if (normalizedUserIdsList.length === 0) {
-      await ctx.reply(ctx.i18n.t('error.usersNotFound'));
-      await ctx.scene.leave();
-      return;
-    }
-
-    await ctx.reply(
-      ctx.i18n.t('announce.startSending', {
-        usersCount: normalizedUserIdsList.length,
-      }),
-    );
-
-    const activities: string[] = state.activities.includes(Activity.All) ? [Activity.All] : state.activities;
-
-    await normalizedUserIdsList.forEach((userId: number) => {
-      const resourceKey: string = ctx.from.username ? 'announce.message2' : 'announce.message';
-      const message: string = ctx.i18n.t(resourceKey, {
-        user: `${ctx.from.first_name} ${ctx.from.last_name || ''}`,
-        activities: getNormalizedActivities(ctx, activities),
-        message: state.message,
-      });
-
-      return ctx.telegram.sendMessage(userId, message, {
-        parse_mode: 'Markdown',
-      });
-    });
-
-    await ctx.reply(ctx.i18n.t('announce.sent'));
-    await ctx.scene.leave();
-  };
-
-  private restartActivitiesSelection = async (ctx: AppContext) => {
-    this.dropState(ctx);
-
-    await ctx.deleteMessage();
-    await ctx.scene.reenter();
-  };
-
-  private handleAllSelection = async (ctx: AppContext) => {
-    const { activities } = this.getState(ctx);
-    activities.length = 0;
-
-    const activitiesList: string[] = Object.keys(Activity).map(k => Activity[k]);
-    activities.push(...activitiesList);
-
-    await this.listenForMessage(ctx);
-  };
-
-  private handleActivitySelection = async (ctx: AppContext) => {
+  private onSelectActivity = async (ctx: AppContext): Promise<void> => {
     const { activities } = this.getState(ctx);
 
     const newActivity = ctx.callbackQuery.data;
@@ -150,7 +74,24 @@ export class AnnounceScene {
     await ctx.editMessageText(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
-  private onMessage = async (ctx: AppContext) => {
+  private onSelectAll = async (ctx: AppContext): Promise<void> => {
+    const { activities } = this.getState(ctx);
+    activities.length = 0;
+
+    const activitiesList: string[] = Object.keys(Activity).map(k => Activity[k]);
+    activities.push(...activitiesList);
+
+    await this.onNext(ctx);
+  };
+
+  private onNext = async (ctx: AppContext): Promise<void> => {
+    await ctx.deleteMessage();
+    await ctx.reply(ctx.i18n.t('announce.requestMessage'));
+
+    this.getState(ctx).isListeningForMessage = true;
+  };
+
+  private onMessage = async (ctx: AppContext): Promise<void> => {
     const state: AnnounceState = this.getState(ctx);
     if (!state.isListeningForMessage) {
       return;
@@ -171,6 +112,63 @@ export class AnnounceScene {
     await ctx.replyWithMarkdown(msg, keyboard);
   };
 
+  private onRestart = async (ctx: AppContext): Promise<void> => {
+    this.dropState(ctx);
+
+    await ctx.deleteMessage();
+    await ctx.scene.reenter();
+  };
+
+  private onApprove = async (ctx: AppContext): Promise<void> => {
+    await ctx.deleteMessage();
+    await ctx.reply(ctx.i18n.t('announce.looking'));
+
+    const { activities, message }: AnnounceState = this.getState(ctx);
+
+    const userIds = await this.getUserIdsForActivities(activities, ctx.from.id);
+
+    if (userIds.length === 0) {
+      await ctx.reply(ctx.i18n.t('error.usersNotFound'));
+      await ctx.scene.leave();
+      return;
+    }
+
+    await ctx.reply(ctx.i18n.t('announce.startSending', { usersCount: userIds.length }));
+
+    const finalizedMessage: string = ctx.i18n.t('announce.message', {
+      user: this.stringifyUserGreeting(ctx),
+      activities: getNormalizedActivities(ctx, activities),
+      message,
+    });
+
+    await userIds.forEach((userId: number) => {
+      return ctx.telegram.sendMessage(userId, finalizedMessage, {
+        parse_mode: 'Markdown',
+      });
+    });
+
+    await ctx.reply(ctx.i18n.t('announce.sent'));
+    await ctx.scene.leave();
+  };
+
+  // helpers
+  private getUserIdsForActivities = async (activities: string[], senderId: number): Promise<number[]> => {
+    if (CONFIG.environment === 'dev') {
+      return [senderId];
+    }
+
+    const activitiesData = await this.activitiesService.getAll();
+
+    const userIds: number[] = activities.reduce((acc: number[], activity: string) => {
+      return [...acc, ...activitiesData[activity]];
+    }, []);
+
+    const userIdsSet: Set<number> = new Set(userIds);
+    userIdsSet.delete(senderId);
+
+    return Array.from(userIdsSet);
+  };
+
   private isAllowedToAnnounce = async (userId: number): Promise<boolean> => {
     const user = await this.usersService.getUser(userId.toString());
 
@@ -186,5 +184,11 @@ export class AnnounceScene {
       activities: [],
       isListeningForMessage: false,
     };
+  };
+
+  private stringifyUserGreeting = ({ from }: AppContext): string => {
+    const user = `*${from.first_name} ${from.last_name || ''}*`;
+
+    return from.username ? `${user} (@${from.username})` : user;
   };
 }
