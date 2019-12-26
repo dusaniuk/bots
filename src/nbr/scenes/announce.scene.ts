@@ -1,13 +1,15 @@
 import { BaseScene, Stage } from 'telegraf';
 import { firestore } from 'firebase-admin';
 
-import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
-import { Actions, Activity } from '../constants/enums';
-import { getNormalizedActivities } from '../utils/activities.utils';
-import { ActivitiesService } from '../services/activities.service';
-import { AppContext } from '../models/appContext';
 import { CONFIG } from '../../config';
+import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
+import { getNormalizedActivities } from '../utils/activities.utils';
+import { stringifyUserGreeting } from '../utils/user.utils';
+import { ActivitiesService } from '../services/activities.service';
+import { MessagingService } from '../services/messaging.service';
 import { UsersService } from '../services/users.service';
+import { Actions, Activity } from '../constants/enums';
+import { AppContext } from '../models/appContext';
 
 interface AnnounceState {
   activities: string[];
@@ -17,6 +19,7 @@ interface AnnounceState {
 
 export class AnnounceScene {
   private readonly activitiesService: ActivitiesService;
+  private readonly messagingService: MessagingService;
   private readonly usersService: UsersService;
 
   public static ID: string = 'announce';
@@ -25,6 +28,7 @@ export class AnnounceScene {
 
   constructor(private db: firestore.Firestore) {
     this.activitiesService = new ActivitiesService(db);
+    this.messagingService = new MessagingService();
     this.usersService = new UsersService(db);
 
     this.scene = new BaseScene(AnnounceScene.ID);
@@ -135,17 +139,15 @@ export class AnnounceScene {
 
     await ctx.reply(ctx.i18n.t('announce.startSending', { usersCount: userIds.length }));
 
-    const finalizedMessage: string = ctx.i18n.t('announce.message', {
-      user: this.stringifyUserGreeting(ctx),
-      activities: getNormalizedActivities(ctx, activities),
-      message,
-    });
-
-    await userIds.forEach((userId: number) => {
-      return ctx.telegram.sendMessage(userId, finalizedMessage, {
-        parse_mode: 'Markdown',
-      });
-    });
+    await this.messagingService.sendMessages(
+      ctx,
+      userIds,
+      ctx.i18n.t('announce.message', {
+        user: stringifyUserGreeting(ctx),
+        activities: getNormalizedActivities(ctx, activities),
+        message,
+      }),
+    );
 
     await ctx.reply(ctx.i18n.t('announce.sent'));
     await ctx.scene.leave();
@@ -153,7 +155,7 @@ export class AnnounceScene {
 
   // helpers
   private getUserIdsForActivities = async (activities: string[], senderId: number): Promise<number[]> => {
-    if (CONFIG.environment === 'dev') {
+    if (CONFIG.isDevMode) {
       return [senderId];
     }
 
@@ -184,11 +186,5 @@ export class AnnounceScene {
       activities: [],
       isListeningForMessage: false,
     };
-  };
-
-  private stringifyUserGreeting = ({ from }: AppContext): string => {
-    const user = `*${from.first_name} ${from.last_name || ''}*`;
-
-    return from.username ? `${user} (@${from.username})` : user;
   };
 }

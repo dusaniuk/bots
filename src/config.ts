@@ -4,6 +4,7 @@ dotenv.config();
 
 export const CONFIG = {
   environment: process.env.ENVIRONMENT,
+  isDevMode: process.env.ENVIRONMENT === 'dev',
   port: process.env.PORT,
   more: {
     botToken: process.env.MORE_BOT_TOKEN,
