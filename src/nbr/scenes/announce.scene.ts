@@ -14,7 +14,9 @@ import { AppContext } from '../models/appContext';
 interface AnnounceState {
   activities: string[];
   isListeningForMessage: boolean;
+  isListeningForTopic: boolean;
   message: string;
+  topic: string;
 }
 
 export class AnnounceScene {
@@ -25,6 +27,8 @@ export class AnnounceScene {
   public static ID: string = 'announce';
 
   public scene: BaseScene<AppContext>;
+
+  private messageText: string;
 
   constructor(private db: firestore.Firestore) {
     this.activitiesService = new ActivitiesService(db);
@@ -104,16 +108,13 @@ export class AnnounceScene {
     state.message = ctx.message.text;
     state.isListeningForMessage = false;
 
-    const isAnnouncingForAllMembers = state.activities.includes(Activity.All);
-    const msgKey = isAnnouncingForAllMembers ? 'confirmRequestToAll' : 'confirmRequest';
-
-    const msg: string = ctx.i18n.t(`announce.${msgKey}`, {
+    this.messageText = ctx.i18n.t('announce.message', {
+      user: stringifyUserGreeting(ctx),
       activities: getNormalizedActivities(ctx, state.activities),
       message: state.message,
     });
 
-    const keyboard = getApproveKeyboard(ctx);
-    await ctx.replyWithMarkdown(msg, keyboard);
+    await ctx.replyWithMarkdown(ctx.i18n.t('announce.confirmAnnounce', { messageText: this.messageText }), getApproveKeyboard(ctx));
   };
 
   private onRestart = async (ctx: AppContext): Promise<void> => {
@@ -127,7 +128,7 @@ export class AnnounceScene {
     await ctx.deleteMessage();
     await ctx.reply(ctx.i18n.t('announce.looking'));
 
-    const { activities, message }: AnnounceState = this.getState(ctx);
+    const { activities }: AnnounceState = this.getState(ctx);
 
     const userIds = await this.getUserIdsForActivities(activities, ctx.from.id);
 
@@ -139,15 +140,7 @@ export class AnnounceScene {
 
     await ctx.reply(ctx.i18n.t('announce.startSending', { usersCount: userIds.length }));
 
-    await this.messagingService.sendMessages(
-      ctx,
-      userIds,
-      ctx.i18n.t('announce.message', {
-        user: stringifyUserGreeting(ctx),
-        activities: getNormalizedActivities(ctx, activities),
-        message,
-      }),
-    );
+    await this.messagingService.sendMessages(ctx, userIds, this.messageText);
 
     await ctx.reply(ctx.i18n.t('announce.sent'));
     await ctx.scene.leave();
@@ -185,6 +178,9 @@ export class AnnounceScene {
     ctx.scene.state = {
       activities: [],
       isListeningForMessage: false,
+      isListeningForTopic: false,
+      message: '',
+      topic: '',
     };
   };
 }
