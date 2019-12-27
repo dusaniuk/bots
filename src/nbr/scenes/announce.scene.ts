@@ -178,7 +178,7 @@ export class AnnounceScene {
 
     const activitiesData = await this.activitiesService.getAll();
 
-    const userIds: number[] = activities.reduce((acc: number[], activity: string) => {
+    const userIds: number[] = [...activities, Activity.All].reduce((acc: number[], activity: string) => {
       return [...acc, ...activitiesData[activity]];
     }, []);
 
