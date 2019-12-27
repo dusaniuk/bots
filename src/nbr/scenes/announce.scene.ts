@@ -94,24 +94,37 @@ export class AnnounceScene {
 
   private onNext = async (ctx: AppContext): Promise<void> => {
     await ctx.deleteMessage();
-    await ctx.reply(ctx.i18n.t('announce.requestMessage'));
+    await ctx.reply(ctx.i18n.t('announce.requestTopic'));
 
-    this.getState(ctx).isListeningForMessage = true;
+    this.getState(ctx).isListeningForTopic = true;
   };
 
   private onMessage = async (ctx: AppContext): Promise<void> => {
     const state: AnnounceState = this.getState(ctx);
-    if (!state.isListeningForMessage) {
+
+    if (!state.isListeningForTopic && !state.isListeningForMessage) {
       return;
     }
 
-    state.message = ctx.message.text;
-    state.isListeningForMessage = false;
+    if (state.isListeningForTopic) {
+      state.topic = ctx.message.text;
+      state.isListeningForTopic = false;
+      state.isListeningForMessage = true;
+
+      await ctx.reply(ctx.i18n.t('announce.requestMessage'));
+      return;
+    }
+
+    if (state.isListeningForMessage) {
+      state.message = ctx.message.text;
+      state.isListeningForMessage = false;
+    }
 
     this.messageText = ctx.i18n.t('announce.message', {
       user: stringifyUserGreeting(ctx),
       activities: getNormalizedActivities(ctx, state.activities),
       message: state.message,
+      topic: state.topic,
     });
 
     await ctx.replyWithMarkdown(ctx.i18n.t('announce.confirmAnnounce', { messageText: this.messageText }), getApproveKeyboard(ctx));
