@@ -7,6 +7,7 @@ import { MessageMetadata } from '../models/messages';
 import { getDeleteMessagesKeyboard } from '../keyboards/deleteMessages.keyboard';
 import { getApproveKeyboard } from '../keyboards';
 import { Actions } from '../constants/enums';
+import { UsersService } from '../services/users.service';
 
 interface DeleteAnnounceState {
   messages: MessageMetadata[];
@@ -15,6 +16,7 @@ interface DeleteAnnounceState {
 
 export class DeleteAnnounceScene {
   private readonly messagingService: MessagingService;
+  private readonly usersService: UsersService;
 
   public static ID: string = 'delete-announce';
 
@@ -22,6 +24,7 @@ export class DeleteAnnounceScene {
 
   constructor(private db: firestore.Firestore) {
     this.messagingService = new MessagingService(db);
+    this.usersService = new UsersService(db);
 
     this.scene = new BaseScene(DeleteAnnounceScene.ID);
     this.scene.hears('abort', Stage.leave());
@@ -38,6 +41,12 @@ export class DeleteAnnounceScene {
 
   private onEnterScene = async (ctx: AppContext): Promise<void> => {
     this.dropState(ctx);
+
+    if (!this.isAllowedToDeleteMessages(ctx.from.id)) {
+      await ctx.reply(ctx.i18n.t('deleteAnnounce.prohibited'));
+      await ctx.scene.leave();
+      return;
+    }
 
     const messages: MessageMetadata[] = await this.messagingService.getLastMessages();
     this.getState(ctx).messages = messages;
@@ -91,6 +100,12 @@ export class DeleteAnnounceScene {
   };
 
   // helpers
+  private isAllowedToDeleteMessages = async (userId: number): Promise<boolean> => {
+    const user = await this.usersService.getUser(userId.toString());
+
+    return !!user.allowedToAnnounce;
+  };
+
   private getState = (ctx: AppContext): DeleteAnnounceState => {
     return ctx.scene.state as DeleteAnnounceState;
   };
