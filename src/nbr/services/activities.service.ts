@@ -7,7 +7,6 @@ export interface ActivitiesData {
   [Activity.Swim]: number[];
   [Activity.Stretch]: number[];
   [Activity.Climb]: number[];
-  [Activity.Sketch]: number[];
   [Activity.Cycling]: number[];
   [Activity.All]: number[];
 }
