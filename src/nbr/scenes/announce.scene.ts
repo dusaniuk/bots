@@ -10,6 +10,7 @@ import { MessagingService } from '../services/messaging.service';
 import { UsersService } from '../services/users.service';
 import { Actions, Activity } from '../constants/enums';
 import { AppContext } from '../models/appContext';
+import { MessageKey } from '../models/messages';
 
 interface AnnounceState {
   activities: string[];
@@ -32,7 +33,7 @@ export class AnnounceScene {
 
   constructor(private db: firestore.Firestore) {
     this.activitiesService = new ActivitiesService(db);
-    this.messagingService = new MessagingService();
+    this.messagingService = new MessagingService(db);
     this.usersService = new UsersService(db);
 
     this.scene = new BaseScene(AnnounceScene.ID);
@@ -141,7 +142,7 @@ export class AnnounceScene {
     await ctx.deleteMessage();
     await ctx.reply(ctx.i18n.t('announce.looking'));
 
-    const { activities }: AnnounceState = this.getState(ctx);
+    const { activities, topic }: AnnounceState = this.getState(ctx);
 
     const userIds = await this.getUserIdsForActivities(activities, ctx.from.id);
 
@@ -153,13 +154,23 @@ export class AnnounceScene {
 
     await ctx.reply(ctx.i18n.t('announce.startSending', { usersCount: userIds.length }));
 
-    await this.messagingService.sendMessages(ctx, userIds, this.messageText);
+    const keys: MessageKey[] = await this.messagingService.sendMessages(ctx, userIds, this.messageText);
+    await this.saveMessageMetadata(topic, keys);
 
     await ctx.reply(ctx.i18n.t('announce.sent'));
     await ctx.scene.leave();
   };
 
   // helpers
+  private saveMessageMetadata = (topic: string, messageKeys: MessageKey[]): Promise<void> => {
+    return this.messagingService.saveMessageMetadata({
+      messageText: this.messageText,
+      timestamp: new Date().getTime(),
+      messageKeys,
+      topic,
+    });
+  };
+
   private getUserIdsForActivities = async (activities: string[], senderId: number): Promise<number[]> => {
     if (CONFIG.isDevMode) {
       return [senderId];
