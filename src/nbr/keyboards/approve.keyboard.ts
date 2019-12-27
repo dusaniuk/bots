@@ -10,6 +10,5 @@ export const getApproveKeyboard = ({ i18n }: AppContext): ExtraReplyMessage => {
     [Markup.callbackButton(i18n.t('title.approve'), Actions.Approve)],
   ])
     .oneTime(true)
-    .resize()
     .extra();
 };

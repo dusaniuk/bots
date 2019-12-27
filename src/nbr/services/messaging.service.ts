@@ -26,8 +26,38 @@ export class MessagingService {
     );
   };
 
+  deleteMessages = async (ctx: AppContext, keys: MessageKey[]): Promise<number> => {
+    const result: boolean[] = await Promise.all(
+      keys.map(({ chatId, messageId }: MessageKey) => {
+        return ctx.telegram.deleteMessage(chatId, messageId);
+      }),
+    );
+
+    return result.filter((isSucceeded: boolean) => isSucceeded).length;
+  };
+
   saveMessageMetadata = async (data: MessageMetadata): Promise<void> => {
     await this.getMessagesRef().add(data);
+  };
+
+  deleteMessageMetadata = async (id: string): Promise<void> => {
+    await this.getMessagesRef()
+      .doc(id)
+      .delete();
+  };
+
+  getLastMessages = async (): Promise<MessageMetadata[]> => {
+    const query = await this.getMessagesRef()
+      .orderBy('timestamp', 'desc')
+      .limit(10)
+      .get();
+
+    return query.docs.map(
+      (doc: firestore.QueryDocumentSnapshot): MessageMetadata => ({
+        ...(doc.data() as MessageMetadata),
+        id: doc.id,
+      }),
+    );
   };
 
   private getMessagesRef = (): firestore.CollectionReference => {

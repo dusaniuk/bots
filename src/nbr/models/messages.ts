@@ -4,6 +4,7 @@ export interface MessageKey {
 }
 
 export interface MessageMetadata {
+  id?: string;
   topic: string;
   timestamp: number;
   messageText: string;

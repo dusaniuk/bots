@@ -1,10 +1,8 @@
 /* eslint-disable no-console */
-import Telegraf, {
-  Context, SceneContextMessageUpdate, session, Stage,
-} from 'telegraf';
-import I18n from 'telegraf-i18n';
+import Telegraf, { Context, session, Stage } from 'telegraf';
 import { firestore } from 'firebase-admin';
-import * as path from 'path';
+import I18n from 'telegraf-i18n';
+import { resolve } from 'path';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
@@ -15,12 +13,13 @@ import { TelegramUser, UsersService } from './services/users.service';
 import { AppContext } from './models/appContext';
 import { onlyPrivate } from './middleware/chat.middleware';
 import { getChatsKeyboard } from './keyboards/chats.keyboard';
+import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';
 
 export class NbrBot implements Bot {
   private readonly usersService: UsersService;
 
-  private readonly bot: Telegraf<SceneContextMessageUpdate>;
-  private readonly stage: Stage<SceneContextMessageUpdate>;
+  private readonly bot: Telegraf<AppContext>;
+  private readonly stage: Stage<AppContext>;
 
   private isRunning: boolean = false;
 
@@ -35,7 +34,7 @@ export class NbrBot implements Bot {
     const i18n = new I18n({
       defaultLanguage: 'ua',
       allowMissing: false,
-      directory: path.resolve(__dirname, 'locales'),
+      directory: resolve(__dirname, 'locales'),
     });
 
     this.bot.use(session());
@@ -45,6 +44,7 @@ export class NbrBot implements Bot {
 
     this.useActivitiesScene();
     this.useAnnounceScene();
+    this.useDeleteAnnounceScene();
 
     this.bot.command('start', async (ctx: AppContext) => {
       await ctx.replyWithMarkdown(ctx.i18n.t('start.greeting'));
@@ -53,8 +53,13 @@ export class NbrBot implements Bot {
       await this.saveTelegrafUser(ctx);
     });
 
-    this.bot.command('announce', async (ctx: SceneContextMessageUpdate) => {
-      await ctx.scene.enter(AnnounceScene.ID);
+    this.bot.command('announce', (ctx: AppContext) => {
+      return ctx.scene.enter(AnnounceScene.ID);
+    });
+
+    this.bot.command('deleteannounce', async (ctx: AppContext) => {
+      await ctx.reply(ctx.i18n.t('deleteAnnounce.intro'));
+      await ctx.scene.enter(DeleteAnnounceScene.ID);
     });
 
     this.bot.command('chats', async (ctx: AppContext) => {
@@ -79,6 +84,11 @@ export class NbrBot implements Bot {
 
   private useAnnounceScene = () => {
     const { scene } = new AnnounceScene(this.db);
+    this.stage.register(scene);
+  };
+
+  private useDeleteAnnounceScene = () => {
+    const { scene } = new DeleteAnnounceScene(this.db);
     this.stage.register(scene);
   };
 
