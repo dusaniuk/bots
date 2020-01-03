@@ -3,7 +3,6 @@ import { firestore } from 'firebase-admin';
 import { UsersService } from '../service/users.service';
 import { AppContext } from '../../shared/models/appContext';
 import { ChatType } from '../models/chatType';
-import { MoreFacesStickers } from '../constants/moreFaces.stickers';
 import { Hunter } from '../models';
 import { createHunter, getGreetingNameForUser, getHuntersScore } from '../utils/helpers';
 
@@ -36,7 +35,6 @@ export class UsersHandler {
 
   private rejectRegistration = async (ctx: AppContext): Promise<void> => {
     await ctx.reply(ctx.i18n.t('error.alreadyInGame'));
-    await ctx.replyWithSticker(MoreFacesStickers.whatDoYouWant);
   };
 
   private addNewUser = async (ctx: AppContext): Promise<void> => {

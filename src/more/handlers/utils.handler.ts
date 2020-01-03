@@ -2,7 +2,6 @@ import { Message } from 'telegraf/typings/telegram-types';
 import { firestore } from 'firebase-admin';
 
 import { AppContext } from '../../shared/models/appContext';
-import { MoreFacesStickers } from '../constants/moreFaces.stickers';
 import { CapturesService } from '../service/captures.service';
 import { UsersService } from '../service/users.service';
 
@@ -20,8 +19,6 @@ export class UtilsHandler {
   };
 
   getHelp = async (ctx: AppContext): Promise<void> => {
-    await ctx.replyWithSticker(MoreFacesStickers.ohMyGod);
-
     await ctx.replyWithMarkdown(ctx.i18n.t('other.rules'));
   };
 
