@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import Telegraf, { ContextMessageUpdate, session } from 'telegraf';
+import Telegraf, { session } from 'telegraf';
 import { firestore } from 'firebase-admin';
 import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
@@ -11,9 +11,10 @@ import { UtilsHandler } from './handlers/utils.handler';
 import { CapturesHandler } from './handlers/captures.handler';
 
 import { UsersHandler } from './handlers/users.handler';
+import { AppContext } from '../shared/models/appContext';
 
 export class MoreBot implements Bot {
-  private readonly bot: Telegraf<ContextMessageUpdate>;
+  private readonly bot: Telegraf<AppContext>;
 
   private readonly usersHandler: UsersHandler;
   private readonly capturesHandler: CapturesHandler;
@@ -62,13 +63,10 @@ export class MoreBot implements Bot {
   };
 
   private bindUtilActions = () => {
-    this.bot.command('ping', this.utilsHandler.pong);
-
-    this.bot.command('help', this.utilsHandler.getHelp);
-    this.bot.command('halp', this.utilsHandler.getHelp);
-
-    this.bot.command('announce', this.utilsHandler.announce);
-
     this.bot.hears(/макс/i, this.utilsHandler.aveMaks);
+
+    this.bot.command('ping', this.utilsHandler.pong);
+    this.bot.command(['help', 'halp'], this.utilsHandler.getHelp);
+    this.bot.command('announce', this.utilsHandler.announce);
   };
 }

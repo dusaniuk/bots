@@ -22,7 +22,7 @@ export class UtilsHandler {
   getHelp = async (ctx: AppContext): Promise<void> => {
     await ctx.replyWithSticker(MoreFacesStickers.ohMyGod);
 
-    await ctx.reply(ctx.i18n.t('other.rules'));
+    await ctx.replyWithMarkdown(ctx.i18n.t('other.rules'));
   };
 
   aveMaks = (ctx: AppContext): Promise<any> => {
