@@ -23,6 +23,7 @@ export class MoreBot implements Bot {
     this.bot = new Telegraf(CONFIG.more.botToken);
 
     this.utilsHandler = new UtilsHandler(this.db);
+    this.usersHandler = new UsersHandler(this.db);
     this.capturesHandler = new CapturesHandler(this.db);
   }
 
