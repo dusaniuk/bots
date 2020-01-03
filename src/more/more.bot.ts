@@ -8,15 +8,20 @@ import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
 
 import { ActionsHandler } from './bot/actionsHandler';
+import { CapturesHandler } from './handlers/captures.handler';
+import { Actions } from './constants/actions';
 
 export class MoreBot implements Bot {
   private readonly bot: Telegraf<ContextMessageUpdate>;
+
   private readonly handler: ActionsHandler;
+  private readonly capturesHandler: CapturesHandler;
 
   constructor(private db: firestore.Firestore) {
     this.bot = new Telegraf(CONFIG.more.botToken);
 
     this.handler = new ActionsHandler(this.db);
+    this.capturesHandler = new CapturesHandler(this.db);
   }
 
   start = () => {
@@ -50,8 +55,8 @@ export class MoreBot implements Bot {
     this.bot.command('help', this.handler.getHelp);
     this.bot.command('halp', this.handler.getHelp);
 
-    this.bot.command('capture', this.handler.capture);
-    this.bot.command('c', this.handler.capture);
+    this.bot.command('capture', this.capturesHandler.capture);
+    this.bot.command('c', this.capturesHandler.capture);
   };
 
   private bindPrivateCommands = () => {
@@ -59,7 +64,7 @@ export class MoreBot implements Bot {
   };
 
   private bindCallbackQueries = () => {
-    this.bot.on('callback_query', this.handler.handleAdminAnswer);
+    this.bot.on('callback_query', this.capturesHandler.handleHunterCapture);
   };
 
   private bindHears = () => {
