@@ -7,20 +7,22 @@ import { resolve } from 'path';
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
 
-import { ActionsHandler } from './bot/actionsHandler';
+import { UtilsHandler } from './handlers/utils.handler';
 import { CapturesHandler } from './handlers/captures.handler';
-import { Actions } from './constants/actions';
+
+import { UsersHandler } from './handlers/users.handler';
 
 export class MoreBot implements Bot {
   private readonly bot: Telegraf<ContextMessageUpdate>;
 
-  private readonly handler: ActionsHandler;
+  private readonly usersHandler: UsersHandler;
   private readonly capturesHandler: CapturesHandler;
+  private readonly utilsHandler: UtilsHandler;
 
   constructor(private db: firestore.Firestore) {
     this.bot = new Telegraf(CONFIG.more.botToken);
 
-    this.handler = new ActionsHandler(this.db);
+    this.utilsHandler = new UtilsHandler(this.db);
     this.capturesHandler = new CapturesHandler(this.db);
   }
 
@@ -34,10 +36,9 @@ export class MoreBot implements Bot {
     this.bot.use(session());
     this.bot.use(i18n.middleware());
 
-    this.bindPublicCommands();
-    this.bindPrivateCommands();
-    this.bindCallbackQueries();
-    this.bindHears();
+    this.bindUsersActions();
+    this.bindCaptureActions();
+    this.bindUtilActions();
 
     this.bot
       .launch()
@@ -47,27 +48,26 @@ export class MoreBot implements Bot {
       });
   };
 
-  private bindPublicCommands = () => {
-    this.bot.command('ping', this.handler.pong);
-    this.bot.command('reg', this.handler.register);
-    this.bot.command('score', this.handler.getScore);
+  private bindUsersActions = () => {
+    this.bot.command('reg', this.usersHandler.register);
+    this.bot.command('score', this.usersHandler.getScore);
+  };
 
-    this.bot.command('help', this.handler.getHelp);
-    this.bot.command('halp', this.handler.getHelp);
-
+  private bindCaptureActions = () => {
     this.bot.command('capture', this.capturesHandler.capture);
     this.bot.command('c', this.capturesHandler.capture);
-  };
 
-  private bindPrivateCommands = () => {
-    this.bot.command('announce', this.handler.announce);
-  };
-
-  private bindCallbackQueries = () => {
     this.bot.on('callback_query', this.capturesHandler.handleHunterCapture);
   };
 
-  private bindHears = () => {
-    this.bot.hears(/макс/i, this.handler.aveMaks);
+  private bindUtilActions = () => {
+    this.bot.command('ping', this.utilsHandler.pong);
+
+    this.bot.command('help', this.utilsHandler.getHelp);
+    this.bot.command('halp', this.utilsHandler.getHelp);
+
+    this.bot.command('announce', this.utilsHandler.announce);
+
+    this.bot.hears(/макс/i, this.utilsHandler.aveMaks);
   };
 }
