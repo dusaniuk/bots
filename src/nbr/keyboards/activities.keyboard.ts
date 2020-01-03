@@ -2,7 +2,7 @@ import { CallbackButton, Markup } from 'telegraf';
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 
 import { Actions, Activity } from '../constants/enums';
-import { AppContext } from '../models/appContext';
+import { AppContext } from '../../shared/models/appContext';
 import { getTitleWithEmoji } from '../utils/title.utils';
 
 export const getActivitiesKeyboard = (ctx: AppContext, activities: string[] = []): ExtraReplyMessage => {

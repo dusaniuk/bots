@@ -5,7 +5,7 @@ import { Actions, Activity } from '../constants/enums';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { ActivitiesService } from '../services/activities.service';
 import { getNormalizedActivities } from '../utils/activities.utils';
-import { AppContext } from '../models/appContext';
+import { AppContext } from '../../shared/models/appContext';
 
 interface ActivitiesState {
   activities: string[];

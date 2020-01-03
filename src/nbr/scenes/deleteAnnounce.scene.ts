@@ -2,7 +2,7 @@ import { BaseScene, Stage } from 'telegraf';
 import { firestore } from 'firebase-admin';
 
 import { MessagingService } from '../services/messaging.service';
-import { AppContext } from '../models/appContext';
+import { AppContext } from '../../shared/models/appContext';
 import { MessageMetadata } from '../models/messages';
 import { getDeleteMessagesKeyboard } from '../keyboards/deleteMessages.keyboard';
 import { getApproveKeyboard } from '../keyboards';

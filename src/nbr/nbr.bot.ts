@@ -10,7 +10,7 @@ import { Bot } from '../shared/bot';
 import { ActivitiesScene } from './scenes/activities.scene';
 import { AnnounceScene } from './scenes/announce.scene';
 import { TelegramUser, UsersService } from './services/users.service';
-import { AppContext } from './models/appContext';
+import { AppContext } from '../shared/models/appContext';
 import { onlyPrivate } from './middleware/chat.middleware';
 import { getChatsKeyboard } from './keyboards/chats.keyboard';
 import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';

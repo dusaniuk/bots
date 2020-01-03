@@ -1,4 +1,4 @@
-import { AppContext } from '../models/appContext';
+import { AppContext } from '../../shared/models/appContext';
 import { getTitle } from './title.utils';
 import { Activity } from '../constants/enums';
 
