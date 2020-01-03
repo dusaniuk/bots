@@ -7,20 +7,16 @@ import { resolve } from 'path';
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
 
-import { FirestoreDatabase } from './database';
-import { Database } from './interfaces/database';
 import { ActionsHandler } from './bot/actionsHandler';
 
 export class MoreBot implements Bot {
   private readonly bot: Telegraf<ContextMessageUpdate>;
   private readonly handler: ActionsHandler;
-  private readonly usersDb: Database;
 
   constructor(private db: firestore.Firestore) {
     this.bot = new Telegraf(CONFIG.more.botToken);
-    this.usersDb = new FirestoreDatabase(this.db);
 
-    this.handler = new ActionsHandler(this.usersDb);
+    this.handler = new ActionsHandler(this.db);
   }
 
   start = () => {

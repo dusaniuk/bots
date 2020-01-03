@@ -1,9 +1,8 @@
 import { firestore } from 'firebase-admin';
 
-import { UsersDatabase } from '../interfaces/database';
 import { Hunter } from '../models';
 
-export class UsersService implements UsersDatabase {
+export class UsersService {
   private readonly chatRef: firestore.CollectionReference;
 
   constructor(private db: firestore.Firestore) {

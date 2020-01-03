@@ -1,8 +1,8 @@
 import { firestore } from 'firebase-admin';
-import { CaptureDatabase } from '../interfaces/database';
+
 import { CaptureRecord } from '../models';
 
-export class CapturesService implements CaptureDatabase {
+export class CapturesService {
   private readonly chatRef: firestore.CollectionReference;
 
   constructor(private db: firestore.Firestore) {
