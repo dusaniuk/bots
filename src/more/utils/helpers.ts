@@ -1,5 +1,6 @@
-import { Context } from 'telegraf';
-import { IncomingMessage } from 'telegraf/typings/telegram-types';
+import { Context, ContextMessageUpdate } from 'telegraf';
+import { IncomingMessage, Message } from 'telegraf/typings/telegram-types';
+
 import { Hunter, Mention, User } from '../models';
 
 export const createHunter = ({ from }: Context): Hunter => {
@@ -30,6 +31,16 @@ export const getGreetingNameForUser = ({ username, firstName, lastName }: User):
   }
 
   return name.join(' ');
+};
+
+export const getVictimsMsg = (victims: User[]): string => {
+  let message = '';
+
+  victims.forEach((user) => {
+    message += ` ${getGreetingNameForUser(user)},`;
+  });
+
+  return message.substring(0, message.length - 1);
 };
 
 export const getMentions = (message: IncomingMessage): Mention[] => {
@@ -67,4 +78,19 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
   });
 
   return mentionedUsers;
+};
+
+export const getHuntersScore = (ctx: ContextMessageUpdate, hunters: Hunter[]): Promise<Message> => {
+  let msg = '';
+
+  hunters.forEach((user: Hunter, index: number) => {
+    let name = getGreetingNameForUser(user);
+    if (name.startsWith('@')) {
+      name = name.substring(1);
+    }
+
+    msg += `${index + 1}) ${name}: ${user.score || 0} \n`;
+  });
+
+  return ctx.reply(msg);
 };

@@ -1,46 +1,49 @@
-import { ContextMessageUpdate, Markup } from 'telegraf';
 import { Message } from 'telegraf/typings/telegram-types';
 
 import { Database } from '../interfaces/database';
-import { TelegrafResponseService } from '../services/telegraf-response.service';
 
 import {
   CaptureRecord, Hunter, Mention, User,
 } from '../models';
 import * as utils from '../utils/helpers';
 import { ChatType } from '../models/chatType';
-
-const enum CallbackQueryType {
-  capture = 'capture',
-}
+import { AppContext } from '../../shared/models/appContext';
+import { getApproveKeyboard } from '../keyboards/approve.keyboard';
+import { MoreFacesStickers } from '../constants/moreFaces.stickers';
+import { CallbackQueryType } from '../constants/callbackQueryType';
 
 export class ActionsHandler {
-  constructor(private db: Database, private response: TelegrafResponseService) {}
+  constructor(private db: Database) {}
 
-  pong = (ctx: ContextMessageUpdate): Promise<Message> => {
-    return this.response.pong(ctx);
+  pong = (ctx: AppContext): Promise<Message> => {
+    return ctx.reply(ctx.i18n.t('other.pong'));
   };
 
-  register = async (ctx: ContextMessageUpdate): Promise<any> => {
+  register = async (ctx: AppContext): Promise<any> => {
     if (ctx.chat.type === ChatType.private) {
-      return this.response.rejectPrivateChat(ctx);
+      return ctx.reply(ctx.i18n.t('error.rejectPrivate'));
     }
 
     const isUserInChat = await this.db.isUserInChat(ctx.chat.id, ctx.from.id);
     if (isUserInChat) {
-      return this.response.userAlreadyInGame(ctx);
+      await ctx.reply(ctx.i18n.t('error.alreadyInGame'));
+      return ctx.replyWithSticker(MoreFacesStickers.whatDoYouWant);
     }
 
     const hunter: Hunter = utils.createHunter(ctx);
     await this.db.addUserInChat(ctx.chat.id, hunter);
 
-    return this.response.greetNewUser(ctx, hunter);
+    return ctx.reply(
+      ctx.i18n.t('user.greetNew', {
+        user: utils.getGreetingNameForUser(hunter),
+      }),
+    );
   };
 
-  capture = async (ctx: ContextMessageUpdate): Promise<any> => {
+  capture = async (ctx: AppContext): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);
     if (mentions.length === 0) {
-      return this.response.showCaptureInstructions(ctx);
+      return ctx.reply(ctx.i18n.t('other.howToCapture'));
     }
 
     const chatUsers: Hunter[] = await this.db.getAllUsersFromChat(ctx.chat.id);
@@ -48,7 +51,7 @@ export class ActionsHandler {
 
     const isMentionedHimself: boolean = mentionedUsers.some(u => u.id === ctx.from.id);
     if (isMentionedHimself) {
-      return this.response.rejectSelfCapture(ctx);
+      return ctx.reply(ctx.i18n.t('error.selfCapture'));
     }
 
     const validUsers: User[] = [];
@@ -69,17 +72,17 @@ export class ActionsHandler {
     });
 
     if (unverifiedUsers.length > 0) {
-      let msg = 'Хммм, тут в нас є юзери, яких немєа в базі. Одмен перевір пліз цих камєрунців: ';
+      let users = '';
 
       unverifiedUsers.forEach((user) => {
-        msg += ` ${user.username}`;
+        users += ` ${user.username}`;
       });
 
-      await ctx.reply(msg);
+      await ctx.replyWithMarkdown(ctx.i18n.t('error.nonRegisteredUsers', { users }));
     }
 
     if (validUsers.length === 0) {
-      return this.response.noUsersToCapture(ctx);
+      return ctx.reply(ctx.i18n.t('error.noUsersToCapture'));
     }
 
     const captureId = await this.db.addCaptureRecord(ctx.chat.id, {
@@ -90,54 +93,51 @@ export class ActionsHandler {
       points: validUsers.length * 4, // TODO: change this logic in future
     });
 
-    const hunter = chatUsers.find(({ id }) => id === ctx.from.id);
-    const msg = this.response.makeCaptureVictimsMsg(hunter, validUsers);
+    const hunter: User = chatUsers.find(({ id }) => id === ctx.from.id);
+    const adminId: number = chatUsers.find(({ isAdmin }: Hunter) => isAdmin).id;
 
-    const adminId = chatUsers.find(({ isAdmin }: Hunter) => isAdmin).id;
-    await ctx.telegram.sendMessage(
-      adminId,
-      `${msg}. Ти апруваєш?`,
-      Markup.inlineKeyboard([
-        Markup.callbackButton('Да', `${CallbackQueryType.capture} approve ${captureId} ${ctx.chat.id}`),
-        Markup.callbackButton('Нєєє', `${CallbackQueryType.capture} reject ${captureId} ${ctx.chat.id}`),
-      ])
-        .oneTime(true)
-        .resize()
-        .extra(),
-    );
+    const messageData = {
+      hunter: utils.getGreetingNameForUser(hunter),
+      victims: utils.getVictimsMsg(validUsers),
+    };
 
-    return ctx.reply(msg, { disable_notification: true });
+    const keyboard = getApproveKeyboard(ctx, captureId);
+    await ctx.telegram.sendMessage(adminId, ctx.i18n.t('capture.summary', messageData), keyboard);
+
+    return ctx.replyWithMarkdown(ctx.i18n.t('capture.message', messageData));
   };
 
-  getScore = async (ctx: ContextMessageUpdate): Promise<any> => {
+  getScore = async (ctx: AppContext): Promise<any> => {
     const hunters = await this.db.getAllUsersFromChat(ctx.chat.id);
     hunters.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
 
-    return this.response.getHuntersScore(ctx, hunters);
+    return utils.getHuntersScore(ctx, hunters);
   };
 
-  handleAdminAnswer = async (ctx: ContextMessageUpdate): Promise<any> => {
+  handleAdminAnswer = async (ctx: AppContext): Promise<any> => {
     const answerType: string = ctx.callbackQuery.data.split(' ')[0];
 
-    switch (answerType) {
-      case CallbackQueryType.capture:
-        return this.handleHunterCapture(ctx);
-      default:
-        throw new Error('unsupported callback query');
+    if (answerType === CallbackQueryType.capture) {
+      return this.handleHunterCapture(ctx);
     }
+
+    throw new Error('unsupported callback query');
   };
 
-  getHelp = (ctx: ContextMessageUpdate): Promise<Message> => {
-    return this.response.explainRulesToUser(ctx);
+  getHelp = async (ctx: AppContext): Promise<void> => {
+    await ctx.replyWithSticker(MoreFacesStickers.ohMyGod);
+
+    await ctx.reply(ctx.i18n.t('other.rules'));
   };
 
-  aveMaks = (ctx: ContextMessageUpdate): Promise<any> => {
-    return this.response.aveMaks(ctx);
+  aveMaks = (ctx: AppContext): Promise<any> => {
+    return ctx.reply(ctx.i18n.t('other.maks'));
   };
 
-  announce = async (ctx: ContextMessageUpdate): Promise<any> => {
+  announce = async (ctx: AppContext): Promise<void> => {
     if (ctx.message.from.id !== 288950149) {
-      return ctx.reply('Маладєц, найшов сікрєтну команду. Но ти не можеш її юзати');
+      await ctx.reply(ctx.i18n.t('announce.secretCommand'));
+      return;
     }
 
     const chatIDs = await this.db.getAllActiveChatsIDs();
@@ -147,10 +147,10 @@ export class ActionsHandler {
 
     await chatIDs.forEach((id: number) => ctx.telegram.sendMessage(id, message));
 
-    return ctx.reply(`Розіслано в наступні чати: ${chatIDs}`);
+    await ctx.reply(ctx.i18n.t('announce.sentTo'));
   };
 
-  private handleHunterCapture = async (ctx: ContextMessageUpdate): Promise<any> => {
+  private handleHunterCapture = async (ctx: AppContext): Promise<void> => {
     const { message, data } = ctx.callbackQuery;
     const [, command, captureId, chatId] = data.split(' ');
 
@@ -163,21 +163,20 @@ export class ActionsHandler {
 
     const userGreetingName = utils.getGreetingNameForUser(user);
 
-    let userResponse;
     if (command === 'approve') {
       await this.db.approveCaptureRecord(+chatId, captureId);
 
       // TODO: remove this 2 lines after I'll migrate to gathering score from capture records
       const newPoints = (user.score || 0) + record.points;
       await this.db.updateUserPoints(+chatId, record.hunterId, newPoints);
-
-      userResponse = `${userGreetingName} харооош. Ти заробив(ла) цілу кучу балів: ${record.points}.`;
-    } else {
-      userResponse = `${userGreetingName} ти шо, хотів(ла) наїбати всіх тут? Відхилено!`;
     }
 
-    await ctx.telegram.sendMessage(chatId, userResponse);
+    const msg = ctx.i18n.t(`capture.${command}`, {
+      user: userGreetingName,
+      points: record.points,
+    });
 
-    return ctx.answerCbQuery('Всьо гуд, обробив заявочку.');
+    await ctx.telegram.sendMessage(chatId, msg);
+    await ctx.answerCbQuery(ctx.i18n.t('other.handled'));
   };
 }

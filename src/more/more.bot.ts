@@ -1,74 +1,72 @@
 /* eslint-disable no-console */
-import Telegraf, { ContextMessageUpdate } from 'telegraf';
+import Telegraf, { ContextMessageUpdate, session } from 'telegraf';
 import { firestore } from 'firebase-admin';
+import I18n from 'telegraf-i18n';
+import { resolve } from 'path';
 
 import { CONFIG } from '../config';
 import { Bot } from '../shared/bot';
 
 import { FirestoreDatabase } from './database';
 import { Database } from './interfaces/database';
-import { ActionsHandler } from './bot/actions-handler';
-import { TelegrafResponseService } from './services/telegraf-response.service';
+import { ActionsHandler } from './bot/actionsHandler';
 
 export class MoreBot implements Bot {
-  private readonly telegrafBot: Telegraf<ContextMessageUpdate>;
+  private readonly bot: Telegraf<ContextMessageUpdate>;
   private readonly handler: ActionsHandler;
   private readonly usersDb: Database;
 
-  private isRunning: boolean = false;
-
   constructor(private db: firestore.Firestore) {
-    this.telegrafBot = new Telegraf(CONFIG.more.botToken);
+    this.bot = new Telegraf(CONFIG.more.botToken);
     this.usersDb = new FirestoreDatabase(this.db);
 
-    const responseService: TelegrafResponseService = new TelegrafResponseService();
-    this.handler = new ActionsHandler(this.usersDb, responseService);
+    this.handler = new ActionsHandler(this.usersDb);
   }
 
   start = () => {
+    const i18n = new I18n({
+      defaultLanguage: 'ua',
+      allowMissing: false,
+      directory: resolve(__dirname, 'locales'),
+    });
+
+    this.bot.use(session());
+    this.bot.use(i18n.middleware());
+
     this.bindPublicCommands();
     this.bindPrivateCommands();
     this.bindCallbackQueries();
     this.bindHears();
 
-    this.telegrafBot
+    this.bot
       .launch()
       .then(() => console.log('more bot has been started'))
       .catch((err) => {
         console.error(err);
-        this.isRunning = false;
       });
-
-    this.isRunning = true;
-  };
-
-  stop = () => {
-    if (this.isRunning) {
-      this.telegrafBot.stop();
-    }
   };
 
   private bindPublicCommands = () => {
-    this.telegrafBot.command('ping', this.handler.pong);
-    this.telegrafBot.command('reg', this.handler.register);
-    this.telegrafBot.command('score', this.handler.getScore);
+    this.bot.command('ping', this.handler.pong);
+    this.bot.command('reg', this.handler.register);
+    this.bot.command('score', this.handler.getScore);
 
-    this.telegrafBot.command('help', this.handler.getHelp);
-    this.telegrafBot.command('halp', this.handler.getHelp);
+    this.bot.command('help', this.handler.getHelp);
+    this.bot.command('halp', this.handler.getHelp);
 
-    this.telegrafBot.command('capture', this.handler.capture);
-    this.telegrafBot.command('c', this.handler.capture);
+    this.bot.command('capture', this.handler.capture);
+    this.bot.command('c', this.handler.capture);
   };
 
   private bindPrivateCommands = () => {
-    this.telegrafBot.command('announce', this.handler.announce);
+    this.bot.command('announce', this.handler.announce);
   };
 
   private bindCallbackQueries = () => {
-    this.telegrafBot.on('callback_query', this.handler.handleAdminAnswer);
+    this.bot.on('callback_query', this.handler.handleAdminAnswer);
   };
 
   private bindHears = () => {
-    this.telegrafBot.hears(/макс/i, this.handler.aveMaks);
+    this.bot.hears(/макс/i, this.handler.aveMaks);
   };
 }
