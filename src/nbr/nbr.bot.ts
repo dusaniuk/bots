@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import Telegraf, { Context, session, Stage } from 'telegraf';
+import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import { firestore } from 'firebase-admin';
 import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
@@ -47,7 +48,7 @@ export class NbrBot implements Bot {
     this.useDeleteAnnounceScene();
 
     this.bot.command('start', async (ctx: AppContext) => {
-      await ctx.replyWithMarkdown(ctx.i18n.t('start.greeting'));
+      await ctx.replyWithMarkdown(ctx.i18n.t('start.intro'));
       await ctx.scene.enter(ActivitiesScene.ID);
 
       await this.saveTelegrafUser(ctx);
@@ -66,6 +67,19 @@ export class NbrBot implements Bot {
       const keyboard = getChatsKeyboard(ctx);
 
       await ctx.reply(ctx.i18n.t('chats.intro'), keyboard);
+    });
+
+    this.bot.on('new_chat_members', async (ctx: AppContext) => {
+      const newMembers: TelegrafUser[] = ctx.message.new_chat_members || [];
+      newMembers.filter((member: TelegrafUser) => !member.is_bot);
+
+      for (const member of newMembers) {
+        await ctx.replyWithMarkdown(
+          ctx.i18n.t('start.greet', {
+            user: `${member.first_name} ${member.last_name || ''}`.trimRight(),
+          }),
+        );
+      }
     });
 
     this.bot
