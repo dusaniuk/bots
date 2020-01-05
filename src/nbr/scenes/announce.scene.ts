@@ -128,7 +128,12 @@ export class AnnounceScene {
       topic: state.topic,
     });
 
-    await ctx.replyWithMarkdown(ctx.i18n.t('announce.confirmAnnounce', { messageText: this.messageText }), getApproveKeyboard(ctx));
+    try {
+      await ctx.replyWithMarkdown(ctx.i18n.t('announce.confirmAnnounce', { messageText: this.messageText }), getApproveKeyboard(ctx));
+    } catch (err) {
+      await ctx.replyWithMarkdown(ctx.i18n.t('error.invalidMarkdown'));
+      await ctx.scene.leave();
+    }
   };
 
   private onRestart = async (ctx: AppContext): Promise<void> => {
