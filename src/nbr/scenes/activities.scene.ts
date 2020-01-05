@@ -71,11 +71,10 @@ export class ActivitiesScene {
 
     await ctx.replyWithMarkdown(msg);
 
-    const tmpMsg = await ctx.reply(ctx.i18n.t('activities.saving'));
-
+    const savingMsg = await ctx.reply(ctx.i18n.t('activities.saving'));
     await this.activitiesService.save(ctx.from.id, activities);
 
-    await ctx.telegram.deleteMessage(tmpMsg.chat.id, tmpMsg.message_id);
+    await ctx.telegram.deleteMessage(savingMsg.chat.id, savingMsg.message_id);
     await ctx.reply(ctx.i18n.t('activities.saved'));
 
     await ctx.scene.leave();

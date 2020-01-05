@@ -12,7 +12,7 @@ import { ActivitiesScene } from './scenes/activities.scene';
 import { AnnounceScene } from './scenes/announce.scene';
 import { TelegramUser, UsersService } from './services/users.service';
 import { AppContext } from '../shared/models/appContext';
-import { onlyPrivate } from './middleware/chat.middleware';
+import { commandsInPrivateOnly } from './middleware/chat.middleware';
 import { getChatsKeyboard } from './keyboards/chats.keyboard';
 import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';
 
@@ -41,7 +41,7 @@ export class NbrBot implements Bot {
     this.bot.use(session());
     this.bot.use(i18n.middleware());
     this.bot.use(this.stage.middleware());
-    this.bot.use(onlyPrivate());
+    this.bot.use(commandsInPrivateOnly());
 
     this.useActivitiesScene();
     this.useAnnounceScene();
@@ -70,8 +70,8 @@ export class NbrBot implements Bot {
     });
 
     this.bot.on('new_chat_members', async (ctx: AppContext) => {
-      const newMembers: TelegrafUser[] = ctx.message.new_chat_members || [];
-      newMembers.filter((member: TelegrafUser) => !member.is_bot);
+      let newMembers: TelegrafUser[] = ctx.message.new_chat_members || [];
+      newMembers = newMembers.filter((member: TelegrafUser) => !member.is_bot);
 
       for (const member of newMembers) {
         await ctx.replyWithMarkdown(

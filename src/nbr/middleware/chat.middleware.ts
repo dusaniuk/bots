@@ -3,11 +3,13 @@ import { Middleware } from 'telegraf';
 import { AppContext } from '../../shared/models/appContext';
 
 const filterNonPrivateChats = async (ctx: AppContext, next: () => any): Promise<{}> => {
-  if (ctx.chat.type !== 'private' && !ctx.updateSubTypes.includes('new_chat_members')) {
+  const isCommand: boolean = (ctx.message.entities || []).some(entity => entity.type === 'bot_command');
+
+  if (isCommand && ctx.chat.type !== 'private') {
     return ctx.reply(ctx.i18n.t('error.nonPrivateChat'));
   }
 
   return next();
 };
 
-export const onlyPrivate = (): Middleware<AppContext> => filterNonPrivateChats;
+export const commandsInPrivateOnly = (): Middleware<AppContext> => filterNonPrivateChats;
