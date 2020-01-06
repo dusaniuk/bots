@@ -1,7 +1,7 @@
 import { AppContext } from '../../shared/models/appContext';
 import { getTitle } from './title.utils';
 import { Activity } from '../constants/enums';
-import { ActivitiesPreferences } from '../models/activitiesData';
+import { ActivitiesPreferences } from '../models/activities';
 
 export const extractSelectedActivities = (preferences: ActivitiesPreferences): string[] => {
   const selectedActivities: string[] = [];

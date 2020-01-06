@@ -1,5 +1,5 @@
 import { firestore } from 'firebase-admin';
-import { ActivitiesData } from '../models/activitiesData';
+import { ActivitiesData } from '../models/activities';
 import { getActivitiesKeys } from '../utils/activities.utils';
 
 export class ActivitiesService {

@@ -6,7 +6,7 @@ import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
 
 import { CONFIG } from '../config';
-import { Bot } from '../shared/bot';
+import { Bot } from '../shared/models/bot';
 
 import { ActivitiesScene } from './scenes/activities.scene';
 import { AnnounceScene } from './scenes/announce.scene';

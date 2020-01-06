@@ -11,7 +11,7 @@ import { UsersService } from '../services/users.service';
 import { Actions, Activity } from '../constants/enums';
 import { AppContext } from '../../shared/models/appContext';
 import { MessageKey } from '../models/messages';
-import { ActivitiesPreferences } from '../models/activitiesData';
+import { ActivitiesPreferences } from '../models/activities';
 
 interface AnnounceState {
   preferences: ActivitiesPreferences;

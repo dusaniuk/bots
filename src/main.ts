@@ -5,7 +5,7 @@ import { CONFIG } from './config';
 import { MoreBot } from './more/more.bot';
 import { NbrBot } from './nbr/nbr.bot';
 
-import { Bot } from './shared/bot';
+import { Bot } from './shared/models/bot';
 import { createDatabase } from './shared/firestore.database';
 
 const db: firestore.Firestore = createDatabase();

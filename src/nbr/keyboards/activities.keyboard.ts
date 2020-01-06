@@ -4,7 +4,7 @@ import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 import { Actions } from '../constants/enums';
 import { AppContext } from '../../shared/models/appContext';
 import { getTitleWithEmoji } from '../utils/title.utils';
-import { ActivitiesPreferences } from '../models/activitiesData';
+import { ActivitiesPreferences } from '../models/activities';
 import { getActivitiesKeys } from '../utils/activities.utils';
 
 export const getActivitiesKeyboard = (ctx: AppContext, preferences: ActivitiesPreferences = {}): ExtraReplyMessage => {

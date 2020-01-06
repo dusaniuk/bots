@@ -1,7 +1,7 @@
 import { Activity } from '../constants/enums';
 import { extractSelectedActivities, getActivitiesKeys, stringifySelectedActivities } from './activities.utils';
 import { AppContext } from '../../shared/models/appContext';
-import { ActivitiesPreferences } from '../models/activitiesData';
+import { ActivitiesPreferences } from '../models/activities';
 
 jest.mock('./title.utils', () => ({
   getTitle: jest.fn().mockImplementation((ctx, activity) => activity),
