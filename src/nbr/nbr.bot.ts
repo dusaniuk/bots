@@ -72,6 +72,10 @@ export class NbrBot implements Bot {
       let newMembers: TelegrafUser[] = ctx.message.new_chat_members || [];
       newMembers = newMembers.filter((member: TelegrafUser) => !member.is_bot);
 
+      if (newMembers.length === 0) {
+        return;
+      }
+
       await ctx.replyWithMarkdown(
         ctx.i18n.t('start.greet', {
           users: stringifyUsers(newMembers),
