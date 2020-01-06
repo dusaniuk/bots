@@ -1,15 +1,6 @@
 import { firestore } from 'firebase-admin';
-import { Activity } from '../constants/enums';
-
-export interface ActivitiesData {
-  [Activity.Run]: number[];
-  [Activity.OCR]: number[];
-  [Activity.Swim]: number[];
-  [Activity.Stretch]: number[];
-  [Activity.Climb]: number[];
-  [Activity.Cycling]: number[];
-  [Activity.All]: number[];
-}
+import { ActivitiesData } from '../models/activitiesData';
+import { getActivitiesKeys } from '../utils/activities.utils';
 
 export class ActivitiesService {
   private readonly nbrRef: firestore.CollectionReference;
@@ -28,7 +19,7 @@ export class ActivitiesService {
     const batch = this.db.batch();
 
     const activitiesData: ActivitiesData = await this.getAll();
-    const activitiesList: string[] = Object.keys(Activity).map(k => Activity[k]);
+    const activitiesList: string[] = getActivitiesKeys();
 
     activitiesList.forEach((activity: string) => {
       const userIDs = new Set([...(activitiesData[activity] || []), userId]);

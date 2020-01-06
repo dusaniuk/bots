@@ -1,8 +1,23 @@
 import { AppContext } from '../../shared/models/appContext';
 import { getTitle } from './title.utils';
 import { Activity } from '../constants/enums';
+import { ActivitiesPreferences } from '../models/activitiesData';
 
-export const getNormalizedActivities = (ctx: AppContext, activities: string[] = []): string => {
+export const extractSelectedActivities = (preferences: ActivitiesPreferences): string[] => {
+  const selectedActivities: string[] = [];
+
+  Object.keys(preferences).forEach((key: string) => {
+    if (preferences[key]) {
+      selectedActivities.push(key);
+    }
+  });
+
+  return selectedActivities;
+};
+
+export const stringifySelectedActivities = (ctx: AppContext, preferences: ActivitiesPreferences = {}): string => {
+  const activities = extractSelectedActivities(preferences);
+
   if (activities.includes(Activity.All)) {
     return getTitle(ctx, Activity.All);
   }
@@ -11,4 +26,8 @@ export const getNormalizedActivities = (ctx: AppContext, activities: string[] = 
     const activityTitle = getTitle(ctx, activity);
     return msg === '' ? activityTitle : `${msg}, ${activityTitle}`;
   }, '');
+};
+
+export const getActivitiesKeys = (): string[] => {
+  return Object.keys(Activity).map(k => Activity[k]);
 };

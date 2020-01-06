@@ -3,7 +3,7 @@ import { firestore } from 'firebase-admin';
 
 import { CONFIG } from '../../config';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
-import { getNormalizedActivities } from '../utils/activities.utils';
+import { extractSelectedActivities, getActivitiesKeys, stringifySelectedActivities } from '../utils/activities.utils';
 import { stringifyUserGreeting } from '../utils/user.utils';
 import { ActivitiesService } from '../services/activities.service';
 import { MessagingService } from '../services/messaging.service';
@@ -11,9 +11,10 @@ import { UsersService } from '../services/users.service';
 import { Actions, Activity } from '../constants/enums';
 import { AppContext } from '../../shared/models/appContext';
 import { MessageKey } from '../models/messages';
+import { ActivitiesPreferences } from '../models/activitiesData';
 
 interface AnnounceState {
-  activities: string[];
+  preferences: ActivitiesPreferences;
   isListeningForMessage: boolean;
   isListeningForTopic: boolean;
   message: string;
@@ -70,25 +71,22 @@ export class AnnounceScene {
   };
 
   private onSelectActivity = async (ctx: AppContext): Promise<void> => {
-    const { activities } = this.getState(ctx);
+    const { preferences } = this.getState(ctx);
 
-    const newActivity = ctx.callbackQuery.data;
-    if (activities.includes(newActivity)) {
-      activities.splice(activities.indexOf(newActivity), 1);
-    } else {
-      activities.push(newActivity);
-    }
+    const toggledActivity = ctx.callbackQuery.data;
+    preferences[toggledActivity] = !preferences[toggledActivity];
 
-    const keyboard = getActivitiesKeyboard(ctx, activities);
+    const keyboard = getActivitiesKeyboard(ctx, preferences);
     await ctx.editMessageText(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
   private onSelectAll = async (ctx: AppContext): Promise<void> => {
-    const { activities } = this.getState(ctx);
-    activities.length = 0;
+    const { preferences } = this.getState(ctx);
 
-    const activitiesList: string[] = Object.keys(Activity).map(k => Activity[k]);
-    activities.push(...activitiesList);
+    const activitiesList: string[] = getActivitiesKeys();
+    activitiesList.forEach((key: string) => {
+      preferences[key] = true;
+    });
 
     await this.onNext(ctx);
   };
@@ -123,7 +121,7 @@ export class AnnounceScene {
 
     this.messageText = ctx.i18n.t('announce.message', {
       user: stringifyUserGreeting(ctx),
-      activities: getNormalizedActivities(ctx, state.activities),
+      activities: stringifySelectedActivities(ctx, state.preferences),
       message: state.message,
       topic: state.topic,
     });
@@ -147,8 +145,9 @@ export class AnnounceScene {
     await ctx.deleteMessage();
     await ctx.reply(ctx.i18n.t('announce.looking'));
 
-    const { activities, topic }: AnnounceState = this.getState(ctx);
+    const { preferences, topic }: AnnounceState = this.getState(ctx);
 
+    const activities = extractSelectedActivities(preferences);
     const userIds = await this.getUserIdsForActivities(activities, ctx.from.id);
 
     if (userIds.length === 0) {
@@ -205,11 +204,11 @@ export class AnnounceScene {
 
   private dropState = (ctx: AppContext): void => {
     ctx.scene.state = {
-      activities: [],
+      preferences: {},
       isListeningForMessage: false,
       isListeningForTopic: false,
       message: '',
       topic: '',
-    };
+    } as AnnounceState;
   };
 }

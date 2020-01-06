@@ -4,11 +4,12 @@ import { firestore } from 'firebase-admin';
 import { Actions, Activity } from '../constants/enums';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { ActivitiesService } from '../services/activities.service';
-import { getNormalizedActivities } from '../utils/activities.utils';
+import { extractSelectedActivities, stringifySelectedActivities } from '../utils/activities.utils';
 import { AppContext } from '../../shared/models/appContext';
+import { ActivitiesPreferences } from '../models/activitiesData';
 
 interface ActivitiesState {
-  activities: string[];
+  preferences: ActivitiesPreferences;
 }
 
 export class ActivitiesScene {
@@ -28,50 +29,69 @@ export class ActivitiesScene {
   }
 
   private attachHookListeners = () => {
-    this.scene.enter(this.enter);
-    this.scene.action(Actions.Next, this.saveActivities);
-    this.scene.action(Actions.Approve, this.approveSelectedActivities);
-    this.scene.action(Actions.Restart, this.restartActivitiesSelection);
+    this.scene.enter(this.onEnterScene);
+    this.scene.action(Actions.Next, this.onNext);
+    this.scene.action(Actions.Approve, this.onApprove);
+    this.scene.action(Actions.Restart, this.onRestart);
 
-    this.scene.action(Activity.All, this.handleAllActivitySelection);
-    this.scene.action(/^.*$/, this.handleActivitySelection);
+    this.scene.action(Activity.All, this.onSelectAll);
+    this.scene.action(/^.*$/, this.onSelectActivity);
   };
 
-  private enter = async (ctx: AppContext) => {
+  private onEnterScene = async (ctx: AppContext) => {
     this.dropState(ctx);
 
     const keyboard = await getActivitiesKeyboard(ctx);
     await ctx.reply(ctx.i18n.t('activities.intro'), keyboard);
   };
 
-  private saveActivities = async (ctx: AppContext) => {
-    await ctx.deleteMessage();
+  private onSelectActivity = async (ctx: AppContext) => {
+    const { preferences } = this.getState(ctx);
 
-    const { activities } = this.getState(ctx);
-    const activitiesMsg = getNormalizedActivities(ctx, activities);
+    const toggledActivity = ctx.callbackQuery.data;
+    preferences[toggledActivity] = !preferences[toggledActivity];
 
-    const keyboard = getApproveKeyboard(ctx);
-
-    const msg = ctx.i18n.t('activities.selectedSummary', {
-      activities: activitiesMsg,
-    });
-
-    await ctx.replyWithMarkdown(msg, keyboard);
+    const keyboard = getActivitiesKeyboard(ctx, preferences);
+    await ctx.editMessageText(ctx.i18n.t('activities.intro'), keyboard);
   };
 
-  private approveSelectedActivities = async (ctx: AppContext) => {
+  private onSelectAll = async (ctx: AppContext) => {
+    const { preferences } = this.getState(ctx);
+    preferences[Activity.All] = true;
+
+    await this.onNext(ctx);
+  };
+
+  private onNext = async (ctx: AppContext) => {
     await ctx.deleteMessage();
 
-    const { activities } = this.getState(ctx);
-    const activitiesMsg = getNormalizedActivities(ctx, activities);
+    const { preferences } = this.getState(ctx);
 
     const msg = ctx.i18n.t('activities.selectedSummary', {
-      activities: activitiesMsg,
+      activities: stringifySelectedActivities(ctx, preferences),
+    });
+
+    await ctx.replyWithMarkdown(msg, getApproveKeyboard(ctx));
+  };
+
+  private onRestart = async (ctx: AppContext) => {
+    await ctx.deleteMessage();
+    await ctx.scene.reenter();
+  };
+
+  private onApprove = async (ctx: AppContext) => {
+    await ctx.deleteMessage();
+
+    const { preferences } = this.getState(ctx);
+
+    const msg = ctx.i18n.t('activities.selectedSummary', {
+      activities: stringifySelectedActivities(ctx, preferences),
     });
 
     await ctx.replyWithMarkdown(msg);
 
     const savingMsg = await ctx.reply(ctx.i18n.t('activities.saving'));
+    const activities = extractSelectedActivities(preferences);
     await this.activitiesService.save(ctx.from.id, activities);
 
     await ctx.telegram.deleteMessage(savingMsg.chat.id, savingMsg.message_id);
@@ -80,40 +100,13 @@ export class ActivitiesScene {
     await ctx.scene.leave();
   };
 
-  private restartActivitiesSelection = async (ctx: AppContext) => {
-    await ctx.deleteMessage();
-    await ctx.scene.reenter();
-  };
-
-  private handleAllActivitySelection = async (ctx: AppContext) => {
-    const { activities } = this.getState(ctx);
-    activities.length = 0;
-    activities.push(ctx.callbackQuery.data);
-
-    await this.saveActivities(ctx);
-  };
-
-  private handleActivitySelection = async (ctx: AppContext) => {
-    const { activities } = this.getState(ctx);
-
-    const newActivity = ctx.callbackQuery.data;
-    if (activities.includes(newActivity)) {
-      activities.splice(activities.indexOf(newActivity), 1);
-    } else {
-      activities.push(newActivity);
-    }
-
-    const keyboard = getActivitiesKeyboard(ctx, activities);
-    await ctx.editMessageText(ctx.i18n.t('activities.intro'), keyboard);
-  };
-
   private getState = (ctx: AppContext): ActivitiesState => {
     return ctx.scene.state as ActivitiesState;
   };
 
   private dropState = (ctx: AppContext): void => {
     ctx.scene.state = {
-      activities: [],
-    };
+      preferences: {},
+    } as ActivitiesState;
   };
 }
