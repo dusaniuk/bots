@@ -6,6 +6,9 @@ export const CONFIG = {
   environment: process.env.ENVIRONMENT,
   isDevMode: process.env.ENVIRONMENT === 'dev',
   port: process.env.PORT,
+  max: {
+    botToken: process.env.MAX_BOT_TOKEN,
+  },
   more: {
     botToken: process.env.MORE_BOT_TOKEN,
   },

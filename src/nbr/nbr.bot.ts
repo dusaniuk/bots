@@ -23,8 +23,6 @@ export class NbrBot implements Bot {
   private readonly bot: Telegraf<AppContext>;
   private readonly stage: Stage<AppContext>;
 
-  private isRunning: boolean = false;
-
   constructor(private db: firestore.Firestore) {
     this.bot = new Telegraf(CONFIG.nbr.botToken);
     this.stage = new Stage([]);
@@ -86,7 +84,6 @@ export class NbrBot implements Bot {
       .then(() => console.log('nbr bot has been started'))
       .catch((err) => {
         console.error(err);
-        this.isRunning = false;
       });
   };
 
