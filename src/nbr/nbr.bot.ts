@@ -15,6 +15,7 @@ import { AppContext } from '../shared/models/appContext';
 import { commandsInPrivateOnly } from './middleware/chat.middleware';
 import { getChatsKeyboard } from './keyboards/chats.keyboard';
 import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';
+import { stringifyUsers } from './utils/user.utils';
 
 export class NbrBot implements Bot {
   private readonly usersService: UsersService;
@@ -73,13 +74,11 @@ export class NbrBot implements Bot {
       let newMembers: TelegrafUser[] = ctx.message.new_chat_members || [];
       newMembers = newMembers.filter((member: TelegrafUser) => !member.is_bot);
 
-      for (const member of newMembers) {
-        await ctx.replyWithMarkdown(
-          ctx.i18n.t('start.greet', {
-            user: `${member.first_name} ${member.last_name || ''}`.trimRight(),
-          }),
-        );
-      }
+      await ctx.replyWithMarkdown(
+        ctx.i18n.t('start.greet', {
+          users: stringifyUsers(newMembers),
+        }),
+      );
     });
 
     this.bot

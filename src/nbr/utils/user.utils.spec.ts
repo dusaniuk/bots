@@ -1,7 +1,8 @@
 import * as faker from 'faker';
+import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
 import { AppContext } from '../../shared/models/appContext';
-import { stringifyUserGreeting } from './user.utils';
+import { stringifyUserGreeting, stringifyUsers } from './user.utils';
 
 describe('user.utils', () => {
   describe('stringifyUserGreeting', () => {
@@ -55,6 +56,43 @@ describe('user.utils', () => {
       const result = stringifyUserGreeting(mockContext);
 
       expect(result).toEqual(`*${firstName}* (@${username})`);
+    });
+  });
+
+  describe('stringifyUsers', () => {
+    it('should return full name for one user', () => {
+      const user: TelegrafUser = {
+        first_name: faker.name.firstName(),
+        last_name: faker.name.lastName(),
+      } as TelegrafUser;
+
+      const result = stringifyUsers([user]);
+
+      expect(result).toEqual(`${user.first_name} ${user.last_name}`);
+    });
+
+    it('should return only first name for one user', () => {
+      const user: TelegrafUser = {
+        first_name: faker.name.firstName(),
+      } as TelegrafUser;
+
+      const result = stringifyUsers([user]);
+
+      expect(result).toEqual(`${user.first_name}`);
+    });
+
+    it('should return first names for 2 users', () => {
+      const userA: TelegrafUser = {
+        first_name: faker.name.firstName(),
+      } as TelegrafUser;
+
+      const userB: TelegrafUser = {
+        first_name: faker.name.firstName(),
+      } as TelegrafUser;
+
+      const result = stringifyUsers([userA, userB]);
+
+      expect(result).toEqual(`${userA.first_name}, ${userB.first_name}`);
     });
   });
 });
