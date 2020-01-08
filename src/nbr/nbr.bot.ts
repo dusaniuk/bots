@@ -70,6 +70,8 @@ export class NbrBot implements Bot {
 
     this.bot.on('new_chat_members', async (ctx: AppContext) => {
       let newMembers: TelegrafUser[] = ctx.message.new_chat_members || [];
+      console.log(`${stringifyUsers(newMembers)} had been added to the chat ${ctx.chat.title} | ${ctx.chat.id}`);
+
       newMembers = newMembers.filter((member: TelegrafUser) => !member.is_bot);
 
       if (newMembers.length === 0) {
