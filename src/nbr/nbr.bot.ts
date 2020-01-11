@@ -78,11 +78,7 @@ export class NbrBot implements Bot {
         return;
       }
 
-      let chatMembersCount: number = await ctx.getChatMembersCount();
-      if (ctx.chat.id === -1001451902273) {
-        chatMembersCount -= 2; // subtract bots count from NBR chat
-      }
-
+      const chatMembersCount: number = await ctx.getChatMembersCount();
       const resourceKey: string = chatMembersCount % 10 === 0 ? 'start.greetAnniversary' : 'start.greet';
 
       await ctx.replyWithMarkdown(
