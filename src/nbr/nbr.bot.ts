@@ -87,6 +87,8 @@ export class NbrBot implements Bot {
           count: chatMembersCount,
         }),
       );
+
+      await ctx.replyWithMarkdown(ctx.i18n.t('start.info'));
     });
 
     this.bot
