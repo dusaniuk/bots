@@ -42,7 +42,9 @@
     "no-empty-function": "off",
     "lines-between-class-members": "off",
     "no-restricted-syntax": "off",
+    "dot-notation": "off",
     "no-await-in-loop": "off",
+    "prefer-destructuring": "off",
     "max-len": [
       "error",
       {

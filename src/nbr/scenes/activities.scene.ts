@@ -23,7 +23,6 @@ export class ActivitiesScene {
     this.activitiesService = new ActivitiesService(db);
 
     this.scene = new BaseScene(ActivitiesScene.ID);
-    this.scene.hears('abort', Stage.leave());
 
     this.attachHookListeners();
   }
@@ -36,6 +35,8 @@ export class ActivitiesScene {
 
     this.scene.action(Activity.All, this.onSelectAll);
     this.scene.action(/^.*$/, this.onSelectActivity);
+
+    this.scene.hears('abort', Stage.leave());
   };
 
   private onEnterScene = async (ctx: AppContext) => {
@@ -67,7 +68,7 @@ export class ActivitiesScene {
 
     const { preferences } = this.getState(ctx);
 
-    const msg = ctx.i18n.t('activities.selectedSummary', {
+    const msg: string = ctx.i18n.t('activities.selectedSummary', {
       activities: stringifySelectedActivities(ctx, preferences),
     });
 
