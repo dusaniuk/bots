@@ -6,6 +6,10 @@ export const CONFIG = {
   environment: process.env.ENVIRONMENT,
   isDevMode: process.env.ENVIRONMENT === 'dev',
   port: process.env.PORT,
+  feedSchedule: {
+    pattern: process.env.FEED_PATTERN,
+    targetChat: process.env.FEED_TARGET,
+  },
   max: {
     botToken: process.env.MAX_BOT_TOKEN,
   },

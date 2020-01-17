@@ -13,6 +13,7 @@ import { AnnounceScene } from './scenes/announce.scene';
 import { TelegramUser, UsersService } from './services/users.service';
 import { AppContext } from '../shared/models/appContext';
 import { commandsInPrivateOnly } from './middleware/chat.middleware';
+import { useFeedSchedule } from './middleware/timer.middleware';
 import { getChatsKeyboard } from './keyboards/chats.keyboard';
 import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';
 import { stringifyUsers } from './utils/user.utils';
@@ -40,6 +41,7 @@ export class NbrBot implements Bot {
     this.bot.use(session());
     this.bot.use(i18n.middleware());
     this.bot.use(this.stage.middleware());
+    this.bot.use(useFeedSchedule());
     this.bot.use(commandsInPrivateOnly());
 
     this.useActivitiesScene();
