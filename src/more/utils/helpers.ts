@@ -1,5 +1,5 @@
-import { Context, ContextMessageUpdate } from 'telegraf';
-import { IncomingMessage, Message } from 'telegraf/typings/telegram-types';
+import { Context } from 'telegraf';
+import { IncomingMessage } from 'telegraf/typings/telegram-types';
 
 import { Hunter, Mention, User } from '../models';
 
@@ -80,17 +80,19 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
   return mentionedUsers;
 };
 
-export const getHuntersScore = (ctx: ContextMessageUpdate, hunters: Hunter[]): Promise<Message> => {
+export const getHuntersScore = (hunters: Hunter[]): string => {
   let msg = '';
 
-  hunters.forEach((user: Hunter, index: number) => {
-    let name = getGreetingNameForUser(user);
-    if (name.startsWith('@')) {
-      name = name.substring(1);
-    }
+  hunters
+    .filter((user: Hunter) => user.score)
+    .forEach((user: Hunter, index: number) => {
+      let name = getGreetingNameForUser(user);
+      if (name.startsWith('@')) {
+        name = name.substring(1);
+      }
 
-    msg += `${index + 1}) ${name}: ${user.score || 0} \n`;
-  });
+      msg += `\n${index + 1}) ${name}: ${user.score || 0}`;
+    });
 
-  return ctx.reply(msg);
+  return msg;
 };

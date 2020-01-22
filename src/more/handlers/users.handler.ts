@@ -30,7 +30,12 @@ export class UsersHandler {
     const hunters = await this.usersService.getAllUsersFromChat(ctx.chat.id);
     hunters.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));
 
-    return getHuntersScore(ctx, hunters);
+    return ctx.reply(
+      ctx.i18n.t('user.score', {
+        score: getHuntersScore(hunters),
+        huntersCount: hunters.length,
+      }),
+    );
   };
 
   private rejectRegistration = async (ctx: AppContext): Promise<void> => {

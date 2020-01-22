@@ -2,6 +2,10 @@ user:
   greetNew: |
     Грітінгс *${user}*
     Ти приєднався до нашої війни не на життя, а на бали.
+  score: |
+    ${score}
+
+    Всього ахотніків: ${huntersCount}
 
 capture:
   message: |
