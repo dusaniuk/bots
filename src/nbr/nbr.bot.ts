@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
-import Telegraf, { Context, session, Stage } from 'telegraf';
+import Telegraf, {
+  BaseScene, Context, session, Stage,
+} from 'telegraf';
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import { firestore } from 'firebase-admin';
 import I18n from 'telegraf-i18n';
@@ -17,9 +19,13 @@ import { useFeedSchedule } from './middleware/timer.middleware';
 import { getChatsKeyboard } from './keyboards/chats.keyboard';
 import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';
 import { stringifyUsers } from './utils/user.utils';
+import { ActivitiesService } from './services/activities.service';
+import { MessagingService } from './services/messaging.service';
 
 export class NbrBot implements Bot {
   private readonly usersService: UsersService;
+  private readonly messagingService: MessagingService;
+  private readonly activitiesService: ActivitiesService;
 
   private readonly bot: Telegraf<AppContext>;
   private readonly stage: Stage<AppContext>;
@@ -29,6 +35,8 @@ export class NbrBot implements Bot {
     this.stage = new Stage([]);
 
     this.usersService = new UsersService(this.db);
+    this.messagingService = new MessagingService(db);
+    this.activitiesService = new ActivitiesService(db);
   }
 
   start = () => {
@@ -102,17 +110,18 @@ export class NbrBot implements Bot {
   };
 
   private useActivitiesScene = () => {
-    const { scene } = new ActivitiesScene(this.db);
+    const { scene } = new ActivitiesScene(new BaseScene(ActivitiesScene.ID), this.activitiesService);
+
     this.stage.register(scene);
   };
 
   private useAnnounceScene = () => {
-    const { scene } = new AnnounceScene(this.db);
+    const { scene } = new AnnounceScene(new BaseScene(AnnounceScene.ID), this.activitiesService, this.messagingService, this.usersService);
     this.stage.register(scene);
   };
 
   private useDeleteAnnounceScene = () => {
-    const { scene } = new DeleteAnnounceScene(this.db);
+    const { scene } = new DeleteAnnounceScene(new BaseScene(DeleteAnnounceScene.ID), this.messagingService, this.usersService);
     this.stage.register(scene);
   };
 

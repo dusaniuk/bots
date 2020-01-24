@@ -1,5 +1,4 @@
 import { BaseScene, Stage } from 'telegraf';
-import { firestore } from 'firebase-admin';
 
 import { CONFIG } from '../../config';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
@@ -22,24 +21,16 @@ interface AnnounceState {
 }
 
 export class AnnounceScene {
-  private readonly activitiesService: ActivitiesService;
-  private readonly messagingService: MessagingService;
-  private readonly usersService: UsersService;
-
   public static ID: string = 'announce';
-
-  public scene: BaseScene<AppContext>;
 
   private messageText: string;
 
-  constructor(private db: firestore.Firestore) {
-    this.activitiesService = new ActivitiesService(db);
-    this.messagingService = new MessagingService(db);
-    this.usersService = new UsersService(db);
-
-    this.scene = new BaseScene(AnnounceScene.ID);
-    this.scene.hears('abort', Stage.leave());
-
+  constructor(
+    public scene: BaseScene<AppContext>,
+    private activitiesService: ActivitiesService,
+    private messagingService: MessagingService,
+    private usersService: UsersService,
+  ) {
     this.attachHookListeners();
   }
 
@@ -53,6 +44,8 @@ export class AnnounceScene {
 
     this.scene.action(Activity.All, this.onSelectAll);
     this.scene.action(/^.*$/, this.onSelectActivity);
+
+    this.scene.hears('abort', Stage.leave());
   };
 
   private onEnterScene = async (ctx: AppContext): Promise<void> => {

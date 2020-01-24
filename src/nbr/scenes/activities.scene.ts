@@ -1,5 +1,4 @@
 import { BaseScene, Stage } from 'telegraf';
-import { firestore } from 'firebase-admin';
 
 import { Actions, Activity } from '../constants/enums';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
@@ -13,17 +12,9 @@ interface ActivitiesState {
 }
 
 export class ActivitiesScene {
-  private readonly activitiesService: ActivitiesService;
-
   public static ID: string = 'activities';
 
-  public scene: BaseScene<AppContext>;
-
-  constructor(private db: firestore.Firestore) {
-    this.activitiesService = new ActivitiesService(db);
-
-    this.scene = new BaseScene(ActivitiesScene.ID);
-
+  constructor(public scene: BaseScene<AppContext>, private activitiesService: ActivitiesService) {
     this.attachHookListeners();
   }
 

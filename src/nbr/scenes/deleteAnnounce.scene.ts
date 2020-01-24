@@ -1,5 +1,4 @@
 import { BaseScene, Stage } from 'telegraf';
-import { firestore } from 'firebase-admin';
 
 import { MessagingService } from '../services/messaging.service';
 import { AppContext } from '../../shared/models/appContext';
@@ -15,20 +14,9 @@ interface DeleteAnnounceState {
 }
 
 export class DeleteAnnounceScene {
-  private readonly messagingService: MessagingService;
-  private readonly usersService: UsersService;
-
   public static ID: string = 'delete-announce';
 
-  public scene: BaseScene<AppContext>;
-
-  constructor(private db: firestore.Firestore) {
-    this.messagingService = new MessagingService(db);
-    this.usersService = new UsersService(db);
-
-    this.scene = new BaseScene(DeleteAnnounceScene.ID);
-    this.scene.hears('abort', Stage.leave());
-
+  constructor(public scene: BaseScene<AppContext>, private messagingService: MessagingService, private usersService: UsersService) {
     this.attachHookListeners();
   }
 
@@ -37,6 +25,8 @@ export class DeleteAnnounceScene {
     this.scene.action(/^delete */, this.onDeleteMessage);
     this.scene.action(Actions.Approve, this.onApprove);
     this.scene.action(Actions.Restart, this.onRestart);
+
+    this.scene.hears('abort', Stage.leave());
   };
 
   private onEnterScene = async (ctx: AppContext): Promise<void> => {
