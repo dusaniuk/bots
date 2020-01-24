@@ -23,7 +23,6 @@ announce:
 
 other:
   pong: 'pong'
-  maks: 'Аве Макс!!!'
   handled: 'Всьо гуд, обробив заявочку.'
   howToCapture: 'Для того, шоб зловити покемонів, треба руцями написати "/capture @username" або "/c @username".'
   yes: 'Да'

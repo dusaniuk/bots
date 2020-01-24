@@ -22,10 +22,6 @@ export class UtilsHandler {
     await ctx.replyWithMarkdown(ctx.i18n.t('other.rules'));
   };
 
-  aveMaks = (ctx: AppContext): Promise<any> => {
-    return ctx.reply(ctx.i18n.t('other.maks'));
-  };
-
   announce = async (ctx: AppContext): Promise<void> => {
     if (ctx.message.from.id !== 288950149) {
       await ctx.reply(ctx.i18n.t('announce.secretCommand'));
