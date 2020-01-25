@@ -13,16 +13,8 @@ import { createMockContext } from '../../../test/context.mock';
 import { Actions, Activity } from '../constants/enums';
 
 jest.mock('../keyboards');
-
-jest.mock('../utils/user.utils', () => ({
-  stringifyUserGreeting: jest.fn().mockReturnValue(''),
-}));
-
-jest.mock('../utils/activities.utils', () => ({
-  extractSelectedActivities: jest.fn().mockReturnValue(['']),
-  getActivitiesKeys: jest.fn().mockReturnValue(['all', 'run', 'ocr']),
-  stringifySelectedActivities: jest.fn().mockReturnValue(''),
-}));
+jest.mock('../utils/user.utils');
+jest.mock('../utils/activities.utils');
 
 describe('AnnounceScene', () => {
   let instance: AnnounceScene;

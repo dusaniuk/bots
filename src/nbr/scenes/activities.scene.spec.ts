@@ -7,11 +7,7 @@ import { stringifySelectedActivities } from '../utils/activities.utils';
 import { createBaseSceneMock, getSceneState, TestableSceneState } from '../../../test/baseScene.mock';
 import { createMockContext } from '../../../test/context.mock';
 
-jest.mock('../utils/activities.utils', () => ({
-  extractSelectedActivities: jest.fn().mockReturnValue({}),
-  stringifySelectedActivities: jest.fn().mockReturnValue({}),
-}));
-
+jest.mock('../utils/activities.utils');
 jest.mock('../keyboards');
 
 describe('ActivitiesScene', () => {
