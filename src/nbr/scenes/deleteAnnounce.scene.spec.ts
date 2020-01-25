@@ -5,10 +5,7 @@ import { UsersService } from '../services/users.service';
 import { AppContext } from '../../shared/models/appContext';
 import { createMockContext } from '../../../test/context.mock';
 
-jest.mock('../keyboards', () => ({
-  getDeleteMessagesKeyboard: jest.fn().mockReturnValue({}),
-  getApproveKeyboard: jest.fn().mockReturnValue({}),
-}));
+jest.mock('../keyboards');
 
 describe('DeleteAnnounceScene', () => {
   let instance: DeleteAnnounceScene;

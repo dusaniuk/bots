@@ -12,10 +12,7 @@ import { createBaseSceneMock, getSceneState, TestableSceneState } from '../../..
 import { createMockContext } from '../../../test/context.mock';
 import { Actions, Activity } from '../constants/enums';
 
-jest.mock('../keyboards', () => ({
-  getActivitiesKeyboard: jest.fn().mockReturnValue({}),
-  getApproveKeyboard: jest.fn().mockReturnValue({}),
-}));
+jest.mock('../keyboards');
 
 jest.mock('../utils/user.utils', () => ({
   stringifyUserGreeting: jest.fn().mockReturnValue(''),

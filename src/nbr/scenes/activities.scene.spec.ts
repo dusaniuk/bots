@@ -11,10 +11,8 @@ jest.mock('../utils/activities.utils', () => ({
   extractSelectedActivities: jest.fn().mockReturnValue({}),
   stringifySelectedActivities: jest.fn().mockReturnValue({}),
 }));
-jest.mock('../keyboards', () => ({
-  getActivitiesKeyboard: jest.fn().mockReturnValue({}),
-  getApproveKeyboard: jest.fn().mockReturnValue({}),
-}));
+
+jest.mock('../keyboards');
 
 describe('ActivitiesScene', () => {
   let instance: ActivitiesScene;
