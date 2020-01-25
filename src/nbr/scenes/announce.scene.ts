@@ -12,7 +12,7 @@ import { AppContext } from '../../shared/models/appContext';
 import { MessageKey } from '../models/messages';
 import { ActivitiesPreferences } from '../models/activities';
 
-interface AnnounceState {
+export interface AnnounceState {
   preferences: ActivitiesPreferences;
   isListeningForMessage: boolean;
   isListeningForTopic: boolean;
@@ -51,7 +51,8 @@ export class AnnounceScene {
   private onEnterScene = async (ctx: AppContext): Promise<void> => {
     this.dropState(ctx);
 
-    if (!this.isAllowedToAnnounce(ctx.from.id)) {
+    const canAnnounce: boolean = await this.isAllowedToAnnounce(ctx.from.id);
+    if (!canAnnounce) {
       await ctx.reply(ctx.i18n.t('announce.prohibited'));
       await ctx.scene.leave();
       return;
@@ -63,6 +64,7 @@ export class AnnounceScene {
     await ctx.reply(ctx.i18n.t('announce.chooseActivities'), keyboard);
   };
 
+  // TODO: consider joining this logic with activities.scene
   private onSelectActivity = async (ctx: AppContext): Promise<void> => {
     const { preferences } = this.getState(ctx);
 
@@ -107,10 +109,8 @@ export class AnnounceScene {
       return;
     }
 
-    if (state.isListeningForMessage) {
-      state.message = ctx.message.text;
-      state.isListeningForMessage = false;
-    }
+    state.message = ctx.message.text;
+    state.isListeningForMessage = false;
 
     this.messageText = ctx.i18n.t('announce.message', {
       user: stringifyUserGreeting(ctx),

@@ -37,6 +37,7 @@ export class ActivitiesScene {
     await ctx.reply(ctx.i18n.t('activities.intro'), keyboard);
   };
 
+  // TODO: consider joining this logic with announce.scene
   private onSelectActivity = async (ctx: AppContext) => {
     const { preferences } = this.getState(ctx);
 

@@ -16,7 +16,7 @@ import { TelegramUser, UsersService } from './services/users.service';
 import { AppContext } from '../shared/models/appContext';
 import { commandsInPrivateOnly } from './middleware/chat.middleware';
 import { useFeedSchedule } from './middleware/timer.middleware';
-import { getChatsKeyboard } from './keyboards/chats.keyboard';
+import { getChatsKeyboard } from './keyboards';
 import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';
 import { stringifyUsers } from './utils/user.utils';
 import { ActivitiesService } from './services/activities.service';

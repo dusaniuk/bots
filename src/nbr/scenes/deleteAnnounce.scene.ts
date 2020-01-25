@@ -3,12 +3,11 @@ import { BaseScene, Stage } from 'telegraf';
 import { MessagingService } from '../services/messaging.service';
 import { AppContext } from '../../shared/models/appContext';
 import { MessageMetadata } from '../models/messages';
-import { getDeleteMessagesKeyboard } from '../keyboards/deleteMessages.keyboard';
-import { getApproveKeyboard } from '../keyboards';
+import { getDeleteMessagesKeyboard, getApproveKeyboard } from '../keyboards';
 import { Actions } from '../constants/enums';
 import { UsersService } from '../services/users.service';
 
-interface DeleteAnnounceState {
+export interface DeleteAnnounceState {
   messages: MessageMetadata[];
   selectedMessage: MessageMetadata;
 }
@@ -32,7 +31,8 @@ export class DeleteAnnounceScene {
   private onEnterScene = async (ctx: AppContext): Promise<void> => {
     this.dropState(ctx);
 
-    if (!this.isAllowedToDeleteMessages(ctx.from.id)) {
+    const canDelete: boolean = await this.isAllowedToDeleteMessages(ctx.from.id);
+    if (!canDelete) {
       await ctx.reply(ctx.i18n.t('deleteAnnounce.prohibited'));
       await ctx.scene.leave();
       return;

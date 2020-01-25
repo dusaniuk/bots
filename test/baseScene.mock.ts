@@ -1,14 +1,18 @@
 import { BaseScene, HearsTriggers, Middleware } from 'telegraf';
+import { UpdateType } from 'telegraf/typings/telegram-types';
+
 import { AppContext } from '../src/shared/models/appContext';
 
 export interface TestableSceneState {
   onEnter?: Middleware<AppContext>;
   actions: Map<HearsTriggers, Middleware<AppContext>>;
+  on: Map<UpdateType, Middleware<AppContext>>;
 }
 
 export const createBaseSceneMock = (): BaseScene<AppContext> => {
   const state: TestableSceneState = {
     actions: new Map<HearsTriggers, Middleware<AppContext>>(),
+    on: new Map<UpdateType, Middleware<AppContext>>(),
   };
 
   return ({
@@ -18,7 +22,9 @@ export const createBaseSceneMock = (): BaseScene<AppContext> => {
     action: jest.fn().mockImplementation((trigger: HearsTriggers, middleware: Middleware<AppContext>) => {
       state.actions.set(trigger.toString(), middleware);
     }),
-    on: jest.fn(),
+    on: jest.fn().mockImplementation((updateType: UpdateType, middleware: Middleware<AppContext>) => {
+      state.on.set(updateType, middleware);
+    }),
     hears: jest.fn(),
     __state__: state,
   } as any) as BaseScene<AppContext>;
