@@ -255,20 +255,6 @@ describe('AnnounceScene', () => {
   });
 
   describe('onRestart', () => {
-    it('should drop state', async () => {
-      ctx.scene.state = { foo: 'bar' };
-
-      await scene.actions.get(Actions.Restart)(ctx);
-
-      expect(ctx.scene.state).toEqual({
-        preferences: {},
-        isListeningForMessage: false,
-        isListeningForTopic: false,
-        message: '',
-        topic: '',
-      });
-    });
-
     it('should delete message', async () => {
       await scene.actions.get(Actions.Restart)(ctx);
 

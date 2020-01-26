@@ -128,8 +128,6 @@ export class AnnounceScene {
   };
 
   private onRestart = async (ctx: AppContext): Promise<void> => {
-    this.dropState(ctx);
-
     await ctx.deleteMessage();
     await ctx.scene.reenter();
   };

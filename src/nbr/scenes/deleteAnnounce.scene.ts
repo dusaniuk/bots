@@ -58,8 +58,12 @@ export class DeleteAnnounceScene {
 
     const messageId: string = ctx.callbackQuery.data.split(' ')[1];
     const metadata: MessageMetadata = state.messages.find(({ id }: MessageMetadata) => id === messageId);
-    state.selectedMessage = metadata;
+    if (!metadata) {
+      await ctx.reply(ctx.i18n.t('deleteAnnounce.noMetadata'));
+      return;
+    }
 
+    state.selectedMessage = metadata;
     const message = ctx.i18n.t('deleteAnnounce.onDelete', {
       usersCount: metadata.messageKeys.length,
       messageText: metadata.messageText,
