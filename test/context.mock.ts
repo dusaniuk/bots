@@ -8,7 +8,7 @@ export const createMockContext = (): AppContext => (({
   },
   callbackQuery: {},
   i18n: {
-    t: jest.fn().mockImplementation(pattern => pattern) as any,
+    t: jest.fn().mockImplementation((pattern) => pattern) as any,
   },
   reply: jest.fn().mockReturnValue(Promise.resolve({ chat: {} })),
   replyWithMarkdown: jest.fn().mockReturnValue(Promise.resolve({})),

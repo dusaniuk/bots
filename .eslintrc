@@ -45,6 +45,8 @@
     "dot-notation": "off",
     "no-await-in-loop": "off",
     "prefer-destructuring": "off",
+    "camelcase": "off",
+    "import/extensions": "off",
     "max-len": [
       "error",
       {
