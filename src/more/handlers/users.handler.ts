@@ -26,6 +26,26 @@ export class UsersHandler {
     return this.addNewUser(ctx);
   };
 
+  update = async (ctx: AppContext): Promise<any> => {
+    const {
+      from,
+      chat: { id: chatId },
+    }: AppContext = ctx;
+
+    const isUserInChat: boolean = await this.usersService.isUserInChat(chatId, from.id);
+    if (!isUserInChat) {
+      return this.addNewUser(ctx);
+    }
+
+    await this.usersService.updateUser(chatId, from.id, {
+      username: `@${from.username}`,
+      firstName: from.first_name,
+      lastName: from.last_name || null,
+    });
+
+    return ctx.reply(ctx.i18n.t('user.successUpdate'));
+  };
+
   getScore = async (ctx: AppContext): Promise<any> => {
     const hunters = await this.usersService.getAllUsersFromChat(ctx.chat.id);
     hunters.sort((a: Hunter, b: Hunter) => (b.score || 0) - (a.score || 0));

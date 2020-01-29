@@ -52,6 +52,7 @@ export class MoreBot implements Bot {
 
   private bindUsersActions = () => {
     this.bot.command('reg', this.usersHandler.register);
+    this.bot.command('update', this.usersHandler.update);
     this.bot.command('score', this.usersHandler.getScore);
   };
 

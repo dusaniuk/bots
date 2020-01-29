@@ -22,6 +22,15 @@ export class UsersService {
     return query.exists;
   };
 
+  updateUser = async (chatId: number, userId: number, props: Partial<Hunter>): Promise<void> => {
+    const batch = this.db.batch();
+
+    const userRef = this.getUserRef(chatId, userId);
+    batch.update(userRef, { ...props });
+
+    await batch.commit();
+  };
+
   getAllUsersFromChat = async (chatId: number): Promise<Hunter[]> => {
     const usersRef = this.getUsersListRef(chatId);
     const query = await usersRef.get();
