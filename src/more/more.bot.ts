@@ -60,7 +60,7 @@ export class MoreBot implements Bot {
     this.bot.command('capture', this.capturesHandler.capture);
     this.bot.command('c', this.capturesHandler.capture);
 
-    this.bot.on('callback_query', this.capturesHandler.handleHunterCapture);
+    this.bot.on('callback_query', this.capturesHandler.handleUserCapture);
   };
 
   private bindUtilActions = () => {

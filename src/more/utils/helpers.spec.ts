@@ -3,11 +3,11 @@ import * as faker from 'faker';
 
 import { IncomingMessage } from 'telegraf/typings/telegram-types';
 import * as helpers from './helpers';
-import { Hunter, Mention, User } from '../models';
+import { Mention, User } from '../models';
 
 describe('heplers', () => {
-  describe('createHunter', () => {
-    it('should create hunter', () => {
+  describe('createUserFromContext', () => {
+    it('should create user', () => {
       const context: Context = {
         from: {
           id: faker.random.number(),
@@ -17,9 +17,9 @@ describe('heplers', () => {
         },
       } as Context;
 
-      const hunter: Hunter = helpers.createHunter(context);
+      const user: User = helpers.createUserFromContext(context);
 
-      expect(hunter).toEqual({
+      expect(user).toEqual({
         id: context.from.id,
         firstName: context.from.first_name,
         lastName: context.from.last_name,
@@ -27,54 +27,54 @@ describe('heplers', () => {
       });
     });
 
-    it('should create hunter without username', () => {
+    it('should create user without username', () => {
       const context = { from: {}, chat: {} } as Context;
 
-      const hunter: Hunter = helpers.createHunter(context);
+      const user: User = helpers.createUserFromContext(context);
 
-      expect(hunter.username).toBeUndefined();
+      expect(user.username).toBeUndefined();
     });
 
-    it('should create hunter without last name', () => {
+    it('should create user without last name', () => {
       const context = { from: {}, chat: {} } as Context;
 
-      const hunter: Hunter = helpers.createHunter(context);
+      const user: User = helpers.createUserFromContext(context);
 
-      expect(hunter.lastName).toBeUndefined();
+      expect(user.lastName).toBeUndefined();
     });
   });
 
   describe('getGreetingNameForUser', () => {
-    it('should return username as hunter name if it has been set', () => {
-      const hunter: User = {
+    it('should return username as user name if it has been set', () => {
+      const user: User = {
         username: faker.internet.userName(),
         firstName: faker.name.firstName(),
       } as User;
 
-      const name = helpers.getGreetingNameForUser(hunter);
+      const name = helpers.getGreetingNameForUser(user);
 
-      expect(name).toEqual(hunter.username);
+      expect(name).toEqual(user.username);
     });
 
     it("should return user's first name if username is not set", () => {
-      const hunter: User = {
+      const user: User = {
         firstName: faker.name.firstName(),
       } as User;
 
-      const name = helpers.getGreetingNameForUser(hunter);
+      const name = helpers.getGreetingNameForUser(user);
 
-      expect(name).toEqual(hunter.firstName);
+      expect(name).toEqual(user.firstName);
     });
 
     it("should return user's first and last names if last name is provided", () => {
-      const hunter: User = {
+      const user: User = {
         firstName: faker.name.firstName(),
         lastName: faker.name.lastName(),
       } as User;
 
-      const name = helpers.getGreetingNameForUser(hunter);
+      const name = helpers.getGreetingNameForUser(user);
 
-      expect(name).toEqual(`${hunter.firstName} ${hunter.lastName}`);
+      expect(name).toEqual(`${user.firstName} ${user.lastName}`);
     });
   });
 

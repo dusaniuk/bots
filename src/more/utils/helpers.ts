@@ -1,23 +1,23 @@
 import { Context } from 'telegraf';
 import { IncomingMessage } from 'telegraf/typings/telegram-types';
 
-import { Hunter, Mention, User } from '../models';
+import { Mention, User } from '../models';
 
-export const createHunter = ({ from }: Context): Hunter => {
-  const hunter: Hunter = {
+export const createUserFromContext = ({ from }: Context): User => {
+  const user: User = {
     id: from.id,
     firstName: from.first_name,
   };
 
   if (from.username) {
-    hunter.username = `@${from.username}`;
+    user.username = `@${from.username}`;
   }
 
   if (from.last_name) {
-    hunter.lastName = from.last_name;
+    user.lastName = from.last_name;
   }
 
-  return hunter;
+  return user;
 };
 
 export const getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
@@ -45,7 +45,7 @@ export const getVictimsMsg = (victims: User[]): string => {
 
 export const getMentions = (message: IncomingMessage): Mention[] => {
   return message.entities
-    .filter(entity => entity.type.endsWith('mention'))
+    .filter((entity) => entity.type.endsWith('mention'))
     .map((mention) => {
       switch (mention.type) {
         case 'mention':
@@ -80,12 +80,12 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
   return mentionedUsers;
 };
 
-export const getHuntersScore = (hunters: Hunter[]): string => {
+export const getUsersScore = (users: User[]): string => {
   let msg = '';
 
-  hunters
-    .filter((user: Hunter) => user.score)
-    .forEach((user: Hunter, index: number) => {
+  users
+    .filter((user: User) => user.score)
+    .forEach((user: User, index: number) => {
       let name = getGreetingNameForUser(user);
       if (name.startsWith('@')) {
         name = name.substring(1);

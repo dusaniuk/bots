@@ -2,9 +2,7 @@ import { firestore } from 'firebase-admin';
 
 import { CapturesService } from '../service/captures.service';
 import { AppContext } from '../../shared/models/appContext';
-import {
-  CaptureRecord, Hunter, Mention, User,
-} from '../models';
+import { CaptureRecord, Mention, User } from '../models';
 import * as utils from '../utils/helpers';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
 import { UsersService } from '../service/users.service';
@@ -25,10 +23,10 @@ export class CapturesHandler {
       return ctx.reply(ctx.i18n.t('other.howToCapture'));
     }
 
-    const chatUsers: Hunter[] = await this.usersService.getAllUsersFromChat(ctx.chat.id);
+    const chatUsers: User[] = await this.usersService.getAllUsersFromChat(ctx.chat.id);
     const mentionedUsers = utils.getMentionedUsers(mentions, chatUsers);
 
-    const isMentionedHimself: boolean = mentionedUsers.some(u => u.id === ctx.from.id);
+    const isMentionedHimself: boolean = mentionedUsers.some((u: User) => u.id === ctx.from.id);
     if (isMentionedHimself) {
       return ctx.reply(ctx.i18n.t('error.selfCapture'));
     }
@@ -38,7 +36,7 @@ export class CapturesHandler {
 
     mentionedUsers.forEach((user: User) => {
       // don't allow to push 2 same users
-      if (validUsers.some(u => u.id === user.id)) {
+      if (validUsers.some((u: User) => u.id === user.id)) {
         return;
       }
 
@@ -68,15 +66,15 @@ export class CapturesHandler {
       approved: false,
       hunterId: ctx.from.id,
       timestamp: new Date().getTime(),
-      victims: validUsers.filter(user => user.id !== null).map(user => user.id),
+      victims: validUsers.filter((user: User) => user.id !== null).map((user: User) => user.id),
       points: validUsers.length * 4, // TODO: change this logic in future
     });
 
-    const hunter: User = chatUsers.find(({ id }) => id === ctx.from.id);
-    const adminId: number = chatUsers.find(({ isAdmin }: Hunter) => isAdmin).id;
+    const user: User = chatUsers.find(({ id }) => id === ctx.from.id);
+    const adminId: number = chatUsers.find(({ isAdmin }: User) => isAdmin).id;
 
     const messageData = {
-      hunter: utils.getGreetingNameForUser(hunter),
+      hunter: utils.getGreetingNameForUser(user),
       victims: utils.getVictimsMsg(validUsers),
     };
 
@@ -86,7 +84,7 @@ export class CapturesHandler {
     return ctx.replyWithMarkdown(ctx.i18n.t('capture.message', messageData));
   };
 
-  handleHunterCapture = async (ctx: AppContext): Promise<void> => {
+  handleUserCapture = async (ctx: AppContext): Promise<void> => {
     const [command, captureId, chatId] = ctx.callbackQuery.data.split(' ');
 
     // delete keyboard from admin's chat

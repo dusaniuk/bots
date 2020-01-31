@@ -1,6 +1,6 @@
 import { firestore } from 'firebase-admin';
 
-import { Hunter } from '../models';
+import { User } from '../models';
 
 export class UsersService {
   private readonly chatRef: firestore.CollectionReference;
@@ -9,11 +9,11 @@ export class UsersService {
     this.chatRef = this.db.collection('chat');
   }
 
-  addUserInChat = async (chatId: number, hunter: Hunter): Promise<void> => {
-    const user = { ...hunter };
-    delete user.id;
+  addUserInChat = async (chatId: number, user: User): Promise<void> => {
+    const userData = { ...user };
+    delete userData.id;
 
-    await this.getUserRef(chatId, hunter.id).create(user);
+    await this.getUserRef(chatId, user.id).create(userData);
   };
 
   isUserInChat = async (chatId: number, userId: number): Promise<boolean> => {
@@ -22,7 +22,7 @@ export class UsersService {
     return query.exists;
   };
 
-  updateUser = async (chatId: number, userId: number, props: Partial<Hunter>): Promise<void> => {
+  updateUser = async (chatId: number, userId: number, props: Omit<Partial<User>, 'id' | 'score'>): Promise<void> => {
     const batch = this.db.batch();
 
     const userRef = this.getUserRef(chatId, userId);
@@ -31,12 +31,12 @@ export class UsersService {
     await batch.commit();
   };
 
-  getAllUsersFromChat = async (chatId: number): Promise<Hunter[]> => {
+  getAllUsersFromChat = async (chatId: number): Promise<User[]> => {
     const usersRef = this.getUsersListRef(chatId);
     const query = await usersRef.get();
 
     return query.docs.map((doc: firestore.QueryDocumentSnapshot) => ({
-      ...(doc.data() as Hunter),
+      ...(doc.data() as User),
       id: +doc.id,
     }));
   };
@@ -44,14 +44,14 @@ export class UsersService {
   getAllActiveChatsIDs = async (): Promise<number[]> => {
     const query = await this.db.collection('chat').get();
 
-    return query.docs.map(({ id }: firestore.QueryDocumentSnapshot) => +id).filter(id => id < 0);
+    return query.docs.map(({ id }: firestore.QueryDocumentSnapshot) => +id).filter((id: number) => id < 0);
   };
 
-  getUserFromChat = async (userId: number, chatId: number): Promise<Hunter> => {
+  getUserFromChat = async (userId: number, chatId: number): Promise<User> => {
     const query = await this.getUserRef(chatId, userId).get();
 
     return {
-      ...(query.data() as Hunter),
+      ...(query.data() as User),
       id: +query.id,
     };
   };
