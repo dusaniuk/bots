@@ -20,6 +20,11 @@
       "git add --all"
     ]
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dusaniuk/more.git"
@@ -61,7 +66,9 @@
     "@typescript-eslint/parser": "^2.18.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-promise": "^4.2.1",
     "faker": "^4.1.0",
     "husky": "^3.0.2",
