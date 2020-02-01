@@ -54,6 +54,9 @@ export class MoreBot implements Bot {
     this.bot.command('reg', this.usersHandler.register);
     this.bot.command('update', this.usersHandler.update);
     this.bot.command('score', this.usersHandler.getScore);
+
+    this.bot.on('new_chat_members', this.usersHandler.onNewMemberInChat);
+    this.bot.on('left_chat_member', this.usersHandler.onLeftChatMember);
   };
 
   private bindCaptureActions = () => {

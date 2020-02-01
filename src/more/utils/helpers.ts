@@ -1,20 +1,19 @@
-import { Context } from 'telegraf';
-import { IncomingMessage } from 'telegraf/typings/telegram-types';
+import { IncomingMessage, User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
 import { Mention, User } from '../models';
 
-export const createUserFromContext = ({ from }: Context): User => {
+export const createUser = (telegrafUser: TelegrafUser): User => {
   const user: User = {
-    id: from.id,
-    firstName: from.first_name,
+    id: telegrafUser.id,
+    firstName: telegrafUser.first_name,
   };
 
-  if (from.username) {
-    user.username = `@${from.username}`;
+  if (telegrafUser.username) {
+    user.username = `@${telegrafUser.username}`;
   }
 
-  if (from.last_name) {
-    user.lastName = from.last_name;
+  if (telegrafUser.last_name) {
+    user.lastName = telegrafUser.last_name;
   }
 
   return user;
@@ -77,7 +76,7 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
     }
   });
 
-  return mentionedUsers;
+  return mentionedUsers.filter((user: User) => user.catchable);
 };
 
 export const getUsersScore = (users: User[]): string => {

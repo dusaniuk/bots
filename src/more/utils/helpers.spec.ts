@@ -1,44 +1,50 @@
 import { Context } from 'telegraf';
 import * as faker from 'faker';
 
-import { IncomingMessage } from 'telegraf/typings/telegram-types';
+import { IncomingMessage, User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import * as helpers from './helpers';
 import { Mention, User } from '../models';
 
 describe('heplers', () => {
-  describe('createUserFromContext', () => {
+  describe('createUser', () => {
     it('should create user', () => {
-      const context: Context = {
-        from: {
-          id: faker.random.number(),
-          first_name: faker.name.firstName(),
-          last_name: faker.name.lastName(),
-          username: faker.internet.userName(),
-        },
-      } as Context;
+      const telegrafUser: TelegrafUser = {
+        id: faker.random.number(),
+        first_name: faker.name.firstName(),
+        last_name: faker.name.lastName(),
+        username: faker.internet.userName(),
+      } as TelegrafUser;
 
-      const user: User = helpers.createUserFromContext(context);
+      const user: User = helpers.createUser(telegrafUser);
 
       expect(user).toEqual({
-        id: context.from.id,
-        firstName: context.from.first_name,
-        lastName: context.from.last_name,
-        username: `@${context.from.username}`,
+        id: telegrafUser.id,
+        firstName: telegrafUser.first_name,
+        lastName: telegrafUser.last_name,
+        username: `@${telegrafUser.username}`,
       });
     });
 
     it('should create user without username', () => {
-      const context = { from: {}, chat: {} } as Context;
+      const telegrafUser = {
+        id: faker.random.number(),
+        first_name: faker.name.firstName(),
+        last_name: faker.name.lastName(),
+      } as TelegrafUser;
 
-      const user: User = helpers.createUserFromContext(context);
+      const user: User = helpers.createUser(telegrafUser);
 
       expect(user.username).toBeUndefined();
     });
 
     it('should create user without last name', () => {
-      const context = { from: {}, chat: {} } as Context;
+      const telegrafUser: TelegrafUser = {
+        id: faker.random.number(),
+        first_name: faker.name.firstName(),
+        username: faker.internet.userName(),
+      } as TelegrafUser;
 
-      const user: User = helpers.createUserFromContext(context);
+      const user: User = helpers.createUser(telegrafUser);
 
       expect(user.lastName).toBeUndefined();
     });

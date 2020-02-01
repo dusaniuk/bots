@@ -5,4 +5,5 @@ export interface User {
   username?: string;
   score?: number;
   isAdmin?: boolean;
+  catchable?: boolean;
 }

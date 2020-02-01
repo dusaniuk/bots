@@ -1,10 +1,11 @@
 import { firestore } from 'firebase-admin';
+import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
 import { UsersService } from '../service/users.service';
 import { AppContext } from '../../shared/models/appContext';
 import { ChatType } from '../models/chatType';
 import { User } from '../models';
-import { createUserFromContext, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
+import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 
 export class UsersHandler {
   private usersService: UsersService;
@@ -23,7 +24,7 @@ export class UsersHandler {
       return ctx.reply(ctx.i18n.t('error.alreadyInGame'));
     }
 
-    return this.addNewUser(ctx);
+    return this.addNewUser(ctx, createUser(ctx.from));
   };
 
   update = async (ctx: AppContext): Promise<any> => {
@@ -34,7 +35,7 @@ export class UsersHandler {
 
     const isUserInChat: boolean = await this.usersService.isUserInChat(chatId, from.id);
     if (!isUserInChat) {
-      return this.addNewUser(ctx);
+      return this.addNewUser(ctx, createUser(ctx.from));
     }
 
     await this.usersService.updateUser(chatId, from.id, {
@@ -58,8 +59,46 @@ export class UsersHandler {
     );
   };
 
-  private addNewUser = async (ctx: AppContext): Promise<void> => {
-    const user: User = createUserFromContext(ctx);
+  onNewMemberInChat = async (ctx: AppContext): Promise<void> => {
+    const newMembers: User[] = this.getNewMembers(ctx);
+
+    for (const user of newMembers) {
+      const isUserInChat = await this.usersService.isUserInChat(ctx.chat.id, user.id);
+
+      if (isUserInChat) {
+        await ctx.reply(ctx.i18n.t('user.welcomeBack'));
+        await this.updateUserCatchability(ctx.chat.id, user.id, true);
+      } else {
+        await this.addNewUser(ctx, user);
+      }
+    }
+  };
+
+  onLeftChatMember = async (ctx: AppContext): Promise<any> => {
+    const leftMember = createUser(ctx.message.left_chat_member);
+
+    await this.updateUserCatchability(ctx.chat.id, leftMember.id, false);
+    await ctx.reply(ctx.i18n.t('user.onLeft', {
+      user: getGreetingNameForUser(leftMember),
+    }));
+  };
+
+  private updateUserCatchability = async (chatId: number, userId: number, isCatchable: boolean): Promise<any> => {
+    try {
+      await this.usersService.updateUser(chatId, userId, {
+        catchable: isCatchable,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  private getNewMembers = (ctx: AppContext): User[] => {
+    const newUsers: TelegrafUser[] = (ctx.message?.new_chat_members ?? []).filter((user) => !user.is_bot);
+    return newUsers.map(createUser);
+  };
+
+  private addNewUser = async (ctx: AppContext, user: User): Promise<void> => {
     await this.usersService.addUserInChat(ctx.chat.id, user);
 
     await ctx.reply(

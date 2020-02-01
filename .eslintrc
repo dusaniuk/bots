@@ -47,6 +47,7 @@
     "prefer-destructuring": "off",
     "camelcase": "off",
     "import/extensions": "off",
+    "import/no-unresolved": "warn",
     "max-len": [
       "error",
       {
