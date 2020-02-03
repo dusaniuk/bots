@@ -1,11 +1,14 @@
 import { Message } from 'telegraf/typings/telegram-types';
 
 import { AppContext } from '../../shared/models/appContext';
-import { CapturesService } from '../service/captures.service';
-import { UsersService } from '../service/users.service';
+import { CatchStore } from '../stores/catch.store';
+import { UsersStore } from '../stores/users.store';
 
 export class UtilsHandler {
-  constructor(private capturesService: CapturesService, private usersService: UsersService) {}
+  constructor(
+    private catchStore: CatchStore,
+    private usersStore: UsersStore,
+  ) { }
 
   pong = (ctx: AppContext): Promise<Message> => {
     return ctx.reply(ctx.i18n.t('other.pong'));
@@ -21,7 +24,7 @@ export class UtilsHandler {
       return;
     }
 
-    const chatIDs = await this.usersService.getAllActiveChatsIDs();
+    const chatIDs = await this.usersStore.getAllActiveChatsIDs();
 
     const botCommand = ctx.message.entities.find(entity => entity.type === 'bot_command');
     const message = ctx.message.text.substring(botCommand.length);

@@ -1,20 +1,20 @@
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
-import { UsersService } from '../service/users.service';
+import { UsersStore } from '../stores/users.store';
 import { AppContext } from '../../shared/models/appContext';
 import { ChatType } from '../constants/chatType';
 import { User } from '../models';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 
 export class UsersHandler {
-  constructor(private usersService: UsersService) {}
+  constructor(private usersStore: UsersStore) {}
 
   register = async (ctx: AppContext): Promise<any> => {
     if (ctx.chat.type === ChatType.private) {
       return ctx.reply(ctx.i18n.t('error.rejectPrivate'));
     }
 
-    const isUserInChat: boolean = await this.usersService.isUserInChat(ctx.chat.id, ctx.from.id);
+    const isUserInChat: boolean = await this.usersStore.isUserInChat(ctx.chat.id, ctx.from.id);
     if (isUserInChat) {
       return ctx.reply(ctx.i18n.t('error.alreadyInGame'));
     }
@@ -28,12 +28,12 @@ export class UsersHandler {
       chat: { id: chatId },
     }: AppContext = ctx;
 
-    const isUserInChat: boolean = await this.usersService.isUserInChat(chatId, from.id);
+    const isUserInChat: boolean = await this.usersStore.isUserInChat(chatId, from.id);
     if (!isUserInChat) {
       return this.addNewUser(ctx, createUser(ctx.from));
     }
 
-    await this.usersService.updateUser(chatId, from.id, {
+    await this.usersStore.updateUser(chatId, from.id, {
       username: `@${from.username}`,
       firstName: from.first_name,
       lastName: from.last_name || null,
@@ -43,7 +43,7 @@ export class UsersHandler {
   };
 
   getScore = async (ctx: AppContext): Promise<any> => {
-    const users = await this.usersService.getAllUsersFromChat(ctx.chat.id);
+    const users = await this.usersStore.getAllUsersFromChat(ctx.chat.id);
     users.sort((a: User, b: User) => (b.score || 0) - (a.score || 0));
 
     return ctx.reply(
@@ -58,7 +58,7 @@ export class UsersHandler {
     const newMembers: User[] = this.getNewMembers(ctx);
 
     for (const user of newMembers) {
-      const isUserInChat = await this.usersService.isUserInChat(ctx.chat.id, user.id);
+      const isUserInChat = await this.usersStore.isUserInChat(ctx.chat.id, user.id);
 
       if (isUserInChat) {
         await ctx.reply(ctx.i18n.t('user.welcomeBack'));
@@ -80,7 +80,7 @@ export class UsersHandler {
 
   private updateUserCatchability = async (chatId: number, userId: number, isCatchable: boolean): Promise<any> => {
     try {
-      await this.usersService.updateUser(chatId, userId, {
+      await this.usersStore.updateUser(chatId, userId, {
         catchable: isCatchable,
       });
     } catch (error) {
@@ -94,7 +94,7 @@ export class UsersHandler {
   };
 
   private addNewUser = async (ctx: AppContext, user: User): Promise<void> => {
-    await this.usersService.addUserInChat(ctx.chat.id, user);
+    await this.usersStore.addUserInChat(ctx.chat.id, user);
 
     await ctx.reply(
       ctx.i18n.t('user.greetNew', {

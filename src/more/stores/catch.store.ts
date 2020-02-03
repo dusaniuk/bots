@@ -2,27 +2,27 @@ import { firestore } from 'firebase-admin';
 
 import { CaptureRecord } from '../models';
 
-export class CapturesService {
+export class CatchStore {
   private readonly chatRef: firestore.CollectionReference;
 
   constructor(private db: firestore.Firestore) {
     this.chatRef = this.db.collection('chat');
   }
 
-  addCaptureRecord = async (chatId: number, record: CaptureRecord): Promise<string> => {
+  addCatchRecord = async (chatId: number, record: CaptureRecord): Promise<string> => {
     const capturesRef = this.getCapturesListRef(chatId);
     const result = await capturesRef.add(record);
 
     return result.id;
   };
 
-  getCaptureRecord = async (chatId: number, recordId: string): Promise<CaptureRecord> => {
+  getCatchRecord = async (chatId: number, recordId: string): Promise<CaptureRecord> => {
     const query = await this.getCaptureRef(chatId, recordId).get();
 
     return query.data() as CaptureRecord;
   };
 
-  approveCaptureRecord = async (chatId: number, recordId: string): Promise<void> => {
+  approveCatch = async (chatId: number, recordId: string): Promise<void> => {
     const batch = this.db.batch();
 
     const captureRef = this.getCaptureRef(chatId, recordId);

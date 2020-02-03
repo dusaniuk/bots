@@ -1,13 +1,16 @@
-import { CapturesService } from '../service/captures.service';
+import { CatchStore } from '../stores/catch.store';
 import { AppContext } from '../../shared/models/appContext';
 import { CaptureRecord, Mention, User } from '../models';
 import * as utils from '../utils/helpers';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
-import { UsersService } from '../service/users.service';
+import { UsersStore } from '../stores/users.store';
 import { Actions } from '../constants/actions';
 
 export class CapturesHandler {
-  constructor(private capturesService: CapturesService, private usersService: UsersService) {}
+  constructor(
+    private catchStore: CatchStore,
+    private usersStore: UsersStore,
+  ) { }
 
   capture = async (ctx: AppContext): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);
@@ -15,7 +18,7 @@ export class CapturesHandler {
       return ctx.reply(ctx.i18n.t('other.howToCapture'));
     }
 
-    const chatUsers: User[] = await this.usersService.getAllUsersFromChat(ctx.chat.id);
+    const chatUsers: User[] = await this.usersStore.getAllUsersFromChat(ctx.chat.id);
     const mentionedUsers = utils.getMentionedUsers(mentions, chatUsers);
 
     const isMentionedHimself: boolean = mentionedUsers.some((u: User) => u.id === ctx.from.id);
@@ -54,7 +57,7 @@ export class CapturesHandler {
       return ctx.reply(ctx.i18n.t('error.noUsersToCapture'));
     }
 
-    const captureId = await this.capturesService.addCaptureRecord(ctx.chat.id, {
+    const catchId = await this.catchStore.addCatchRecord(ctx.chat.id, {
       approved: false,
       hunterId: ctx.from.id,
       timestamp: new Date().getTime(),
@@ -70,7 +73,7 @@ export class CapturesHandler {
       victims: utils.getVictimsMsg(validUsers),
     };
 
-    const keyboard = getApproveKeyboard(ctx, captureId);
+    const keyboard = getApproveKeyboard(ctx, catchId);
     await ctx.telegram.sendMessage(adminId, ctx.i18n.t('capture.summary', messageData), keyboard);
 
     return ctx.replyWithMarkdown(ctx.i18n.t('capture.message', messageData));
@@ -83,20 +86,20 @@ export class CapturesHandler {
     await ctx.deleteMessage();
 
     // get record by capture id
-    const record: CaptureRecord = await this.capturesService.getCaptureRecord(+chatId, captureId);
-    const user = await this.usersService.getUserFromChat(record.hunterId, +chatId);
+    const catchRecord: CaptureRecord = await this.catchStore.getCatchRecord(+chatId, captureId);
+    const user = await this.usersStore.getUserFromChat(catchRecord.hunterId, +chatId);
 
     if (command === Actions.ApproveCapture) {
-      await this.capturesService.approveCaptureRecord(+chatId, captureId);
+      await this.catchStore.approveCatch(+chatId, captureId);
 
       // TODO: remove this 2 lines after I'll migrate to gathering score from capture records
-      const newPoints = (user.score || 0) + record.points;
-      await this.usersService.updateUserPoints(+chatId, record.hunterId, newPoints);
+      const newPoints = (user.score || 0) + catchRecord.points;
+      await this.usersStore.updateUserPoints(+chatId, catchRecord.hunterId, newPoints);
     }
 
     const msg = ctx.i18n.t(command, {
       user: utils.getGreetingNameForUser(user),
-      points: record.points,
+      points: catchRecord.points,
     });
 
     await ctx.telegram.sendMessage(chatId, msg);

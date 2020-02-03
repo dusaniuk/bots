@@ -2,7 +2,7 @@ import { firestore } from 'firebase-admin';
 
 import { User } from '../models';
 
-export class UsersService {
+export class UsersStore {
   private readonly chatRef: firestore.CollectionReference;
 
   constructor(private db: firestore.Firestore) {

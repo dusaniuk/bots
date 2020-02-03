@@ -12,14 +12,14 @@ import { UtilsHandler } from './handlers/utils.handler';
 import { CapturesHandler } from './handlers/captures.handler';
 
 import { AppContext } from '../shared/models/appContext';
-import { CapturesService } from './service/captures.service';
-import { UsersService } from './service/users.service';
+import { CatchStore } from './stores/catch.store';
+import { UsersStore } from './stores/users.store';
 
 export class MoreBot implements Bot {
   private readonly bot: Telegraf<AppContext>;
 
-  private readonly capturesService: CapturesService;
-  private readonly usersService: UsersService;
+  private readonly catchStore: CatchStore;
+  private readonly usersStore: UsersStore;
 
   private readonly usersHandler: UsersHandler;
   private readonly capturesHandler: CapturesHandler;
@@ -28,12 +28,12 @@ export class MoreBot implements Bot {
   constructor(private db: firestore.Firestore) {
     this.bot = new Telegraf(CONFIG.more.botToken);
 
-    this.capturesService = new CapturesService(db);
-    this.usersService = new UsersService(db);
+    this.catchStore = new CatchStore(db);
+    this.usersStore = new UsersStore(db);
 
-    this.utilsHandler = new UtilsHandler(this.capturesService, this.usersService);
-    this.usersHandler = new UsersHandler(this.usersService);
-    this.capturesHandler = new CapturesHandler(this.capturesService, this.usersService);
+    this.utilsHandler = new UtilsHandler(this.catchStore, this.usersStore);
+    this.usersHandler = new UsersHandler(this.usersStore);
+    this.capturesHandler = new CapturesHandler(this.catchStore, this.usersStore);
   }
 
   start = () => {
