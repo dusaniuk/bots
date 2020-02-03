@@ -11,19 +11,7 @@
     "test:nbr": "yarn test src/nbr/",
     "coverage": "yarn test --collectCoverage",
     "tdd": "yarn test --watch",
-    "format": "prettier-eslint '$PWD/src/**/*.{ts,json}' --write",
     "lint": "./node_modules/.bin/eslint **/*.ts"
-  },
-  "lint-staged": {
-    "**/*.ts": [
-      "yarn format",
-      "git add --all"
-    ]
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
   },
   "repository": {
     "type": "git",
@@ -66,15 +54,12 @@
     "@typescript-eslint/parser": "^2.18.0",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-promise": "^4.2.1",
     "faker": "^4.1.0",
     "husky": "^3.0.2",
     "jest": "^24.9.0",
     "lint-staged": "^9.2.1",
-    "prettier-eslint-cli": "^5.0.0",
     "ts-jest": "^24.1.0"
   }
 }

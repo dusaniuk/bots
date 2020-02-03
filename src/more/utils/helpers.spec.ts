@@ -1,4 +1,3 @@
-import { Context } from 'telegraf';
 import * as faker from 'faker';
 
 import { IncomingMessage, User as TelegrafUser } from 'telegraf/typings/telegram-types';
