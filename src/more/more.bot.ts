@@ -7,14 +7,19 @@ import { resolve } from 'path';
 import { CONFIG } from '../config';
 import { Bot } from '../shared/models/bot';
 
+import { UsersHandler } from './handlers/users.handler';
 import { UtilsHandler } from './handlers/utils.handler';
 import { CapturesHandler } from './handlers/captures.handler';
 
-import { UsersHandler } from './handlers/users.handler';
 import { AppContext } from '../shared/models/appContext';
+import { CapturesService } from './service/captures.service';
+import { UsersService } from './service/users.service';
 
 export class MoreBot implements Bot {
   private readonly bot: Telegraf<AppContext>;
+
+  private readonly capturesService: CapturesService;
+  private readonly usersService: UsersService;
 
   private readonly usersHandler: UsersHandler;
   private readonly capturesHandler: CapturesHandler;
@@ -23,9 +28,12 @@ export class MoreBot implements Bot {
   constructor(private db: firestore.Firestore) {
     this.bot = new Telegraf(CONFIG.more.botToken);
 
-    this.utilsHandler = new UtilsHandler(this.db);
-    this.usersHandler = new UsersHandler(this.db);
-    this.capturesHandler = new CapturesHandler(this.db);
+    this.capturesService = new CapturesService(db);
+    this.usersService = new UsersService(db);
+
+    this.utilsHandler = new UtilsHandler(this.capturesService, this.usersService);
+    this.usersHandler = new UsersHandler(this.usersService);
+    this.capturesHandler = new CapturesHandler(this.capturesService, this.usersService);
   }
 
   start = () => {
@@ -45,7 +53,7 @@ export class MoreBot implements Bot {
     this.bot
       .launch()
       .then(() => console.log('more bot has been started'))
-      .catch((err) => {
+      .catch(err => {
         console.error(err);
       });
   };
@@ -60,8 +68,7 @@ export class MoreBot implements Bot {
   };
 
   private bindCaptureActions = () => {
-    this.bot.command('capture', this.capturesHandler.capture);
-    this.bot.command('c', this.capturesHandler.capture);
+    this.bot.command(['capture', 'c'], this.capturesHandler.capture);
 
     this.bot.on('callback_query', this.capturesHandler.handleUserCapture);
   };

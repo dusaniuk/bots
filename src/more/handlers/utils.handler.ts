@@ -1,18 +1,11 @@
 import { Message } from 'telegraf/typings/telegram-types';
-import { firestore } from 'firebase-admin';
 
 import { AppContext } from '../../shared/models/appContext';
 import { CapturesService } from '../service/captures.service';
 import { UsersService } from '../service/users.service';
 
 export class UtilsHandler {
-  private capturesService: CapturesService;
-  private usersService: UsersService;
-
-  constructor(private db: firestore.Firestore) {
-    this.capturesService = new CapturesService(db);
-    this.usersService = new UsersService(db);
-  }
+  constructor(private capturesService: CapturesService, private usersService: UsersService) {}
 
   pong = (ctx: AppContext): Promise<Message> => {
     return ctx.reply(ctx.i18n.t('other.pong'));

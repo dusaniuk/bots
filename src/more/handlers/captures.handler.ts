@@ -1,5 +1,3 @@
-import { firestore } from 'firebase-admin';
-
 import { CapturesService } from '../service/captures.service';
 import { AppContext } from '../../shared/models/appContext';
 import { CaptureRecord, Mention, User } from '../models';
@@ -9,13 +7,7 @@ import { UsersService } from '../service/users.service';
 import { Actions } from '../constants/actions';
 
 export class CapturesHandler {
-  private capturesService: CapturesService;
-  private usersService: UsersService;
-
-  constructor(private db: firestore.Firestore) {
-    this.capturesService = new CapturesService(db);
-    this.usersService = new UsersService(db);
-  }
+  constructor(private capturesService: CapturesService, private usersService: UsersService) {}
 
   capture = async (ctx: AppContext): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);
@@ -51,7 +43,7 @@ export class CapturesHandler {
     if (unverifiedUsers.length > 0) {
       let users = '';
 
-      unverifiedUsers.forEach((user) => {
+      unverifiedUsers.forEach((user: User) => {
         users += ` ${user.username}`;
       });
 
@@ -70,11 +62,11 @@ export class CapturesHandler {
       points: validUsers.length * 4, // TODO: change this logic in future
     });
 
-    const user: User = chatUsers.find(({ id }) => id === ctx.from.id);
+    const hunter: User = chatUsers.find(({ id }) => id === ctx.from.id);
     const adminId: number = chatUsers.find(({ isAdmin }: User) => isAdmin).id;
 
     const messageData = {
-      hunter: utils.getGreetingNameForUser(user),
+      hunter: utils.getGreetingNameForUser(hunter),
       victims: utils.getVictimsMsg(validUsers),
     };
 

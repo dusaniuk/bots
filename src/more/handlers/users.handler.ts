@@ -1,18 +1,13 @@
-import { firestore } from 'firebase-admin';
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
 import { UsersService } from '../service/users.service';
 import { AppContext } from '../../shared/models/appContext';
-import { ChatType } from '../models/chatType';
+import { ChatType } from '../constants/chatType';
 import { User } from '../models';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 
 export class UsersHandler {
-  private usersService: UsersService;
-
-  constructor(private db: firestore.Firestore) {
-    this.usersService = new UsersService(db);
-  }
+  constructor(private usersService: UsersService) {}
 
   register = async (ctx: AppContext): Promise<any> => {
     if (ctx.chat.type === ChatType.private) {
