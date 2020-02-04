@@ -1,4 +1,4 @@
-export interface CaptureRecord {
+export interface CatchRecord {
   approved?: boolean;
   hunterId: number;
   timestamp: number;

@@ -1,21 +1,21 @@
 import { CatchStore } from '../stores/catch.store';
 import { AppContext } from '../../shared/models/appContext';
-import { CaptureRecord, Mention, User } from '../models';
+import { CatchRecord, Mention, User } from '../models';
 import * as utils from '../utils/helpers';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
 import { UsersStore } from '../stores/users.store';
 import { Actions } from '../constants/actions';
 
-export class CapturesHandler {
+export class CatchHandler {
   constructor(
     private catchStore: CatchStore,
     private usersStore: UsersStore,
   ) { }
 
-  capture = async (ctx: AppContext): Promise<any> => {
+  catch = async (ctx: AppContext): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);
     if (mentions.length === 0) {
-      return ctx.reply(ctx.i18n.t('other.howToCapture'));
+      return ctx.reply(ctx.i18n.t('other.howToCatch'));
     }
 
     const chatUsers: User[] = await this.usersStore.getAllUsersFromChat(ctx.chat.id);
@@ -23,7 +23,7 @@ export class CapturesHandler {
 
     const isMentionedHimself: boolean = mentionedUsers.some((u: User) => u.id === ctx.from.id);
     if (isMentionedHimself) {
-      return ctx.reply(ctx.i18n.t('error.selfCapture'));
+      return ctx.reply(ctx.i18n.t('error.selfCatch'));
     }
 
     const validUsers: User[] = [];
@@ -54,7 +54,7 @@ export class CapturesHandler {
     }
 
     if (validUsers.length === 0) {
-      return ctx.reply(ctx.i18n.t('error.noUsersToCapture'));
+      return ctx.reply(ctx.i18n.t('error.noUsersToCatch'));
     }
 
     const catchId = await this.catchStore.addCatchRecord(ctx.chat.id, {
@@ -74,25 +74,24 @@ export class CapturesHandler {
     };
 
     const keyboard = getApproveKeyboard(ctx, catchId);
-    await ctx.telegram.sendMessage(adminId, ctx.i18n.t('capture.summary', messageData), keyboard);
+    await ctx.telegram.sendMessage(adminId, ctx.i18n.t('catch.summary', messageData), keyboard);
 
-    return ctx.replyWithMarkdown(ctx.i18n.t('capture.message', messageData));
+    return ctx.replyWithMarkdown(ctx.i18n.t('catch.message', messageData));
   };
 
-  handleUserCapture = async (ctx: AppContext): Promise<void> => {
-    const [command, captureId, chatId] = ctx.callbackQuery.data.split(' ');
+  handleUserCatch = async (ctx: AppContext): Promise<void> => {
+    const [command, catchId, chatId] = ctx.callbackQuery.data.split(' ');
 
     // delete keyboard from admin's chat
     await ctx.deleteMessage();
 
-    // get record by capture id
-    const catchRecord: CaptureRecord = await this.catchStore.getCatchRecord(+chatId, captureId);
+    const catchRecord: CatchRecord = await this.catchStore.getCatchRecord(+chatId, catchId);
     const user = await this.usersStore.getUserFromChat(catchRecord.hunterId, +chatId);
 
-    if (command === Actions.ApproveCapture) {
-      await this.catchStore.approveCatch(+chatId, captureId);
+    if (command === Actions.ApproveCatch) {
+      await this.catchStore.approveCatch(+chatId, catchId);
 
-      // TODO: remove this 2 lines after I'll migrate to gathering score from capture records
+      // TODO: remove this 2 lines after I'll migrate to gathering score from catch records
       const newPoints = (user.score || 0) + catchRecord.points;
       await this.usersStore.updateUserPoints(+chatId, catchRecord.hunterId, newPoints);
     }

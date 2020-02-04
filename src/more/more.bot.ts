@@ -9,7 +9,7 @@ import { Bot } from '../shared/models/bot';
 
 import { UsersHandler } from './handlers/users.handler';
 import { UtilsHandler } from './handlers/utils.handler';
-import { CapturesHandler } from './handlers/captures.handler';
+import { CatchHandler } from './handlers/catch.handler';
 
 import { AppContext } from '../shared/models/appContext';
 import { CatchStore } from './stores/catch.store';
@@ -22,7 +22,7 @@ export class MoreBot implements Bot {
   private readonly usersStore: UsersStore;
 
   private readonly usersHandler: UsersHandler;
-  private readonly capturesHandler: CapturesHandler;
+  private readonly catchHandler: CatchHandler;
   private readonly utilsHandler: UtilsHandler;
 
   constructor(private db: firestore.Firestore) {
@@ -33,10 +33,10 @@ export class MoreBot implements Bot {
 
     this.utilsHandler = new UtilsHandler(this.catchStore, this.usersStore);
     this.usersHandler = new UsersHandler(this.usersStore);
-    this.capturesHandler = new CapturesHandler(this.catchStore, this.usersStore);
+    this.catchHandler = new CatchHandler(this.catchStore, this.usersStore);
   }
 
-  start = () => {
+  start = (): void => {
     const i18n = new I18n({
       defaultLanguage: 'ua',
       allowMissing: false,
@@ -47,18 +47,18 @@ export class MoreBot implements Bot {
     this.bot.use(i18n.middleware());
 
     this.bindUsersActions();
-    this.bindCaptureActions();
+    this.bindCatchActions();
     this.bindUtilActions();
 
     this.bot
       .launch()
       .then(() => console.log('more bot has been started'))
-      .catch(err => {
+      .catch((err: Error) => {
         console.error(err);
       });
   };
 
-  private bindUsersActions = () => {
+  private bindUsersActions = (): void => {
     this.bot.command('reg', this.usersHandler.register);
     this.bot.command('update', this.usersHandler.update);
     this.bot.command('score', this.usersHandler.getScore);
@@ -67,13 +67,13 @@ export class MoreBot implements Bot {
     this.bot.on('left_chat_member', this.usersHandler.onLeftChatMember);
   };
 
-  private bindCaptureActions = () => {
-    this.bot.command(['capture', 'c'], this.capturesHandler.capture);
+  private bindCatchActions = (): void => {
+    this.bot.command(['catch', 'c'], this.catchHandler.catch);
 
-    this.bot.on('callback_query', this.capturesHandler.handleUserCapture);
+    this.bot.on('callback_query', this.catchHandler.handleUserCatch);
   };
 
-  private bindUtilActions = () => {
+  private bindUtilActions = (): void => {
     this.bot.command('ping', this.utilsHandler.pong);
     this.bot.command(['help', 'halp'], this.utilsHandler.getHelp);
     this.bot.command('announce', this.utilsHandler.announce);

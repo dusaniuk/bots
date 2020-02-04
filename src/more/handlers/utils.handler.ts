@@ -1,4 +1,4 @@
-import { Message } from 'telegraf/typings/telegram-types';
+import { Message, MessageEntity } from 'telegraf/typings/telegram-types';
 
 import { AppContext } from '../../shared/models/appContext';
 import { CatchStore } from '../stores/catch.store';
@@ -26,7 +26,7 @@ export class UtilsHandler {
 
     const chatIDs = await this.usersStore.getAllActiveChatsIDs();
 
-    const botCommand = ctx.message.entities.find(entity => entity.type === 'bot_command');
+    const botCommand = ctx.message.entities.find((entity: MessageEntity) => entity.type === 'bot_command');
     const message = ctx.message.text.substring(botCommand.length);
 
     await chatIDs.forEach((id: number) => ctx.telegram.sendMessage(id, message));
