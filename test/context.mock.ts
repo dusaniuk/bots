@@ -1,4 +1,4 @@
-import { AppContext } from '../src/shared/models/appContext';
+import { AppContext } from '../src/shared/interfaces/appContext';
 
 export const createMockContext = (): AppContext => {
   return {

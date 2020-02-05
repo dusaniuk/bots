@@ -2,7 +2,7 @@ import { CallbackButton, Markup } from 'telegraf';
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 
 import { Actions } from '../constants/enums';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { getTitleWithEmoji } from '../utils/title.utils';
 import { ActivitiesPreferences } from '../models/activities';
 import { getActivitiesKeys } from '../utils/activities.utils';

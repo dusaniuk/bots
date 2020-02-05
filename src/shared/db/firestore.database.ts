@@ -1,5 +1,5 @@
 import { credential, firestore, initializeApp } from 'firebase-admin';
-import { CONFIG } from '../config';
+import { CONFIG } from '../../config';
 
 export const createDatabase = (): firestore.Firestore => {
   const app = initializeApp({

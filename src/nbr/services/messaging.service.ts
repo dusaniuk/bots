@@ -1,7 +1,7 @@
 import { ExtraEditMessage } from 'telegraf/typings/telegram-types';
 
 import { firestore } from 'firebase-admin';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { MessageKey, MessageMetadata } from '../models/messages';
 import { CONFIG } from '../../config';
 

@@ -1,7 +1,7 @@
 import { Middleware } from 'telegraf';
 import { CronJob } from 'cron';
 
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { CONFIG } from '../../config';
 
 let isFeedStarted = false;

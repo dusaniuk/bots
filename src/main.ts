@@ -1,21 +1,20 @@
-import { firestore } from 'firebase-admin';
+import 'reflect-metadata';
 
-import { Server } from './server';
 import { CONFIG } from './config';
-import { MoreBot } from './more/more.bot';
-// import { NbrBot } from './nbr/nbr.bot';
+import { Server } from './shared/server';
+import { container } from './shared/ioc';
+import { Bot } from './shared/interfaces';
 
-import { Bot } from './shared/models/bot';
-import { createDatabase } from './shared/firestore.database';
-
-const db: firestore.Firestore = createDatabase();
-
-const moreBot: Bot = new MoreBot(db);
-// const nbrBot: Bot = new NbrBot(db);
+// import { TYPES as NBR_TYPES } from './nbr/ioc/types';
+import { TYPES as MORE_TYPES } from './more/ioc/types';
 
 if (CONFIG.environment !== 'test') {
-  // nbrBot.start();
-  moreBot.start();
+  const bots: Bot[] = [
+    container.get<Bot>(MORE_TYPES.MORE_BOT),
+    // container.get<Bot>(NBR_TYPES.NBR_BOT),
+  ];
+
+  bots.forEach((bot: Bot) => bot.start());
 
   const server: Server = new Server();
   server.run();

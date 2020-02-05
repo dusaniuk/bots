@@ -1,7 +1,7 @@
 import { BaseScene, HearsTriggers, Middleware } from 'telegraf';
 import { UpdateType } from 'telegraf/typings/telegram-types';
 
-import { AppContext } from '../src/shared/models/appContext';
+import { AppContext } from '../src/shared/interfaces/appContext';
 
 export interface TestableSceneState {
   onEnter?: Middleware<AppContext>;

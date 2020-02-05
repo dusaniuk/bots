@@ -1,13 +1,19 @@
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
+import { inject, injectable } from 'inversify';
 
-import { UsersStore } from '../stores/users.store';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces';
+
+import { TYPES } from '../ioc/types';
 import { ChatType } from '../constants/chatType';
-import { User } from '../models';
+import { User, UsersStore } from '../interfaces';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 
+
+@injectable()
 export class UsersHandler {
-  constructor(private usersStore: UsersStore) {}
+  constructor(
+    @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
+  ) {}
 
   register = async (ctx: AppContext): Promise<any> => {
     if (ctx.chat.type === ChatType.private) {

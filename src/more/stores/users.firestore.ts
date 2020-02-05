@@ -1,13 +1,21 @@
 import { firestore } from 'firebase-admin';
+import { inject, injectable } from 'inversify';
 
-import { User } from '../models';
+import { Database } from '../../shared/interfaces';
 
-export class UsersStore {
-  private readonly chatRef: firestore.CollectionReference;
+import { TYPES } from '../ioc/types';
+import { User, UsersStore } from '../interfaces';
 
-  constructor(private db: firestore.Firestore) {
-    this.chatRef = this.db.collection('chat');
+
+@injectable()
+export class UsersFirestore implements UsersStore {
+  private get chatRef(): firestore.CollectionReference {
+    return this.db.collection('chat');
   }
+
+  constructor(
+    @inject(TYPES.DATABASE) private db: Database,
+  ) {}
 
   addUserInChat = async (chatId: number, user: User): Promise<void> => {
     const userData = { ...user };

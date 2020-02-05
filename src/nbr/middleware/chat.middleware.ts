@@ -1,6 +1,6 @@
 import { Middleware } from 'telegraf';
 
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 
 const filterNonPrivateChats = async (ctx: AppContext, next: () => any): Promise<{}> => {
   const isCommand: boolean = ((ctx.message && ctx.message.entities) || []).some(entity => entity.type === 'bot_command');

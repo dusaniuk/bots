@@ -2,9 +2,9 @@ import * as faker from 'faker';
 
 import { IncomingMessage, User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import * as helpers from './helpers';
-import { Mention, User } from '../models';
+import { Mention, User } from '../interfaces';
 
-describe('heplers', () => {
+describe('helpers', () => {
   describe('createUser', () => {
     it('should create user', () => {
       const telegrafUser: TelegrafUser = {

@@ -4,12 +4,12 @@
     "esModuleInterop": true,
     "target": "es6",
     "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "sourceMap": true,
     "outDir": "dist",
-    "typeRoots": [
-      "./node_modules/telegraf/typings",
-      "./node_modules/@types"
-    ]
+    "lib": ["es6"],
+    "types": ["reflect-metadata", "jest"]
   },
   "lib": ["es2015"]
 }

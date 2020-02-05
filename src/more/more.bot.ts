@@ -1,39 +1,24 @@
 /* eslint-disable no-console */
 import Telegraf, { session } from 'telegraf';
-import { firestore } from 'firebase-admin';
+import { inject, injectable } from 'inversify';
 import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
 
 import { CONFIG } from '../config';
-import { Bot } from '../shared/models/bot';
+import { Bot, AppContext } from '../shared/interfaces';
 
-import { UsersHandler } from './handlers/users.handler';
-import { UtilsHandler } from './handlers/utils.handler';
-import { CatchHandler } from './handlers/catch.handler';
+import { CatchHandler, UsersHandler, UtilsHandler } from './handlers';
 
-import { AppContext } from '../shared/models/appContext';
-import { CatchStore } from './stores/catch.store';
-import { UsersStore } from './stores/users.store';
-
+@injectable()
 export class MoreBot implements Bot {
   private readonly bot: Telegraf<AppContext>;
 
-  private readonly catchStore: CatchStore;
-  private readonly usersStore: UsersStore;
-
-  private readonly usersHandler: UsersHandler;
-  private readonly catchHandler: CatchHandler;
-  private readonly utilsHandler: UtilsHandler;
-
-  constructor(private db: firestore.Firestore) {
+  constructor(
+    @inject(UtilsHandler) private utilsHandler: UtilsHandler,
+    @inject(UsersHandler) private usersHandler: UsersHandler,
+    @inject(CatchHandler) private catchHandler: CatchHandler,
+  ) {
     this.bot = new Telegraf(CONFIG.more.botToken);
-
-    this.catchStore = new CatchStore(db);
-    this.usersStore = new UsersStore(db);
-
-    this.utilsHandler = new UtilsHandler(this.catchStore, this.usersStore);
-    this.usersHandler = new UsersHandler(this.usersStore);
-    this.catchHandler = new CatchHandler(this.catchStore, this.usersStore);
   }
 
   start = (): void => {

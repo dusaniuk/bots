@@ -1,7 +1,7 @@
 import { credential, initializeApp } from 'firebase-admin';
 
 import { createDatabase } from './firestore.database';
-import { CONFIG } from '../config';
+import { CONFIG } from '../../config';
 
 jest.mock('firebase-admin', () => ({
   initializeApp: jest.fn().mockReturnValue({ firestore: () => {} }),

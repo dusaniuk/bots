@@ -1,4 +1,4 @@
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { getTitle, getTitleWithEmoji } from './title.utils';
 
 describe('title.utils', () => {

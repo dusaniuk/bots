@@ -1,7 +1,7 @@
 import { BaseScene, Stage } from 'telegraf';
 
 import { MessagingService } from '../services/messaging.service';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { MessageMetadata } from '../models/messages';
 import { getDeleteMessagesKeyboard, getApproveKeyboard } from '../keyboards';
 import { Actions } from '../constants/enums';

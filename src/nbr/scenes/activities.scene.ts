@@ -4,7 +4,7 @@ import { Actions, Activity } from '../constants/enums';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { ActivitiesService } from '../services/activities.service';
 import { extractSelectedActivities, stringifySelectedActivities } from '../utils/activities.utils';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { ActivitiesPreferences } from '../models/activities';
 
 interface ActivitiesState {

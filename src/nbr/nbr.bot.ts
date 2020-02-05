@@ -3,17 +3,17 @@ import Telegraf, {
   BaseScene, Context, session, Stage,
 } from 'telegraf';
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
-import { firestore } from 'firebase-admin';
+import { inject, injectable } from 'inversify';
 import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
 
 import { CONFIG } from '../config';
-import { Bot } from '../shared/models/bot';
+import { Bot } from '../shared/interfaces/bot';
 
 import { ActivitiesScene } from './scenes/activities.scene';
 import { AnnounceScene } from './scenes/announce.scene';
 import { TelegramUser, UsersService } from './services/users.service';
-import { AppContext } from '../shared/models/appContext';
+import { AppContext } from '../shared/interfaces/appContext';
 import { commandsInPrivateOnly } from './middleware/chat.middleware';
 import { useFeedSchedule } from './middleware/timer.middleware';
 import { getChatsKeyboard } from './keyboards';
@@ -22,6 +22,10 @@ import { stringifyUsers } from './utils/user.utils';
 import { ActivitiesService } from './services/activities.service';
 import { MessagingService } from './services/messaging.service';
 
+import { Database } from '../shared/interfaces/vendors';
+import { TYPES } from './ioc/types';
+
+@injectable()
 export class NbrBot implements Bot {
   private readonly usersService: UsersService;
   private readonly messagingService: MessagingService;
@@ -30,7 +34,9 @@ export class NbrBot implements Bot {
   private readonly bot: Telegraf<AppContext>;
   private readonly stage: Stage<AppContext>;
 
-  constructor(private db: firestore.Firestore) {
+  constructor(
+    @inject(TYPES.DATABASE) private db: Database,
+  ) {
     this.bot = new Telegraf(CONFIG.nbr.botToken);
     this.stage = new Stage([]);
 

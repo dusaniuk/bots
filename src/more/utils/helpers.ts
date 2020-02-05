@@ -1,6 +1,7 @@
 import { IncomingMessage, User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
-import { Mention, User } from '../models';
+import { Mention, User } from '../interfaces';
+
 
 export const createUser = (telegrafUser: TelegrafUser): User => {
   const user: User = {
@@ -76,7 +77,7 @@ export const getMentionedUsers = (mentions: Mention[], users: User[]): User[] =>
     }
   });
 
-  return mentionedUsers.filter((user: User) => user.catchable);
+  return mentionedUsers;
 };
 
 export const getUsersScore = (users: User[]): string => {

@@ -4,7 +4,7 @@ import { DeleteAnnounceScene, DeleteAnnounceState } from './deleteAnnounce.scene
 import { createBaseSceneMock, getSceneState, TestableSceneState } from '../../../test/baseScene.mock';
 import { MessagingService } from '../services/messaging.service';
 import { UsersService } from '../services/users.service';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { createMockContext } from '../../../test/context.mock';
 import { Actions } from '../constants/enums';
 

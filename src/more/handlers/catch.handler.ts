@@ -1,16 +1,20 @@
-import { CatchStore } from '../stores/catch.store';
-import { AppContext } from '../../shared/models/appContext';
-import { CatchRecord, Mention, User } from '../models';
-import * as utils from '../utils/helpers';
-import { getApproveKeyboard } from '../keyboards/approve.keyboard';
-import { UsersStore } from '../stores/users.store';
-import { Actions } from '../constants/actions';
+import { inject, injectable } from 'inversify';
 
+import { AppContext } from '../../shared/interfaces';
+
+import { TYPES } from '../ioc/types';
+import * as utils from '../utils/helpers';
+import { Actions } from '../constants/actions';
+import { CatchRecord, CatchStore, Mention, User, UsersStore } from '../interfaces';
+import { getApproveKeyboard } from '../keyboards/approve.keyboard';
+
+
+@injectable()
 export class CatchHandler {
   constructor(
-    private catchStore: CatchStore,
-    private usersStore: UsersStore,
-  ) { }
+    @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
+    @inject(TYPES.CATCH_STORE) private catchStore: CatchStore,
+  ) {}
 
   catch = async (ctx: AppContext): Promise<any> => {
     const mentions: Mention[] = utils.getMentions(ctx.message);

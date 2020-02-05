@@ -6,7 +6,7 @@ import { ActivitiesService } from '../services/activities.service';
 import { MessagingService } from '../services/messaging.service';
 import { UsersService } from '../services/users.service';
 
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 
 import { createBaseSceneMock, getSceneState, TestableSceneState } from '../../../test/baseScene.mock';
 import { createMockContext } from '../../../test/context.mock';

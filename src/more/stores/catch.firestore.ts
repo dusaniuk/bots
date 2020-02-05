@@ -1,13 +1,21 @@
 import { firestore } from 'firebase-admin';
+import { inject, injectable } from 'inversify';
 
-import { CatchRecord } from '../models';
+import { Database } from '../../shared/interfaces';
 
-export class CatchStore {
-  private readonly chatRef: firestore.CollectionReference;
+import { TYPES } from '../ioc/types';
+import { CatchRecord, CatchStore } from '../interfaces';
 
-  constructor(private db: firestore.Firestore) {
-    this.chatRef = this.db.collection('chat');
+
+@injectable()
+export class CatchFirestore implements CatchStore {
+  private get chatRef(): firestore.CollectionReference {
+    return this.db.collection('chat');
   }
+
+  constructor(
+    @inject(TYPES.DATABASE) private db: Database,
+  ) {}
 
   addCatchRecord = async (chatId: number, record: CatchRecord): Promise<string> => {
     const catchRef = this.getCatchesListRef(chatId);

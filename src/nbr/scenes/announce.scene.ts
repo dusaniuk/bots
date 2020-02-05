@@ -8,7 +8,7 @@ import { ActivitiesService } from '../services/activities.service';
 import { MessagingService } from '../services/messaging.service';
 import { UsersService } from '../services/users.service';
 import { Actions, Activity } from '../constants/enums';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { MessageKey } from '../models/messages';
 import { ActivitiesPreferences } from '../models/activities';
 

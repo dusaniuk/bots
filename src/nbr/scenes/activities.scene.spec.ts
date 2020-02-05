@@ -1,6 +1,6 @@
 import { ActivitiesScene } from './activities.scene';
 import { Actions, Activity } from '../constants/enums';
-import { AppContext } from '../../shared/models/appContext';
+import { AppContext } from '../../shared/interfaces/appContext';
 import { ActivitiesService } from '../services/activities.service';
 import { stringifySelectedActivities } from '../utils/activities.utils';
 
