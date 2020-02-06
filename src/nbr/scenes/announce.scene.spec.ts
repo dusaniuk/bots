@@ -1,16 +1,13 @@
 import * as faker from 'faker';
 
-import { AnnounceScene, AnnounceState } from './announce.scene';
-
-import { ActivitiesService } from '../services/activities.service';
-import { MessagingService } from '../services/messaging.service';
-import { UsersService } from '../services/users.service';
-
-import { AppContext } from '../../shared/interfaces/appContext';
+import { AppContext } from '../../shared/interfaces';
 
 import { createBaseSceneMock, getSceneState, TestableSceneState } from '../../../test/baseScene.mock';
+import { ActivitiesStore, MessageStore, UsersStore } from '../interfaces';
 import { createMockContext } from '../../../test/context.mock';
 import { Actions, Activity } from '../constants/enums';
+
+import { AnnounceScene, AnnounceState } from './announce.scene';
 
 jest.mock('../keyboards');
 jest.mock('../utils/user.utils');
@@ -18,9 +15,10 @@ jest.mock('../utils/activities.utils');
 
 describe('AnnounceScene', () => {
   let instance: AnnounceScene;
-  let activitiesService: ActivitiesService;
-  let messagingService: MessagingService;
-  let usersService: UsersService;
+
+  let activitiesStore: ActivitiesStore;
+  let messageStore: MessageStore;
+  let usersStore: UsersStore;
 
   let scene: TestableSceneState;
   let ctx: AppContext;
@@ -29,15 +27,15 @@ describe('AnnounceScene', () => {
     jest.clearAllMocks();
 
     const baseScene = createBaseSceneMock();
-    activitiesService = {
+    activitiesStore = {
       getAll: jest.fn().mockResolvedValue({}),
     } as any;
-    messagingService = {} as any;
-    usersService = {
+    messageStore = {} as any;
+    usersStore = {
       getUser: jest.fn().mockReturnValue({}),
     } as any;
 
-    instance = new AnnounceScene(baseScene, activitiesService, messagingService, usersService);
+    instance = new AnnounceScene(baseScene, activitiesStore, messageStore, usersStore);
 
     scene = getSceneState(instance.scene);
 
@@ -80,32 +78,32 @@ describe('AnnounceScene', () => {
     });
 
     it('should request user by from id', async () => {
-      await scene.onEnter(ctx, () => {});
+      await scene.onEnter(ctx);
 
-      expect(usersService.getUser).toHaveBeenCalledWith(`${ctx.from.id}`);
+      expect(usersStore.getUser).toHaveBeenCalledWith(`${ctx.from.id}`);
     });
 
     it('should reply that announce is prohibited and leave state', async () => {
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: false });
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: false });
 
-      await scene.onEnter(ctx, () => {});
+      await scene.onEnter(ctx);
 
       expect(ctx.reply).toHaveBeenCalledWith('announce.prohibited');
       expect(ctx.scene.leave).toHaveBeenCalledTimes(1);
     });
 
     it('should reply with announce.intro', async () => {
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
 
-      await scene.onEnter(ctx, () => {});
+      await scene.onEnter(ctx);
 
       expect(ctx.replyWithMarkdown).toHaveBeenCalledWith('announce.intro');
     });
 
     it('should reply with announce.chooseActivities', async () => {
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
 
-      await scene.onEnter(ctx, () => {});
+      await scene.onEnter(ctx);
 
       expect(ctx.reply).toHaveBeenCalledWith('announce.chooseActivities', expect.anything());
     });

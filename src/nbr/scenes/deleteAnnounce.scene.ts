@@ -1,25 +1,33 @@
-import { BaseScene, Stage } from 'telegraf';
+import { Stage } from 'telegraf';
+import { inject, injectable } from 'inversify';
 
-import { MessagingService } from '../services/messaging.service';
-import { AppContext } from '../../shared/interfaces/appContext';
-import { MessageMetadata } from '../models/messages';
-import { getDeleteMessagesKeyboard, getApproveKeyboard } from '../keyboards';
+import { AppContext } from '../../shared/interfaces';
+import {
+  MessageMetadata,
+  MessageStore,
+  TelegramScene,
+  UsersStore,
+} from '../interfaces';
+import { getApproveKeyboard, getDeleteMessagesKeyboard } from '../keyboards';
 import { Actions } from '../constants/enums';
-import { UsersService } from '../services/users.service';
+import { TYPES } from '../ioc/types';
 
 export interface DeleteAnnounceState {
   messages: MessageMetadata[];
   selectedMessage: MessageMetadata;
 }
 
-export class DeleteAnnounceScene {
-  public static ID: string = 'delete-announce';
-
-  constructor(public scene: BaseScene<AppContext>, private messagingService: MessagingService, private usersService: UsersService) {
-    this.attachHookListeners();
+@injectable()
+export class DeleteAnnounceScene extends TelegramScene {
+  constructor(
+    @inject(TYPES.DELETE_ANNOUNCE_ID) private sceneId: string,
+    @inject(TYPES.MESSAGE_STORE) private messageStore: MessageStore,
+    @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
+  ) {
+    super(sceneId);
   }
 
-  private attachHookListeners = () => {
+  protected attachHookListeners = (): void => {
     this.scene.enter(this.onEnterScene);
     this.scene.action(/^delete */, this.onDeleteMessage);
     this.scene.action(Actions.Approve, this.onApprove);
@@ -38,7 +46,7 @@ export class DeleteAnnounceScene {
       return;
     }
 
-    const messages: MessageMetadata[] = await this.messagingService.getLastMessages();
+    const messages: MessageMetadata[] = await this.messageStore.getLastMessages();
     this.getState(ctx).messages = messages;
 
     if (messages.length === 0) {
@@ -82,7 +90,7 @@ export class DeleteAnnounceScene {
       selectedMessage: { id, messageKeys },
     }: DeleteAnnounceState = this.getState(ctx);
 
-    const deletedCount: number = await this.messagingService.deleteMessages(ctx, messageKeys);
+    const deletedCount: number = await this.messageStore.deleteMessages(ctx, messageKeys);
 
     await ctx.replyWithMarkdown(
       ctx.i18n.t('deleteAnnounce.onSuccess', {
@@ -90,12 +98,12 @@ export class DeleteAnnounceScene {
       }),
     );
 
-    await this.messagingService.deleteMessageMetadata(id);
+    await this.messageStore.deleteMessageMetadata(id);
   };
 
   // helpers
   private isAllowedToDeleteMessages = async (userId: number): Promise<boolean> => {
-    const user = await this.usersService.getUser(userId.toString());
+    const user = await this.usersStore.getUser(userId.toString());
 
     return !!user.allowedToAnnounce;
   };

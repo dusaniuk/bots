@@ -1,7 +1,7 @@
 import { Markup } from 'telegraf';
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 
-import { AppContext } from '../../shared/interfaces/appContext';
+import { AppContext } from '../../shared/interfaces';
 
 const CHATS_LINKS = {
   runPro: 'https://t.me/joinchat/JPBxH1jhwl1DgcBKLpGc-A',

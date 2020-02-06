@@ -1,18 +1,26 @@
 import { ExtraEditMessage } from 'telegraf/typings/telegram-types';
-
+import { inject, injectable } from 'inversify';
 import { firestore } from 'firebase-admin';
-import { AppContext } from '../../shared/interfaces/appContext';
-import { MessageKey, MessageMetadata } from '../models/messages';
+
+import { AppContext, Database } from '../../shared/interfaces';
+
 import { CONFIG } from '../../config';
+import { TYPES } from '../ioc/types';
+
+import { MessageStore, MessageKey, MessageMetadata } from '../interfaces';
 
 const MARKDOWN_EXTRA: ExtraEditMessage = { parse_mode: 'Markdown', disable_notification: CONFIG.isDevMode };
 
-export class MessagingService {
-  private readonly nbrRef: firestore.CollectionReference;
-
-  constructor(private db: firestore.Firestore) {
-    this.nbrRef = this.db.collection('nbr');
+@injectable()
+export class MessagingFirestore implements MessageStore {
+  private get nbrRef(): firestore.CollectionReference {
+    return this.db.collection('nbr');
   }
+
+  constructor(
+    @inject(TYPES.DATABASE) private db: Database,
+  ) { }
+
 
   sendMessages = (ctx: AppContext, userIds: number[], text: string): Promise<MessageKey[]> => {
     return Promise.all(

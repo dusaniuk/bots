@@ -2,19 +2,18 @@ import * as faker from 'faker';
 
 import { DeleteAnnounceScene, DeleteAnnounceState } from './deleteAnnounce.scene';
 import { createBaseSceneMock, getSceneState, TestableSceneState } from '../../../test/baseScene.mock';
-import { MessagingService } from '../services/messaging.service';
-import { UsersService } from '../services/users.service';
-import { AppContext } from '../../shared/interfaces/appContext';
+import { AppContext } from '../../shared/interfaces';
 import { createMockContext } from '../../../test/context.mock';
 import { Actions } from '../constants/enums';
+import { MessageStore, UsersStore } from '../interfaces';
 
 jest.mock('../keyboards');
 
 describe('DeleteAnnounceScene', () => {
   let instance: DeleteAnnounceScene;
 
-  let messagingService: MessagingService;
-  let usersService: UsersService;
+  let messageStore: MessageStore;
+  let usersStore: UsersStore;
 
   let scene: TestableSceneState;
   let ctx: AppContext;
@@ -23,16 +22,16 @@ describe('DeleteAnnounceScene', () => {
     jest.clearAllMocks();
 
     const baseScene = createBaseSceneMock();
-    messagingService = {
+    messageStore = {
       getLastMessages: jest.fn().mockResolvedValue([]),
       deleteMessages: jest.fn().mockResolvedValue(0),
       deleteMessageMetadata: jest.fn().mockResolvedValue({}),
     } as any;
-    usersService = {
+    usersStore = {
       getUser: jest.fn().mockResolvedValue({}),
     } as any;
 
-    instance = new DeleteAnnounceScene(baseScene, messagingService, usersService);
+    instance = new DeleteAnnounceScene(baseScene, messageStore, usersStore);
 
     scene = getSceneState(instance.scene);
 
@@ -70,11 +69,11 @@ describe('DeleteAnnounceScene', () => {
     it('should get user', async () => {
       await scene.onEnter(ctx);
 
-      expect(usersService.getUser).toHaveBeenCalledWith(`${ctx.from.id}`);
+      expect(usersStore.getUser).toHaveBeenCalledWith(`${ctx.from.id}`);
     });
 
     it('should reply with deleteAnnounce.prohibited and leave state', async () => {
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: false });
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: false });
 
       await scene.onEnter(ctx);
 
@@ -83,16 +82,16 @@ describe('DeleteAnnounceScene', () => {
     });
 
     it('should get last messages', async () => {
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
 
       await scene.onEnter(ctx);
 
-      expect(messagingService.getLastMessages).toHaveBeenCalled();
+      expect(messageStore.getLastMessages).toHaveBeenCalled();
     });
 
     it('should reply with deleteAnnounce.noMessages and leave scene', async () => {
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
-      messagingService.getLastMessages = jest.fn().mockResolvedValue([]);
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
+      messageStore.getLastMessages = jest.fn().mockResolvedValue([]);
 
       await scene.onEnter(ctx);
 
@@ -103,8 +102,8 @@ describe('DeleteAnnounceScene', () => {
     it('should store last messages in state', async () => {
       const messages: any[] = ['one', 'two'];
 
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
-      messagingService.getLastMessages = jest.fn().mockResolvedValue(messages);
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
+      messageStore.getLastMessages = jest.fn().mockResolvedValue(messages);
 
       await scene.onEnter(ctx);
 
@@ -112,8 +111,8 @@ describe('DeleteAnnounceScene', () => {
     });
 
     it('should reply with deleteAnnounce.intro2 if there are some messages', async () => {
-      usersService.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
-      messagingService.getLastMessages = jest.fn().mockResolvedValue(['one', 'two']);
+      usersStore.getUser = jest.fn().mockReturnValue({ allowedToAnnounce: true });
+      messageStore.getLastMessages = jest.fn().mockResolvedValue(['one', 'two']);
 
       await scene.onEnter(ctx);
 
@@ -183,12 +182,12 @@ describe('DeleteAnnounceScene', () => {
 
       await scene.actions.get(Actions.Approve)(ctx);
 
-      expect(messagingService.deleteMessages).toHaveBeenCalledWith(ctx, messageKeys);
+      expect(messageStore.deleteMessages).toHaveBeenCalledWith(ctx, messageKeys);
     });
 
     it('should reply with deleteAnnounce.onSuccess', async () => {
       const deletedCount = faker.random.number();
-      messagingService.deleteMessages = jest.fn().mockResolvedValue(deletedCount);
+      messageStore.deleteMessages = jest.fn().mockResolvedValue(deletedCount);
 
       await scene.actions.get(Actions.Approve)(ctx);
 
@@ -208,7 +207,7 @@ describe('DeleteAnnounceScene', () => {
 
       await scene.actions.get(Actions.Approve)(ctx);
 
-      expect(messagingService.deleteMessageMetadata).toHaveBeenCalledWith(id);
+      expect(messageStore.deleteMessageMetadata).toHaveBeenCalledWith(id);
     });
   });
 });

@@ -1,24 +1,27 @@
-import { BaseScene, Stage } from 'telegraf';
+import { Stage } from 'telegraf';
+import { inject, injectable } from 'inversify';
 
 import { Actions, Activity } from '../constants/enums';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
-import { ActivitiesService } from '../services/activities.service';
 import { extractSelectedActivities, stringifySelectedActivities } from '../utils/activities.utils';
-import { AppContext } from '../../shared/interfaces/appContext';
-import { ActivitiesPreferences } from '../models/activities';
+import { AppContext } from '../../shared/interfaces';
+import { ActivitiesPreferences, ActivitiesStore, TelegramScene } from '../interfaces';
+import { TYPES } from '../ioc/types';
 
 interface ActivitiesState {
   preferences: ActivitiesPreferences;
 }
 
-export class ActivitiesScene {
-  public static ID: string = 'activities';
-
-  constructor(public scene: BaseScene<AppContext>, private activitiesService: ActivitiesService) {
-    this.attachHookListeners();
+@injectable()
+export class ActivitiesScene extends TelegramScene {
+  constructor(
+    @inject(TYPES.ACTIVITIES_ID) private sceneId: string,
+    @inject(TYPES.ACTIVITIES_STORE) private activitiesStore: ActivitiesStore,
+  ) {
+    super(sceneId);
   }
 
-  private attachHookListeners = () => {
+  protected attachHookListeners = (): void => {
     this.scene.enter(this.onEnterScene);
     this.scene.action(Actions.Next, this.onNext);
     this.scene.action(Actions.Approve, this.onApprove);
@@ -85,7 +88,7 @@ export class ActivitiesScene {
 
     const savingMsg = await ctx.reply(ctx.i18n.t('activities.saving'));
     const activities = extractSelectedActivities(preferences);
-    await this.activitiesService.save(ctx.from.id, activities);
+    await this.activitiesStore.save(ctx.from.id, activities);
 
     await ctx.telegram.deleteMessage(savingMsg.chat.id, savingMsg.message_id);
     await ctx.reply(ctx.i18n.t('activities.saved'));

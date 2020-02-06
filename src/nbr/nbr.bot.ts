@@ -1,49 +1,43 @@
 /* eslint-disable no-console */
-import Telegraf, {
-  BaseScene, Context, session, Stage,
-} from 'telegraf';
+import Telegraf, { Context, session, Stage } from 'telegraf';
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import { inject, injectable } from 'inversify';
 import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
 
 import { CONFIG } from '../config';
-import { Bot } from '../shared/interfaces/bot';
+import { AppContext, Bot } from '../shared/interfaces';
 
-import { ActivitiesScene } from './scenes/activities.scene';
-import { AnnounceScene } from './scenes/announce.scene';
-import { TelegramUser, UsersService } from './services/users.service';
-import { AppContext } from '../shared/interfaces/appContext';
-import { commandsInPrivateOnly } from './middleware/chat.middleware';
-import { useFeedSchedule } from './middleware/timer.middleware';
+import { TelegramUser } from './services/users.firestore';
+
+import { commandsInPrivateOnly, useFeedSchedule } from './middleware';
 import { getChatsKeyboard } from './keyboards';
-import { DeleteAnnounceScene } from './scenes/deleteAnnounce.scene';
 import { stringifyUsers } from './utils/user.utils';
-import { ActivitiesService } from './services/activities.service';
-import { MessagingService } from './services/messaging.service';
 
-import { Database } from '../shared/interfaces/vendors';
 import { TYPES } from './ioc/types';
+import { Scene } from './constants/enums';
+import { TelegramScene, UsersStore } from './interfaces';
 
 @injectable()
 export class NbrBot implements Bot {
-  private readonly usersService: UsersService;
-  private readonly messagingService: MessagingService;
-  private readonly activitiesService: ActivitiesService;
-
   private readonly bot: Telegraf<AppContext>;
   private readonly stage: Stage<AppContext>;
 
   constructor(
-    @inject(TYPES.DATABASE) private db: Database,
+    @inject(TYPES.ANNOUNCE_SCENE) private announceScene: TelegramScene,
+    @inject(TYPES.ACTIVITIES_SCENE) private activitiesScene: TelegramScene,
+    @inject(TYPES.DELETE_ANNOUNCE_SCENE) private deleteAnnounceScene: TelegramScene,
+    @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
   ) {
     this.bot = new Telegraf(CONFIG.nbr.botToken);
     this.stage = new Stage([]);
-
-    this.usersService = new UsersService(this.db);
-    this.messagingService = new MessagingService(db);
-    this.activitiesService = new ActivitiesService(db);
   }
+
+  private useScenes = (): void => {
+    this.activitiesScene.useScene(this.stage);
+    this.announceScene.useScene(this.stage);
+    this.deleteAnnounceScene.useScene(this.stage);
+  };
 
   start = () => {
     const i18n = new I18n({
@@ -58,24 +52,22 @@ export class NbrBot implements Bot {
     this.bot.use(useFeedSchedule());
     this.bot.use(commandsInPrivateOnly());
 
-    this.useActivitiesScene();
-    this.useAnnounceScene();
-    this.useDeleteAnnounceScene();
+    this.useScenes();
 
     this.bot.command('start', async (ctx: AppContext) => {
       await ctx.replyWithMarkdown(ctx.i18n.t('start.intro'));
-      await ctx.scene.enter(ActivitiesScene.ID);
+      await ctx.scene.enter(Scene.Activities);
 
       await this.saveTelegrafUser(ctx);
     });
 
     this.bot.command('announce', (ctx: AppContext) => {
-      return ctx.scene.enter(AnnounceScene.ID);
+      return ctx.scene.enter(Scene.Announce);
     });
 
     this.bot.command('deleteannounce', async (ctx: AppContext) => {
       await ctx.reply(ctx.i18n.t('deleteAnnounce.intro'));
-      await ctx.scene.enter(DeleteAnnounceScene.ID);
+      await ctx.scene.enter(Scene.DeleteAnnounce);
     });
 
     this.bot.command('chats', async (ctx: AppContext) => {
@@ -115,23 +107,7 @@ export class NbrBot implements Bot {
       });
   };
 
-  private useActivitiesScene = () => {
-    const { scene } = new ActivitiesScene(new BaseScene(ActivitiesScene.ID), this.activitiesService);
-
-    this.stage.register(scene);
-  };
-
-  private useAnnounceScene = () => {
-    const { scene } = new AnnounceScene(new BaseScene(AnnounceScene.ID), this.activitiesService, this.messagingService, this.usersService);
-    this.stage.register(scene);
-  };
-
-  private useDeleteAnnounceScene = () => {
-    const { scene } = new DeleteAnnounceScene(new BaseScene(DeleteAnnounceScene.ID), this.messagingService, this.usersService);
-    this.stage.register(scene);
-  };
-
-  private saveTelegrafUser = async ({ from }: Context) => {
+  private saveTelegrafUser = async ({ from }: Context): Promise<void> => {
     const user: TelegramUser = {
       id: from.id.toString(),
       firstName: from.first_name,
@@ -145,6 +121,6 @@ export class NbrBot implements Bot {
       user.username = from.username;
     }
 
-    await this.usersService.saveUser(user);
+    await this.usersStore.saveUser(user);
   };
 }

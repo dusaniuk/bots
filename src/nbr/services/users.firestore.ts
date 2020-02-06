@@ -1,4 +1,9 @@
 import { firestore } from 'firebase-admin';
+import { inject, injectable } from 'inversify';
+
+import { UsersStore } from '../interfaces';
+import { Database } from '../../shared/interfaces';
+import { TYPES } from '../ioc/types';
 
 export interface TelegramUser {
   id: string;
@@ -8,12 +13,15 @@ export interface TelegramUser {
   allowedToAnnounce?: boolean;
 }
 
-export class UsersService {
-  private readonly nbrRef: firestore.CollectionReference;
-
-  constructor(private db: firestore.Firestore) {
-    this.nbrRef = this.db.collection('nbr');
+@injectable()
+export class UsersFirestore implements UsersStore {
+  private get nbrRef(): firestore.CollectionReference {
+    return this.db.collection('nbr');
   }
+
+  constructor(
+    @inject(TYPES.DATABASE) private db: Database,
+  ) { }
 
   getUser = async (userId: string): Promise<TelegramUser> => {
     const query = await this.getMemberRef(userId).get();

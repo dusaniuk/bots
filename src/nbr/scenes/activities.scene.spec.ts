@@ -1,18 +1,18 @@
 import { ActivitiesScene } from './activities.scene';
 import { Actions, Activity } from '../constants/enums';
-import { AppContext } from '../../shared/interfaces/appContext';
-import { ActivitiesService } from '../services/activities.service';
+import { AppContext } from '../../shared/interfaces';
 import { stringifySelectedActivities } from '../utils/activities.utils';
 
 import { createBaseSceneMock, getSceneState, TestableSceneState } from '../../../test/baseScene.mock';
 import { createMockContext } from '../../../test/context.mock';
+import { ActivitiesStore } from '../interfaces';
 
 jest.mock('../utils/activities.utils');
 jest.mock('../keyboards');
 
 describe('ActivitiesScene', () => {
   let instance: ActivitiesScene;
-  let activitiesService: ActivitiesService;
+  let activitiesStore: ActivitiesStore;
 
   let scene: TestableSceneState;
   let ctx: AppContext;
@@ -21,11 +21,11 @@ describe('ActivitiesScene', () => {
     jest.clearAllMocks();
 
     const baseScene = createBaseSceneMock();
-    activitiesService = {
+    activitiesStore = {
       save: jest.fn(),
     } as any;
 
-    instance = new ActivitiesScene(baseScene, activitiesService);
+    instance = new ActivitiesScene(baseScene, activitiesStore);
 
     scene = getSceneState(instance.scene);
 
@@ -45,7 +45,7 @@ describe('ActivitiesScene', () => {
     it('should drop state', async () => {
       ctx.scene.state = { preferences: { foobar: 'data' } };
 
-      await scene.onEnter(ctx, () => {});
+      await scene.onEnter(ctx);
 
       expect(ctx.scene.state).toEqual({
         preferences: {},
@@ -53,7 +53,7 @@ describe('ActivitiesScene', () => {
     });
 
     it('should reply with intro message', async () => {
-      await scene.onEnter(ctx, () => {});
+      await scene.onEnter(ctx);
 
       expect(ctx.reply).toHaveBeenCalledWith('activities.intro', expect.anything());
     });
@@ -167,7 +167,7 @@ describe('ActivitiesScene', () => {
     it('should save activities', async () => {
       await scene.actions.get(Actions.Approve)(ctx);
 
-      expect(activitiesService.save).toHaveBeenCalledWith(ctx.from.id, expect.anything());
+      expect(activitiesStore.save).toHaveBeenCalledWith(ctx.from.id, expect.anything());
     });
 
     it('should deleteMessage', async () => {

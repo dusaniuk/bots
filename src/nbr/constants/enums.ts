@@ -13,3 +13,9 @@ export const enum Actions {
   Approve = 'approve',
   Restart = 'restart',
 }
+
+export const enum Scene {
+  Activities = 'ACTIVITIES.SCENE',
+  Announce = 'ANNOUNCE.SCENE',
+  DeleteAnnounce = 'DELETE_ANNOUNCE.SCENE',
+}

@@ -1,9 +1,11 @@
 import { Middleware } from 'telegraf';
+import { MessageEntity } from 'telegraf/typings/telegram-types';
 
-import { AppContext } from '../../shared/interfaces/appContext';
+import { AppContext } from '../../shared/interfaces';
 
 const filterNonPrivateChats = async (ctx: AppContext, next: () => any): Promise<{}> => {
-  const isCommand: boolean = ((ctx.message && ctx.message.entities) || []).some(entity => entity.type === 'bot_command');
+  const messageEntities: MessageEntity[] = (ctx.message?.entities ?? []);
+  const isCommand: boolean = messageEntities.some((entity: MessageEntity) => entity.type === 'bot_command');
 
   if (isCommand && ctx.chat.type !== 'private') {
     return ctx.reply(ctx.i18n.t('error.nonPrivateChat'));

@@ -1,16 +1,21 @@
-import { BaseScene, Stage } from 'telegraf';
+import { Stage } from 'telegraf';
+import { inject, injectable } from 'inversify';
 
 import { CONFIG } from '../../config';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { extractSelectedActivities, getActivitiesKeys, stringifySelectedActivities } from '../utils/activities.utils';
 import { stringifyUserGreeting } from '../utils/user.utils';
-import { ActivitiesService } from '../services/activities.service';
-import { MessagingService } from '../services/messaging.service';
-import { UsersService } from '../services/users.service';
 import { Actions, Activity } from '../constants/enums';
-import { AppContext } from '../../shared/interfaces/appContext';
-import { MessageKey } from '../models/messages';
-import { ActivitiesPreferences } from '../models/activities';
+import { AppContext } from '../../shared/interfaces';
+import {
+  ActivitiesPreferences,
+  ActivitiesStore,
+  MessageKey,
+  MessageStore,
+  TelegramScene,
+  UsersStore,
+} from '../interfaces';
+import { TYPES } from '../ioc/types';
 
 export interface AnnounceState {
   preferences: ActivitiesPreferences;
@@ -20,21 +25,20 @@ export interface AnnounceState {
   topic: string;
 }
 
-export class AnnounceScene {
-  public static ID: string = 'announce';
-
+@injectable()
+export class AnnounceScene extends TelegramScene {
   private messageText: string;
 
   constructor(
-    public scene: BaseScene<AppContext>,
-    private activitiesService: ActivitiesService,
-    private messagingService: MessagingService,
-    private usersService: UsersService,
+    @inject(TYPES.ANNOUNCE_ID) private sceneId: string,
+    @inject(TYPES.ACTIVITIES_STORE) private activitiesStore: ActivitiesStore,
+    @inject(TYPES.MESSAGE_STORE) private messageStore: MessageStore,
+    @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
   ) {
-    this.attachHookListeners();
+    super(sceneId);
   }
 
-  private attachHookListeners = () => {
+  protected attachHookListeners = (): void => {
     this.scene.enter(this.onEnterScene);
     this.scene.on('message', this.onMessage);
 
@@ -149,7 +153,7 @@ export class AnnounceScene {
 
     await ctx.reply(ctx.i18n.t('announce.startSending', { usersCount: userIds.length }));
 
-    const keys: MessageKey[] = await this.messagingService.sendMessages(ctx, userIds, this.messageText);
+    const keys: MessageKey[] = await this.messageStore.sendMessages(ctx, userIds, this.messageText);
     await this.saveMessageMetadata(topic, keys);
 
     await ctx.reply(ctx.i18n.t('announce.sent'));
@@ -158,7 +162,7 @@ export class AnnounceScene {
 
   // helpers
   private saveMessageMetadata = (topic: string, messageKeys: MessageKey[]): Promise<void> => {
-    return this.messagingService.saveMessageMetadata({
+    return this.messageStore.saveMessageMetadata({
       messageText: this.messageText,
       timestamp: new Date().getTime(),
       messageKeys,
@@ -171,7 +175,7 @@ export class AnnounceScene {
       return [senderId];
     }
 
-    const activitiesData = await this.activitiesService.getAll();
+    const activitiesData = await this.activitiesStore.getAll();
 
     const userIds: number[] = [...activities, Activity.All].reduce((acc: number[], activity: string) => {
       return [...acc, ...activitiesData[activity]];
@@ -184,7 +188,7 @@ export class AnnounceScene {
   };
 
   private isAllowedToAnnounce = async (userId: number): Promise<boolean> => {
-    const user = await this.usersService.getUser(userId.toString());
+    const user = await this.usersStore.getUser(userId.toString());
 
     return !!user.allowedToAnnounce;
   };
