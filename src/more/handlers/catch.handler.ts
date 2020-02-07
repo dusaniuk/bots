@@ -5,8 +5,11 @@ import { AppContext } from '../../shared/interfaces';
 import { TYPES } from '../ioc/types';
 import * as utils from '../utils/helpers';
 import { Actions } from '../constants/actions';
-import { CatchRecord, CatchStore, Mention, User, UsersStore } from '../interfaces';
+import { CatchRecord, CatchStore, User, UsersStore } from '../interfaces';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
+import { MentionsService } from '../services';
+
+import { CatchMentions } from '../models';
 
 
 @injectable()
@@ -14,71 +17,49 @@ export class CatchHandler {
   constructor(
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
     @inject(TYPES.CATCH_STORE) private catchStore: CatchStore,
+    @inject(TYPES.MENTION_SERVICE) private mentionsService: MentionsService,
   ) {}
 
   catch = async (ctx: AppContext): Promise<any> => {
-    const mentions: Mention[] = utils.getMentions(ctx.message);
-    if (mentions.length === 0) {
+    const mentionsData: CatchMentions = await this.mentionsService.getMentionsFromContext(ctx);
+
+    if (!mentionsData.hasMentions) {
       return ctx.reply(ctx.i18n.t('other.howToCatch'));
     }
 
-    const chatUsers: User[] = await this.usersStore.getAllUsersFromChat(ctx.chat.id);
-    const mentionedUsers = utils.getMentionedUsers(mentions, chatUsers);
-
-    const isMentionedHimself: boolean = mentionedUsers.some((u: User) => u.id === ctx.from.id);
-    if (isMentionedHimself) {
+    if (mentionsData.isMentionedHimself) {
       return ctx.reply(ctx.i18n.t('error.selfCatch'));
     }
 
-    const validUsers: User[] = [];
-    const unverifiedUsers: User[] = [];
-
-    mentionedUsers.forEach((user: User) => {
-      // don't allow to push 2 same users
-      if (validUsers.some((u: User) => u.id === user.id)) {
-        return;
-      }
-
-      if (user.id) {
-        validUsers.push(user);
-        return;
-      }
-
-      unverifiedUsers.push(user);
-    });
-
-    if (unverifiedUsers.length > 0) {
+    if (mentionsData.unverifiedMentions.length > 0) {
       let users = '';
 
-      unverifiedUsers.forEach((user: User) => {
+      mentionsData.unverifiedMentions.forEach((user: User) => {
         users += ` ${user.username}`;
       });
 
       await ctx.replyWithMarkdown(ctx.i18n.t('error.nonRegisteredUsers', { users }));
     }
 
-    if (validUsers.length === 0) {
+    if (mentionsData.victims.length === 0) {
       return ctx.reply(ctx.i18n.t('error.noUsersToCatch'));
     }
 
     const catchId = await this.catchStore.addCatchRecord(ctx.chat.id, {
       approved: false,
-      hunterId: ctx.from.id,
+      hunterId: mentionsData.hunter.id,
       timestamp: new Date().getTime(),
-      victims: validUsers.filter((user: User) => user.id !== null).map((user: User) => user.id),
-      points: validUsers.length * 4, // TODO: change this logic in future
+      victims: mentionsData.victims.filter((user: User) => user.id !== null).map((user: User) => user.id),
+      points: mentionsData.victims.length * 4, // TODO: change this logic in future
     });
 
-    const hunter: User = chatUsers.find(({ id }) => id === ctx.from.id);
-    const adminId: number = chatUsers.find(({ isAdmin }: User) => isAdmin).id;
-
     const messageData = {
-      hunter: utils.getGreetingNameForUser(hunter),
-      victims: utils.getVictimsMsg(validUsers),
+      hunter: utils.getGreetingNameForUser(mentionsData.hunter),
+      victims: utils.getVictimsMsg(mentionsData.victims),
     };
 
     const keyboard = getApproveKeyboard(ctx, catchId);
-    await ctx.telegram.sendMessage(adminId, ctx.i18n.t('catch.summary', messageData), keyboard);
+    await ctx.telegram.sendMessage(mentionsData.admin.id, ctx.i18n.t('catch.summary', messageData), keyboard);
 
     return ctx.replyWithMarkdown(ctx.i18n.t('catch.message', messageData));
   };

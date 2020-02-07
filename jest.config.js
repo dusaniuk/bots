@@ -9,4 +9,5 @@ module.exports = {
   notify: true,
   preset: 'ts-jest',
   testEnvironment: 'node',
+  setupFiles: ['./jest.setup.js'],
 };
