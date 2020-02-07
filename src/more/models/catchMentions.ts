@@ -9,6 +9,14 @@ export class CatchMentions {
     return this.victims.some((user: User) => user.id === this.hunter.id);
   }
 
+  public get haveUnverifiedMentions(): boolean {
+    return this.unverifiedMentions.length > 0;
+  }
+
+  public get haveVictims(): boolean {
+    return this.victims.length > 0;
+  }
+
   constructor(
     public admin: User,
     public hunter: User,

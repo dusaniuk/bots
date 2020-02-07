@@ -1,7 +1,7 @@
 import * as faker from 'faker';
 
 import { CatchMentions } from './catchMentions';
-import { User } from '../interfaces';
+import { Mention, User } from '../interfaces';
 
 describe('CatchMentions', () => {
   let catchMentions: CatchMentions;
@@ -17,6 +17,34 @@ describe('CatchMentions', () => {
       catchMentions = new CatchMentions(null, null, [{} as User], []);
 
       expect(catchMentions.hasMentions).toBeTruthy();
+    });
+  });
+
+  describe('haveUnverifiedMentions', () => {
+    it('should return false if all mentions are verified', () => {
+      catchMentions = new CatchMentions(null, null, [], []);
+
+      expect(catchMentions.haveUnverifiedMentions).toBeFalsy();
+    });
+
+    it('should return true if there are unverified mentions', () => {
+      catchMentions = new CatchMentions(null, null, [], [{} as Mention]);
+
+      expect(catchMentions.haveUnverifiedMentions).toBeTruthy();
+    });
+  });
+
+  describe('haveVictims', () => {
+    it('should return false if there are no victims', () => {
+      catchMentions = new CatchMentions(null, null, [], []);
+
+      expect(catchMentions.haveVictims).toBeFalsy();
+    });
+
+    it('should return true if there are victims', () => {
+      catchMentions = new CatchMentions(null, null, [{} as User], []);
+
+      expect(catchMentions.haveVictims).toBeTruthy();
     });
   });
 

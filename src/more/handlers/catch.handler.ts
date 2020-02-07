@@ -31,11 +31,11 @@ export class CatchHandler {
       return this.telegramResponse.rejectSelfCapture(ctx);
     }
 
-    if (mentionsData.unverifiedMentions.length > 0) {
+    if (mentionsData.haveUnverifiedMentions) {
       await this.telegramResponse.showUnverifiedMentions(ctx, mentionsData.unverifiedMentions);
     }
 
-    if (mentionsData.victims.length === 0) {
+    if (!mentionsData.haveVictims) {
       return this.telegramResponse.noUsersToCatch(ctx);
     }
 
