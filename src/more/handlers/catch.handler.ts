@@ -6,8 +6,7 @@ import { TYPES } from '../ioc/types';
 import * as utils from '../utils/helpers';
 import { Actions } from '../constants/actions';
 import { CatchRecord, CatchStore, User, UsersStore } from '../interfaces';
-import { getApproveKeyboard } from '../keyboards/approve.keyboard';
-import { MentionsService } from '../services';
+import { MentionsService, TelegramResponse } from '../services';
 
 import { CatchMentions } from '../models';
 
@@ -18,34 +17,29 @@ export class CatchHandler {
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
     @inject(TYPES.CATCH_STORE) private catchStore: CatchStore,
     @inject(TYPES.MENTION_SERVICE) private mentionsService: MentionsService,
+    @inject(TYPES.TELEGRAM_RESPONSE) private telegramResponse: TelegramResponse,
   ) {}
 
   catch = async (ctx: AppContext): Promise<any> => {
     const mentionsData: CatchMentions = await this.mentionsService.getMentionsFromContext(ctx);
 
     if (!mentionsData.hasMentions) {
-      return ctx.reply(ctx.i18n.t('other.howToCatch'));
+      return this.telegramResponse.showCatchInstruction(ctx);
     }
 
     if (mentionsData.isMentionedHimself) {
-      return ctx.reply(ctx.i18n.t('error.selfCatch'));
+      return this.telegramResponse.rejectSelfCapture(ctx);
     }
 
     if (mentionsData.unverifiedMentions.length > 0) {
-      let users = '';
-
-      mentionsData.unverifiedMentions.forEach((user: User) => {
-        users += ` ${user.username}`;
-      });
-
-      await ctx.replyWithMarkdown(ctx.i18n.t('error.nonRegisteredUsers', { users }));
+      await this.telegramResponse.showUnverifiedMentions(ctx, mentionsData.unverifiedMentions);
     }
 
     if (mentionsData.victims.length === 0) {
-      return ctx.reply(ctx.i18n.t('error.noUsersToCatch'));
+      return this.telegramResponse.noUsersToCatch(ctx);
     }
 
-    const catchId = await this.catchStore.addCatchRecord(ctx.chat.id, {
+    const catchId: string = await this.catchStore.addCatchRecord(ctx.chat.id, {
       approved: false,
       hunterId: mentionsData.hunter.id,
       timestamp: new Date().getTime(),
@@ -53,15 +47,10 @@ export class CatchHandler {
       points: mentionsData.victims.length * 4, // TODO: change this logic in future
     });
 
-    const messageData = {
-      hunter: utils.getGreetingNameForUser(mentionsData.hunter),
-      victims: utils.getVictimsMsg(mentionsData.victims),
-    };
-
-    const keyboard = getApproveKeyboard(ctx, catchId);
-    await ctx.telegram.sendMessage(mentionsData.admin.id, ctx.i18n.t('catch.summary', messageData), keyboard);
-
-    return ctx.replyWithMarkdown(ctx.i18n.t('catch.message', messageData));
+    return Promise.all([
+      this.telegramResponse.notifyAdminAboutCatch(ctx, catchId, mentionsData),
+      this.telegramResponse.notifyChatAboutCatch(ctx, mentionsData),
+    ]);
   };
 
   handleUserCatch = async (ctx: AppContext): Promise<void> => {

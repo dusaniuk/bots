@@ -11,12 +11,13 @@ export const createMockContext = (): AppContext => {
     i18n: {
       t: jest.fn().mockImplementation((pattern: string) => pattern),
     },
-    reply: jest.fn().mockReturnValue(Promise.resolve({ chat: {} })),
-    replyWithMarkdown: jest.fn().mockReturnValue(Promise.resolve({})),
-    editMessageText: jest.fn().mockReturnValue(Promise.resolve({})),
-    deleteMessage: jest.fn().mockReturnValue(Promise.resolve({})),
+    reply: jest.fn().mockResolvedValue({ chat: {} }),
+    replyWithMarkdown: jest.fn().mockResolvedValue({}),
+    editMessageText: jest.fn().mockResolvedValue({}),
+    deleteMessage: jest.fn().mockResolvedValue({}),
     telegram: {
-      deleteMessage: jest.fn().mockReturnValue(Promise.resolve({})),
+      sendMessage: jest.fn().mockResolvedValue({}),
+      deleteMessage: jest.fn().mockResolvedValue({}),
     },
   } as any;
 };

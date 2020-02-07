@@ -5,6 +5,7 @@ export const TYPES = {
 
   MENTION_PARSER: Symbol.for('more.mentions-parser'),
   MENTION_SERVICE: Symbol.for('more.mention-service'),
+  TELEGRAM_RESPONSE: Symbol.for('more.telegram-response'),
 
   CATCH_STORE: Symbol.for('more.catch.store'),
   USERS_STORE: Symbol.for('more.users.store'),
