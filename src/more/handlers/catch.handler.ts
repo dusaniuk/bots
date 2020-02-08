@@ -5,9 +5,8 @@ import { AppContext } from '../../shared/interfaces';
 import { TYPES } from '../ioc/types';
 import * as utils from '../utils/helpers';
 import { Actions } from '../constants/actions';
-import { CatchRecord, CatchStore, User, UsersStore } from '../interfaces';
-import { MentionsService, TelegramResponse } from '../services';
-
+import { CatchRecord, CatchStore, UsersStore } from '../interfaces';
+import { CatchService, MentionsService, TelegramResponse } from '../services';
 import { CatchMentions } from '../models';
 
 
@@ -16,6 +15,7 @@ export class CatchHandler {
   constructor(
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
     @inject(TYPES.CATCH_STORE) private catchStore: CatchStore,
+    @inject(TYPES.CATCH_SERVICE) private catchService: CatchService,
     @inject(TYPES.MENTION_SERVICE) private mentionsService: MentionsService,
     @inject(TYPES.TELEGRAM_RESPONSE) private telegramResponse: TelegramResponse,
   ) {}
@@ -39,13 +39,11 @@ export class CatchHandler {
       return this.telegramResponse.noUsersToCatch(ctx);
     }
 
-    const catchId: string = await this.catchStore.addCatchRecord(ctx.chat.id, {
-      approved: false,
-      hunterId: mentionsData.hunter.id,
-      timestamp: new Date().getTime(),
-      victims: mentionsData.victims.filter((user: User) => user.id !== null).map((user: User) => user.id),
-      points: mentionsData.victims.length * 4, // TODO: change this logic in future
-    });
+    const catchId: string = await this.catchService.addCatchRecord(
+      ctx.chat.id,
+      mentionsData.hunter.id,
+      mentionsData.victims,
+    );
 
     return Promise.all([
       this.telegramResponse.notifyAdminAboutCatch(ctx, catchId, mentionsData),
