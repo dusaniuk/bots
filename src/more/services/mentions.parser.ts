@@ -39,21 +39,29 @@ export class MentionsParser {
     }
 
     return {
-      username: messageText.substr(entity.offset + 1, entity.length).trim(),
+      username: messageText.substr(entity.offset, entity.length).replace('@', ''),
     };
   };
 
   private filterUniqueMentions = (mentions: Mention[]): Mention[] => {
-    return mentions.reduce((acc: Array<Mention>, val: Mention) => {
-      const alreadyMentioned: boolean = this.hasMentionInArray(acc, val);
+    const uniqueMentions: Mention[] = [];
 
-      return alreadyMentioned ? acc : [...acc, val];
-    }, []);
+    for (const mention of mentions) {
+      const alreadyMentioned: boolean = this.hasMentionInArray(uniqueMentions, mention);
+      if (!alreadyMentioned) {
+        uniqueMentions.push(mention);
+      }
+    }
+
+    return uniqueMentions;
   };
 
   private hasMentionInArray = (array: Mention[], value: Mention): boolean => {
     return array.some((mention: Mention) => {
-      return mention.username === value.username || mention.id === value.id;
+      const usernameMatch: boolean = mention.username === value.username && typeof value.username !== 'undefined';
+      const idMatch: boolean = mention.id === value.id && typeof value.id !== 'undefined';
+
+      return usernameMatch || idMatch;
     });
   }
 }

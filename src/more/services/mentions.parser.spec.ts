@@ -25,7 +25,7 @@ describe('MentionService', () => {
         ...ctx.message,
         text: `@${username}`,
         entities: [
-          { type: 'mention', offset: 0, length: username.length },
+          { type: 'mention', offset: 0, length: username.length + 1 },
         ],
       };
 
@@ -71,7 +71,7 @@ describe('MentionService', () => {
             length: firstName.length,
             user: { id, is_bot: false, first_name: firstName },
           }, {
-            type: 'mention', offset: firstName.length + 1, length: username.length,
+            type: 'mention', offset: firstName.length + 1, length: username.length + 1,
           },
         ],
       };
@@ -83,6 +83,26 @@ describe('MentionService', () => {
       expect(mentions[1]).toEqual({ username });
     });
 
+    it('should return 2 mentions by username', () => {
+      const username1 = faker.name.firstName();
+      const username2 = faker.internet.userName();
+
+      ctx.message = {
+        ...ctx.message,
+        text: `@${username1} @${username2}`,
+        entities: [
+          { type: 'mention', offset: 0, length: username1.length + 1 },
+          { type: 'mention', offset: username1.length + 2, length: username2.length + 1 },
+        ],
+      };
+
+      const mentions: Mention[] = service.getMentionsFromContext(ctx);
+
+      expect(mentions).toHaveLength(2);
+      expect(mentions[0]).toEqual({ username: username1 });
+      expect(mentions[1]).toEqual({ username: username2 });
+    });
+
     it('should return only one mention if one user was mentioned twice', () => {
       const username = faker.internet.userName();
 
@@ -90,8 +110,8 @@ describe('MentionService', () => {
         ...ctx.message,
         text: `@${username} @${username}`,
         entities: [
-          { type: 'mention', offset: 0, length: username.length },
-          { type: 'mention', offset: username.length + 2, length: username.length },
+          { type: 'mention', offset: 0, length: username.length + 1 },
+          { type: 'mention', offset: username.length + 2, length: username.length + 1 },
         ],
       };
 
