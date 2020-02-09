@@ -1,6 +1,6 @@
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
-import { User } from '../interfaces';
+import { User, UserWithScore } from '../interfaces';
 
 
 export const createUser = (telegrafUser: TelegrafUser): User => {
@@ -43,18 +43,17 @@ export const getVictimsMsg = (victims: User[]): string => {
   return message.substring(0, message.length - 1);
 };
 
-export const getUsersScore = (users: User[]): string => {
+export const getUsersScore = (users: UserWithScore[]): string => {
   let msg = '';
 
   users
-    .filter((user: User) => user.score)
-    .forEach((user: User, index: number) => {
-      let name = getGreetingNameForUser(user);
+    .forEach((user: UserWithScore, index: number) => {
+      let name = getGreetingNameForUser(user.user);
       if (name.startsWith('@')) {
         name = name.substring(1);
       }
 
-      msg += `\n${index + 1}) ${name}: ${user.score || 0}`;
+      msg += `\n${index + 1}) ${name}: ${user.points}`;
     });
 
   return msg;

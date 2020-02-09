@@ -5,14 +5,15 @@ import { AppContext } from '../../shared/interfaces';
 
 import { TYPES } from '../ioc/types';
 import { ChatType } from '../constants/chatType';
-import { User, UsersStore } from '../interfaces';
+import { ScoreItem, User, UsersStore, UserWithScore } from '../interfaces';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
-
+import { ScoreService } from '../services';
 
 @injectable()
 export class UsersHandler {
   constructor(
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
+    @inject(TYPES.SCORE_SERVICE) private scoreService: ScoreService,
   ) {}
 
   register = async (ctx: AppContext): Promise<any> => {
@@ -49,12 +50,21 @@ export class UsersHandler {
   };
 
   getScore = async (ctx: AppContext): Promise<any> => {
-    const users = await this.usersStore.getAllUsersFromChat(ctx.chat.id);
-    users.sort((a: User, b: User) => (b.score || 0) - (a.score || 0));
+    const [scoreItems, users] = await Promise.all([
+      await this.scoreService.getUsersScore(ctx.chat.id),
+      await this.usersStore.getAllUsersFromChat(ctx.chat.id),
+    ]);
+
+    const usersWithScore: UserWithScore[] = scoreItems
+      .map((item: ScoreItem) => {
+        const user = users.find((u: User) => u.id === item.hunterId);
+        return { user, points: item.points };
+      })
+      .sort((a: UserWithScore, b: UserWithScore) => b.points - a.points);
 
     return ctx.reply(
       ctx.i18n.t('user.score', {
-        score: getUsersScore(users),
+        score: getUsersScore(usersWithScore),
         usersCount: users.length,
       }),
     );

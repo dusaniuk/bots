@@ -24,6 +24,20 @@ export class CatchFirestore implements CatchStore {
     return result.id;
   };
 
+  getAllApprovedRecordsInRange = async (chatId: number, startTimestamp: number, endTimestamp: number): Promise<CatchRecord[]> => {
+    const catchesListRef: firestore.CollectionReference = this.getCatchesListRef(chatId);
+
+    const query: firestore.QuerySnapshot = await catchesListRef
+      .where('approved', '==', true)
+      .where('timestamp', '>', startTimestamp)
+      .where('timestamp', '<=', endTimestamp)
+      .get();
+
+    return query.docs.map((doc: firestore.QueryDocumentSnapshot) => ({
+      ...(doc.data() as CatchRecord),
+    }));
+  };
+
   getCatchRecord = async (chatId: number, recordId: string): Promise<CatchRecord> => {
     const query = await this.getCatchRef(chatId, recordId).get();
 
