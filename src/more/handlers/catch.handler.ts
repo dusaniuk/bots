@@ -55,7 +55,11 @@ export class CatchHandler {
     const [command, catchId, chatId] = ctx.callbackQuery.data.split(' ');
 
     // delete keyboard from admin's chat
-    await ctx.deleteMessage();
+    try {
+      await ctx.deleteMessage();
+    } catch (error) {
+      console.error('Can\t delete message from admin chat', error);
+    }
 
     const catchRecord: CatchRecord = await this.catchStore.getCatchRecord(+chatId, catchId);
     const user = await this.usersStore.getUserFromChat(catchRecord.hunterId, +chatId);
