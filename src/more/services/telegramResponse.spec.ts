@@ -24,6 +24,25 @@ describe('TelegramResponse', () => {
     ctx = createMockContext();
   });
 
+  describe('deleteMessageFromAdminChat', () => {
+    it('should delete message from context', async () => {
+      await service.deleteMessageFromAdminChat(ctx);
+
+      expect(ctx.deleteMessage).toHaveBeenCalled();
+    });
+
+    it('should console error if occured', async () => {
+      const error = new Error(faker.random.words(5));
+      ctx.deleteMessage = jest.fn().mockRejectedValue(error);
+
+      jest.spyOn(global.console, 'error').mockReturnValue();
+
+      await service.deleteMessageFromAdminChat(ctx);
+
+      expect(console.error).toHaveBeenCalledWith(expect.any(String), error);
+    });
+  });
+
   describe('notifyAdminAboutCatch', () => {
     it('should send message to admin', async () => {
       const catchId: string = faker.random.uuid();

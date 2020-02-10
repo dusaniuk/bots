@@ -8,6 +8,14 @@ import * as utils from '../utils/helpers';
 
 @injectable()
 export class TelegramResponse {
+  deleteMessageFromAdminChat = async (ctx: AppContext): Promise<void> => {
+    try {
+      await ctx.deleteMessage();
+    } catch (error) {
+      console.error('Can\'t delete message from admin chat', error);
+    }
+  };
+
   notifyAdminAboutCatch = async (ctx: AppContext, catchId: string, mentionsData: CatchMentions): Promise<void> => {
     const keyboard = getApproveKeyboard(ctx, catchId);
 

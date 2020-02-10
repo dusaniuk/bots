@@ -51,12 +51,7 @@ export class CatchHandler {
   handleUserCatch = async (ctx: AppContext): Promise<void> => {
     const { action, catchId, chatId } = this.getAdminDecisionFromContext(ctx);
 
-    // delete keyboard from admin's chat
-    try {
-      await ctx.deleteMessage();
-    } catch (error) {
-      console.error('Can\t delete message from admin chat', error);
-    }
+    await this.telegramResponse.deleteMessageFromAdminChat(ctx);
 
     // TODO: this is gonna be separated into 2 different functions
     // TODO: when I change bind with telegraf
