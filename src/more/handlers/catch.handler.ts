@@ -48,20 +48,24 @@ export class CatchHandler {
     ]);
   };
 
-  handleUserCatch = async (ctx: AppContext): Promise<void> => {
-    const { action, catchId, chatId } = this.getAdminDecisionFromContext(ctx);
+  approveCatch = async (ctx: AppContext): Promise<void> => {
+    const { catchId, chatId } = this.getAdminDecisionFromContext(ctx);
 
     await this.telegramResponse.deleteMessageFromAdminChat(ctx);
 
-    // TODO: this is gonna be separated into 2 different functions
-    // TODO: when I change bind with telegraf
-    if (action === Actions.ApproveCatch) {
-      const { hunter, earnedPoints } = await this.catchService.approveCatch(chatId, catchId);
-      await this.telegramResponse.sayAboutSucceededCatch(ctx, chatId, hunter, earnedPoints);
-    } else {
-      const { hunter } = await this.catchService.rejectCatch(chatId, catchId);
-      await this.telegramResponse.sayAboutFailedCatch(ctx, chatId, hunter);
-    }
+    const { hunter, earnedPoints } = await this.catchService.approveCatch(chatId, catchId);
+    await this.telegramResponse.sayAboutSucceededCatch(ctx, chatId, hunter, earnedPoints);
+
+    await this.telegramResponse.notifyAdminAboutHandledCatch(ctx);
+  };
+
+  rejectCatch = async (ctx: AppContext): Promise<void> => {
+    const { catchId, chatId } = this.getAdminDecisionFromContext(ctx);
+
+    await this.telegramResponse.deleteMessageFromAdminChat(ctx);
+
+    const { hunter } = await this.catchService.rejectCatch(chatId, catchId);
+    await this.telegramResponse.sayAboutFailedCatch(ctx, chatId, hunter);
 
     await this.telegramResponse.notifyAdminAboutHandledCatch(ctx);
   };

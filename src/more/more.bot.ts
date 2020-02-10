@@ -8,6 +8,7 @@ import { CONFIG } from '../config';
 import { Bot, AppContext } from '../shared/interfaces';
 
 import { CatchHandler, UsersHandler, UtilsHandler } from './handlers';
+import { Actions } from './constants/actions';
 
 @injectable()
 export class MoreBot implements Bot {
@@ -55,7 +56,12 @@ export class MoreBot implements Bot {
   private bindCatchActions = (): void => {
     this.bot.command(['catch', 'c'], this.catchHandler.catch);
 
-    this.bot.on('callback_query', this.catchHandler.handleUserCatch);
+    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.catchHandler.approveCatch);
+    this.bot.action(this.checkForAction(Actions.RejectCatch), this.catchHandler.rejectCatch);
+  };
+
+  private checkForAction = (action: Actions) => {
+    return (trigger: string) => trigger.startsWith(action);
   };
 
   private bindUtilActions = (): void => {
