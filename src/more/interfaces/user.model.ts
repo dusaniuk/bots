@@ -3,7 +3,6 @@ export interface User {
   firstName?: string;
   lastName?: string;
   username?: string;
-  score?: number;
   isAdmin?: boolean;
   catchable?: boolean;
 }

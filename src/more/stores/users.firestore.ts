@@ -30,7 +30,7 @@ export class UsersFirestore implements UsersStore {
     return query.exists;
   };
 
-  updateUser = async (chatId: number, userId: number, props: Omit<Partial<User>, 'id' | 'score'>): Promise<void> => {
+  updateUser = async (chatId: number, userId: number, props: Omit<Partial<User>, 'id'>): Promise<void> => {
     const batch = this.db.batch();
 
     const userRef = this.getUserRef(chatId, userId);
@@ -62,15 +62,6 @@ export class UsersFirestore implements UsersStore {
       ...(query.data() as User),
       id: +query.id,
     };
-  };
-
-  updateUserPoints = async (chatId: number, userId: number, score: number): Promise<void> => {
-    const batch = this.db.batch();
-
-    const userRef = this.getUserRef(chatId, userId);
-    batch.update(userRef, { score });
-
-    await batch.commit();
   };
 
   private getUsersListRef = (chatId: number): firestore.CollectionReference => {

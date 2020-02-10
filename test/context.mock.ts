@@ -11,6 +11,7 @@ export const createMockContext = (): AppContext => {
     i18n: {
       t: jest.fn().mockImplementation((pattern: string) => pattern),
     },
+    answerCbQuery: jest.fn().mockResolvedValue({}),
     reply: jest.fn().mockResolvedValue({ chat: {} }),
     replyWithMarkdown: jest.fn().mockResolvedValue({}),
     editMessageText: jest.fn().mockResolvedValue({}),

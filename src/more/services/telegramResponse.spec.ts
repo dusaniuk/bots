@@ -6,6 +6,7 @@ import { AppContext } from '../../shared/interfaces';
 import { createMockContext } from '../../../test/context.mock';
 import { CatchMentions } from '../models';
 import { Mention, User } from '../interfaces';
+import { getGreetingNameForUser } from '../utils/helpers';
 
 jest.mock('../keyboards/approve.keyboard');
 jest.mock('../utils/helpers');
@@ -33,6 +34,14 @@ describe('TelegramResponse', () => {
       await service.notifyAdminAboutCatch(ctx, catchId, mentionsData);
 
       expect(ctx.telegram.sendMessage).toHaveBeenCalledWith(admin.id, 'catch.summary', undefined);
+    });
+  });
+
+  describe('notifyAdminAboutHandledCatch', () => {
+    it('should answer with callback query', async () => {
+      await service.notifyAdminAboutHandledCatch(ctx);
+
+      expect(ctx.answerCbQuery).toHaveBeenCalledWith('other.handled');
     });
   });
 
@@ -67,6 +76,57 @@ describe('TelegramResponse', () => {
       await service.showCatchInstruction(ctx);
 
       expect(ctx.reply).toHaveBeenCalledWith('other.howToCatch');
+    });
+  });
+
+  describe('sayAboutSucceededCatch', () => {
+    let chatId: number;
+    let hunter: User;
+    let earnedPoints: number;
+
+    beforeEach(() => {
+      chatId = faker.random.number();
+      hunter = {} as User;
+      earnedPoints = faker.random.number(100);
+    });
+
+    it('should call greeting name for user', async () => {
+      await service.sayAboutSucceededCatch(ctx, chatId, hunter, earnedPoints);
+
+      expect(getGreetingNameForUser).toHaveBeenCalledWith(hunter);
+    });
+
+    it('should send message into provided chat', async () => {
+      await service.sayAboutSucceededCatch(ctx, chatId, hunter, earnedPoints);
+
+      expect(ctx.telegram.sendMessage).toHaveBeenCalledWith(chatId, 'catch.approved');
+      expect(ctx.i18n.t).toHaveBeenCalledWith('catch.approved', {
+        user: undefined,
+        points: earnedPoints,
+      });
+    });
+  });
+
+  describe('sayAboutFailedCatch', () => {
+    let chatId: number;
+    let hunter: User;
+
+    beforeEach(() => {
+      chatId = faker.random.number();
+      hunter = {} as User;
+    });
+
+    it('should call greeting name for user', async () => {
+      await service.sayAboutFailedCatch(ctx, chatId, hunter);
+
+      expect(getGreetingNameForUser).toHaveBeenCalledWith(hunter);
+    });
+
+    it('should send message into provided chat', async () => {
+      await service.sayAboutFailedCatch(ctx, chatId, hunter);
+
+      expect(ctx.telegram.sendMessage).toHaveBeenCalledWith(chatId, 'catch.rejected');
+      expect(ctx.i18n.t).toHaveBeenCalledWith('catch.rejected', expect.anything());
     });
   });
 

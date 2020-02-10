@@ -3,9 +3,8 @@ import { inject, injectable } from 'inversify';
 import { AppContext } from '../../shared/interfaces';
 
 import { TYPES } from '../ioc/types';
-import * as utils from '../utils/helpers';
 import { Actions } from '../constants/actions';
-import { CatchRecord, CatchStore, UsersStore } from '../interfaces';
+import { AdminDecision } from '../interfaces';
 import { CatchService, MentionsService, TelegramResponse } from '../services';
 import { CatchMentions } from '../models';
 
@@ -13,8 +12,6 @@ import { CatchMentions } from '../models';
 @injectable()
 export class CatchHandler {
   constructor(
-    @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
-    @inject(TYPES.CATCH_STORE) private catchStore: CatchStore,
     @inject(TYPES.CATCH_SERVICE) private catchService: CatchService,
     @inject(TYPES.MENTION_SERVICE) private mentionsService: MentionsService,
     @inject(TYPES.TELEGRAM_RESPONSE) private telegramResponse: TelegramResponse,
@@ -52,7 +49,7 @@ export class CatchHandler {
   };
 
   handleUserCatch = async (ctx: AppContext): Promise<void> => {
-    const [command, catchId, chatId] = ctx.callbackQuery.data.split(' ');
+    const { action, catchId, chatId } = this.getAdminDecisionFromContext(ctx);
 
     // delete keyboard from admin's chat
     try {
@@ -61,23 +58,26 @@ export class CatchHandler {
       console.error('Can\t delete message from admin chat', error);
     }
 
-    const catchRecord: CatchRecord = await this.catchStore.getCatchRecord(+chatId, catchId);
-    const user = await this.usersStore.getUserFromChat(catchRecord.hunterId, +chatId);
-
-    if (command === Actions.ApproveCatch) {
-      await this.catchStore.approveCatch(+chatId, catchId);
-
-      // TODO: remove this 2 lines after I'll migrate to gathering score from catch records
-      const newPoints = (user.score || 0) + catchRecord.points;
-      await this.usersStore.updateUserPoints(+chatId, catchRecord.hunterId, newPoints);
+    // TODO: this is gonna be separated into 2 different functions
+    // TODO: when I change bind with telegraf
+    if (action === Actions.ApproveCatch) {
+      const { hunter, earnedPoints } = await this.catchService.approveCatch(chatId, catchId);
+      await this.telegramResponse.sayAboutSucceededCatch(ctx, chatId, hunter, earnedPoints);
+    } else {
+      const { hunter } = await this.catchService.rejectCatch(chatId, catchId);
+      await this.telegramResponse.sayAboutFailedCatch(ctx, chatId, hunter);
     }
 
-    const msg = ctx.i18n.t(command, {
-      user: utils.getGreetingNameForUser(user),
-      points: catchRecord.points,
-    });
+    await this.telegramResponse.notifyAdminAboutHandledCatch(ctx);
+  };
 
-    await ctx.telegram.sendMessage(chatId, msg);
-    await ctx.answerCbQuery(ctx.i18n.t('other.handled'));
+  private getAdminDecisionFromContext = (ctx: AppContext): AdminDecision => {
+    const [command, catchId, chatId] = ctx.callbackQuery.data.split(' ');
+
+    return {
+      action: command as Actions,
+      chatId: +chatId,
+      catchId,
+    };
   };
 }

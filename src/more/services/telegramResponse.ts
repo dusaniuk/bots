@@ -15,6 +15,10 @@ export class TelegramResponse {
     await ctx.telegram.sendMessage(mentionsData.admin.id, summaryMessage, keyboard);
   };
 
+  notifyAdminAboutHandledCatch = async (ctx: AppContext): Promise<void> => {
+    await ctx.answerCbQuery(ctx.i18n.t('other.handled'));
+  };
+
   notifyChatAboutCatch = async (ctx: AppContext, mentionsData: CatchMentions): Promise<void> => {
     await ctx.replyWithMarkdown(ctx.i18n.t('catch.message', this.getMessageData(mentionsData)));
   };
@@ -29,6 +33,19 @@ export class TelegramResponse {
 
   showCatchInstruction = async (ctx: AppContext): Promise<void> => {
     await ctx.reply(ctx.i18n.t('other.howToCatch'));
+  };
+
+  sayAboutSucceededCatch = async (ctx: AppContext, chatId: number, hunter: User, earnedPoints: number): Promise<void> => {
+    await ctx.telegram.sendMessage(chatId, ctx.i18n.t('catch.approved', {
+      user: utils.getGreetingNameForUser(hunter),
+      points: earnedPoints,
+    }));
+  };
+
+  sayAboutFailedCatch = async (ctx: AppContext, chatId: number, hunter: User): Promise<void> => {
+    await ctx.telegram.sendMessage(chatId, ctx.i18n.t('catch.rejected', {
+      user: utils.getGreetingNameForUser(hunter),
+    }));
   };
 
   showUnverifiedMentions = async (ctx: AppContext, mentions: Mention[]): Promise<void> => {
