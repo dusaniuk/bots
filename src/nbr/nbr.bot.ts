@@ -8,7 +8,7 @@ import { resolve } from 'path';
 import { CONFIG } from '../config';
 import { AppContext, Bot } from '../shared/interfaces';
 
-import { TelegramUser } from './services/users.firestore';
+import { TelegramUser } from './store/users.firestore';
 
 import { commandsInPrivateOnly, useFeedSchedule } from './middleware';
 import { getChatsKeyboard } from './keyboards';

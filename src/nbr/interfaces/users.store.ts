@@ -1,4 +1,4 @@
-import { TelegramUser } from '../services/users.firestore';
+import { TelegramUser } from '../store/users.firestore';
 
 export interface UsersStore {
   getUser(userId: string): Promise<TelegramUser>;
