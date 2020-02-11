@@ -11,7 +11,7 @@ import { TYPES as MORE_TYPES } from './more/ioc/types';
 if (CONFIG.environment !== 'test') {
   const bots: Bot[] = [
     container.get<Bot>(MORE_TYPES.MORE_BOT),
-    // container.get<Bot>(NBR_TYPES.NBR_BOT),
+    container.get<Bot>(NBR_TYPES.NBR_BOT),
   ];
 
   bots.forEach((bot: Bot) => bot.start());

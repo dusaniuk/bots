@@ -18,6 +18,7 @@ export const CONFIG = {
   },
   nbr: {
     botToken: process.env.NBR_BOT_TOKEN,
+    whitelistedChats: process.env.NBR_WHITELISTED_CHATS.split(' ').map((id: string) => +id),
   },
   firebase: {
     clientEmail: process.env.CLIENT_EMAIL,
