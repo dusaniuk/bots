@@ -10,7 +10,7 @@ import { AppContext, Bot } from '../shared/interfaces';
 
 import { TelegramUser } from './store/users.firestore';
 
-import { checkChatAllowance, commandsInPrivateOnly, useFeedSchedule } from './middleware';
+import { commandsInPrivateOnly, useFeedSchedule } from './middleware';
 import { getChatsKeyboard } from './keyboards';
 import { stringifyUsers } from './utils/user.utils';
 
@@ -51,7 +51,6 @@ export class NbrBot implements Bot {
     this.bot.use(this.stage.middleware());
     this.bot.use(useFeedSchedule());
     this.bot.use(commandsInPrivateOnly());
-    this.bot.use(checkChatAllowance());
 
     this.useScenes();
 
