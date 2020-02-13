@@ -5,6 +5,7 @@ import { Mention, User } from '../interfaces';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
 import { CatchMentions } from '../models';
 import * as utils from '../utils/helpers';
+import { Logger } from '../../shared/logger';
 
 @injectable()
 export class TelegramResponse {
@@ -12,7 +13,7 @@ export class TelegramResponse {
     try {
       await ctx.deleteMessage();
     } catch (error) {
-      console.error('Can\'t delete message from admin chat', error);
+      Logger.error('[more] can\'t delete message from admin chat', error);
     }
   };
 

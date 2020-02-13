@@ -7,6 +7,7 @@ import { createMockContext } from '../../../test/context.mock';
 import { CatchMentions } from '../models';
 import { Mention, User } from '../interfaces';
 import { getGreetingNameForUser } from '../utils/helpers';
+import { Logger } from '../../shared/logger';
 
 jest.mock('../keyboards/approve.keyboard');
 jest.mock('../utils/helpers');
@@ -35,11 +36,11 @@ describe('TelegramResponse', () => {
       const error = new Error(faker.random.words(5));
       ctx.deleteMessage = jest.fn().mockRejectedValue(error);
 
-      jest.spyOn(global.console, 'error').mockReturnValue();
+      jest.spyOn(Logger, 'error').mockReturnValue();
 
       await service.deleteMessageFromAdminChat(ctx);
 
-      expect(console.error).toHaveBeenCalledWith(expect.any(String), error);
+      expect(Logger.error).toHaveBeenCalledWith(expect.any(String), error);
     });
   });
 
