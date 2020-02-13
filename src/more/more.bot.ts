@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import Telegraf, { session } from 'telegraf';
 import { inject, injectable } from 'inversify';
 import I18n from 'telegraf-i18n';
@@ -9,6 +8,7 @@ import { Bot, AppContext } from '../shared/interfaces';
 
 import { CatchHandler, UsersHandler, UtilsHandler } from './handlers';
 import { Actions } from './constants/actions';
+import { Logger } from '../shared/logger';
 
 @injectable()
 export class MoreBot implements Bot {
@@ -38,9 +38,9 @@ export class MoreBot implements Bot {
 
     this.bot
       .launch()
-      .then(() => console.log('more bot has been started'))
+      .then(() => Logger.info('[more] bot has been started'))
       .catch((err: Error) => {
-        console.error(err);
+        Logger.error('[more] bot has failed due to an error', err);
       });
   };
 
@@ -61,12 +61,12 @@ export class MoreBot implements Bot {
   };
 
   private checkForAction = (action: Actions) => {
-    return (trigger: string) => trigger.startsWith(action);
+    return (trigger: string): boolean => trigger.startsWith(action);
   };
 
   private bindUtilActions = (): void => {
     this.bot.command('ping', this.utilsHandler.pong);
-    this.bot.command(['help', 'halp'], this.utilsHandler.getHelp);
     this.bot.command('announce', this.utilsHandler.announce);
+    this.bot.help(this.utilsHandler.getHelp);
   };
 }

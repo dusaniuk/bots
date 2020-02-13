@@ -3,6 +3,7 @@ import { CronJob } from 'cron';
 
 import { AppContext } from '../../shared/interfaces';
 import { CONFIG } from '../../config';
+import { Logger } from '../../shared/logger';
 
 let isFeedStarted = false;
 
@@ -11,7 +12,7 @@ const TARGET_CHAT = CONFIG.feedSchedule.targetChat;
 
 export const feedSchedule = async (ctx: AppContext, next: () => any): Promise<{}> => {
   if (!CRON_PATTERN && !TARGET_CHAT) {
-    console.log("Can't start scheduler without cron pattern and target chat");
+    Logger.error('[cron]: can\'t start scheduler without cron pattern and target chat');
     return next();
   }
 
@@ -19,7 +20,7 @@ export const feedSchedule = async (ctx: AppContext, next: () => any): Promise<{}
     return next();
   }
 
-  console.log(`Scheduler started at: ${CRON_PATTERN} for chat ${TARGET_CHAT}`);
+  Logger.info(`[cron] scheduler started at: ${CRON_PATTERN} for chat ${TARGET_CHAT}`);
 
   const job = new CronJob(
     CRON_PATTERN,

@@ -8,6 +8,7 @@ import { ChatType } from '../constants/chatType';
 import { ScoreItem, User, UsersStore, UserWithScore } from '../interfaces';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 import { ScoreService } from '../services';
+import { Logger } from '../../shared/logger';
 
 @injectable()
 export class UsersHandler {
@@ -100,7 +101,7 @@ export class UsersHandler {
         catchable: isCatchable,
       });
     } catch (error) {
-      console.log(error);
+      Logger.error('[more] can\'t update user catchability', error);
     }
   };
 

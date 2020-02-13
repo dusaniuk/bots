@@ -2,6 +2,7 @@
 import express from 'express';
 
 import { CONFIG } from '../config';
+import { Logger } from './logger';
 
 const packageInfo = require('../../package.json');
 
@@ -17,7 +18,7 @@ export class Server {
     const port = this.getPort();
 
     this.app.listen(port, () => {
-      console.log(`web server started at port ${port}`);
+      Logger.info(`[serve] launch at port ${port}`);
     });
   };
 

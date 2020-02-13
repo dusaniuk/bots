@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import Telegraf, { Context, session, Stage } from 'telegraf';
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import { inject, injectable } from 'inversify';
@@ -17,6 +16,7 @@ import { stringifyUsers } from './utils/user.utils';
 import { TYPES } from './ioc/types';
 import { Scene } from './constants/enums';
 import { TelegramScene, UsersStore } from './interfaces';
+import { Logger } from '../shared/logger';
 
 @injectable()
 export class NbrBot implements Bot {
@@ -39,7 +39,7 @@ export class NbrBot implements Bot {
     this.deleteAnnounceScene.useScene(this.stage);
   };
 
-  start = () => {
+  start = (): void => {
     const i18n = new I18n({
       defaultLanguage: 'ua',
       allowMissing: false,
@@ -78,7 +78,7 @@ export class NbrBot implements Bot {
 
     this.bot.on('new_chat_members', async (ctx: AppContext) => {
       let newMembers: TelegrafUser[] = ctx.message.new_chat_members || [];
-      console.log(`${stringifyUsers(newMembers)} had been added to the chat ${ctx.chat.title} | ${ctx.chat.id}`);
+      Logger.info(`[nbr] new users has been added to the chat ${ctx.chat.title} (ID: ${ctx.chat.id})`, newMembers);
 
       newMembers = newMembers.filter((member: TelegrafUser) => !member.is_bot);
 
@@ -101,9 +101,9 @@ export class NbrBot implements Bot {
 
     this.bot
       .launch()
-      .then(() => console.log('nbr bot has been started'))
-      .catch((err) => {
-        console.error(err);
+      .then(() => Logger.info('[nbr] bot has been started'))
+      .catch((err: Error) => {
+        Logger.error('[nbr] bot has failed due to an error', err);
       });
   };
 
