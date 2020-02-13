@@ -1,17 +1,16 @@
 import dotenv from 'dotenv';
 
+import { AppConfig } from './interfaces';
+
 dotenv.config();
 
-export const CONFIG = {
+export const CONFIG: AppConfig = {
   environment: process.env.ENVIRONMENT,
   isDevMode: process.env.ENVIRONMENT === 'dev',
-  port: process.env.PORT,
+  port: +process.env.PORT || 8080,
   feedSchedule: {
     pattern: process.env.FEED_PATTERN,
-    targetChat: process.env.FEED_TARGET,
-  },
-  max: {
-    botToken: process.env.MAX_BOT_TOKEN,
+    targetChat: +process.env.FEED_TARGET,
   },
   more: {
     botToken: process.env.MORE_BOT_TOKEN,

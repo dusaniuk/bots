@@ -15,7 +15,7 @@ export class Server {
   }
 
   run = (): void => {
-    const port = this.getPort();
+    const port = CONFIG.port;
 
     this.app.listen(port, () => {
       Logger.info(`[serve] launch at port ${port}`);
@@ -30,6 +30,4 @@ export class Server {
       });
     });
   };
-
-  private getPort = (): string => CONFIG.port || '8080';
 }
