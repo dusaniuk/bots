@@ -9,7 +9,5 @@ export interface UsersStore {
 
   getAllUsersFromChat(chatId: number): Promise<User[]>;
 
-  getAllActiveChatsIDs(): Promise<number[]>;
-
   getUserFromChat(userId: number, chatId: number): Promise<User>;
 }

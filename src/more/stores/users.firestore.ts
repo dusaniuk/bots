@@ -49,12 +49,6 @@ export class UsersFirestore implements UsersStore {
     }));
   };
 
-  getAllActiveChatsIDs = async (): Promise<number[]> => {
-    const query = await this.db.collection('chat').get();
-
-    return query.docs.map(({ id }: firestore.QueryDocumentSnapshot) => +id).filter((id: number) => id < 0);
-  };
-
   getUserFromChat = async (userId: number, chatId: number): Promise<User> => {
     const query = await this.getUserRef(chatId, userId).get();
 

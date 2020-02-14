@@ -66,7 +66,6 @@ export class MoreBot implements Bot {
 
   private bindUtilActions = (): void => {
     this.bot.command('ping', this.utilsHandler.pong);
-    this.bot.command('announce', this.utilsHandler.announce);
     this.bot.help(this.utilsHandler.getHelp);
   };
 }
