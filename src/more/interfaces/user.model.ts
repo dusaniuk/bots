@@ -4,5 +4,4 @@ export interface User {
   lastName?: string;
   username?: string;
   isAdmin?: boolean;
-  catchable?: boolean;
 }

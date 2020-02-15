@@ -8,7 +8,6 @@ import { ChatType } from '../constants/chatType';
 import { ScoreItem, User, UsersStore, UserWithScore } from '../interfaces';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 import { ScoreService } from '../services';
-import { Logger } from '../../shared/logger';
 
 @injectable()
 export class UsersHandler {
@@ -75,11 +74,10 @@ export class UsersHandler {
     const newMembers: User[] = this.getNewMembers(ctx);
 
     for (const user of newMembers) {
-      const isUserInChat = await this.usersStore.isUserInChat(ctx.chat.id, user.id);
+      const isUserInChat: boolean = await this.usersStore.isUserInChat(ctx.chat.id, user.id);
 
       if (isUserInChat) {
         await ctx.reply(ctx.i18n.t('user.welcomeBack'));
-        await this.updateUserCatchability(ctx.chat.id, user.id, true);
       } else {
         await this.addNewUser(ctx, user);
       }
@@ -89,20 +87,9 @@ export class UsersHandler {
   onLeftChatMember = async (ctx: AppContext): Promise<any> => {
     const leftMember = createUser(ctx.message.left_chat_member);
 
-    await this.updateUserCatchability(ctx.chat.id, leftMember.id, false);
     await ctx.reply(ctx.i18n.t('user.onLeft', {
       user: getGreetingNameForUser(leftMember),
     }));
-  };
-
-  private updateUserCatchability = async (chatId: number, userId: number, isCatchable: boolean): Promise<any> => {
-    try {
-      await this.usersStore.updateUser(chatId, userId, {
-        catchable: isCatchable,
-      });
-    } catch (error) {
-      Logger.error('[more] can\'t update user catchability', error);
-    }
   };
 
   private getNewMembers = (ctx: AppContext): User[] => {
