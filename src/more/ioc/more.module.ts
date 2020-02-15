@@ -4,8 +4,6 @@ import { Bot } from '../../shared/interfaces';
 
 import { TYPES } from './types';
 import { MoreBot } from '../more.bot';
-import { CatchStore, UsersStore } from '../interfaces';
-import { CatchFirestore, UsersFirestore } from '../stores';
 import { CatchHandler, UsersHandler, UtilsHandler } from '../handlers';
 import {
   MentionsParser,
@@ -21,10 +19,6 @@ export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
   bind<UtilsHandler>(UtilsHandler).toSelf();
   bind<UsersHandler>(UsersHandler).toSelf();
   bind<CatchHandler>(CatchHandler).toSelf();
-
-  // DB interaction
-  bind<CatchStore>(TYPES.CATCH_STORE).to(CatchFirestore);
-  bind<UsersStore>(TYPES.USERS_STORE).to(UsersFirestore);
 
   // services
   bind<CatchService>(TYPES.CATCH_SERVICE).to(CatchService);

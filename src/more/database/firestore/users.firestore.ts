@@ -1,10 +1,10 @@
 import { firestore } from 'firebase-admin';
 import { inject, injectable } from 'inversify';
 
-import { Database } from '../../shared/interfaces';
+import { Database } from '../../../shared/interfaces';
 
-import { TYPES } from '../ioc/types';
-import { User, UsersStore } from '../interfaces';
+import { DATABASE_TYPES } from '../types';
+import { User, UsersStore } from '../../interfaces';
 
 
 @injectable()
@@ -14,7 +14,7 @@ export class UsersFirestore implements UsersStore {
   }
 
   constructor(
-    @inject(TYPES.DATABASE) private db: Database,
+    @inject(DATABASE_TYPES.DATABASE) private db: Database,
   ) {}
 
   addUserInChat = async (chatId: number, user: User): Promise<void> => {
