@@ -20,7 +20,7 @@ describe('helpers', () => {
         id: telegrafUser.id,
         firstName: telegrafUser.first_name,
         lastName: telegrafUser.last_name,
-        username: `@${telegrafUser.username}`,
+        username: telegrafUser.username,
       });
     });
 

@@ -10,7 +10,7 @@ export const createUser = (telegrafUser: TelegrafUser): User => {
   };
 
   if (telegrafUser.username) {
-    user.username = `@${telegrafUser.username}`;
+    user.username = telegrafUser.username;
   }
 
   if (telegrafUser.last_name) {
