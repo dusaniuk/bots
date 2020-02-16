@@ -58,7 +58,7 @@ describe('helpers', () => {
 
       const name = helpers.getGreetingNameForUser(user);
 
-      expect(name).toEqual(user.username);
+      expect(name).toEqual(`@${user.username}`);
     });
 
     it("should return user's first name if username is not set", () => {

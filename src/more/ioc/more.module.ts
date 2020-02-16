@@ -12,6 +12,9 @@ import {
   CatchService,
   ScoreService,
 } from '../services';
+import { UsersController } from '../core/controllers/users.controller';
+import { ScorePresenter, UsersPresenter } from '../core/interfaces/controllers';
+import { ScoreController } from '../core/controllers/score.controller';
 
 
 export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
@@ -19,6 +22,10 @@ export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
   bind<UtilsHandler>(UtilsHandler).toSelf();
   bind<UsersHandler>(UsersHandler).toSelf();
   bind<CatchHandler>(CatchHandler).toSelf();
+
+  // controllers
+  bind<UsersPresenter>(TYPES.USERS_HANDLER).to(UsersController);
+  bind<ScorePresenter>(TYPES.SCORE_HANDLER).to(ScoreController);
 
   // services
   bind<CatchService>(TYPES.CATCH_SERVICE).to(CatchService);

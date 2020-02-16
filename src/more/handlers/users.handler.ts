@@ -5,15 +5,19 @@ import { AppContext } from '../../shared/interfaces';
 
 import { TYPES } from '../ioc/types';
 import { ChatType } from '../constants/chatType';
-import { ScoreItem, User, UsersStore, UserWithScore } from '../interfaces';
+import { User } from '../interfaces';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
-import { ScoreService } from '../services';
+import { UsersController } from '../core/controllers/users.controller';
+import { ActionResult } from '../core/models/actionResult';
+import { AlreadyInGameError, NotInGameError } from '../core/errors';
+import { ScoreController } from '../core/controllers/score.controller';
+import { Score } from '../core/interfaces/controllers';
 
 @injectable()
 export class UsersHandler {
   constructor(
-    @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
-    @inject(TYPES.SCORE_SERVICE) private scoreService: ScoreService,
+    @inject(TYPES.USERS_HANDLER) private usersController: UsersController,
+    @inject(TYPES.SCORE_HANDLER) private scoreHandler: ScoreController,
   ) {}
 
   register = async (ctx: AppContext): Promise<any> => {
@@ -21,65 +25,58 @@ export class UsersHandler {
       return ctx.reply(ctx.i18n.t('error.rejectPrivate'));
     }
 
-    const isUserInChat: boolean = await this.usersStore.isUserInChat(ctx.chat.id, ctx.from.id);
-    if (isUserInChat) {
+    const user: User = createUser(ctx.from);
+    const result: ActionResult = await this.usersController.addUserToGame(ctx.chat.id, user);
+
+    if (result?.error instanceof AlreadyInGameError) {
       return ctx.reply(ctx.i18n.t('error.alreadyInGame'));
     }
 
-    return this.addNewUser(ctx, createUser(ctx.from));
+    return ctx.reply(
+      ctx.i18n.t('user.greetNew', {
+        user: getGreetingNameForUser(user),
+      }),
+    );
   };
 
   update = async (ctx: AppContext): Promise<any> => {
-    const {
-      from,
-      chat: { id: chatId },
-    }: AppContext = ctx;
+    const { from, chat }: AppContext = ctx;
 
-    const isUserInChat: boolean = await this.usersStore.isUserInChat(chatId, from.id);
-    if (!isUserInChat) {
-      return this.addNewUser(ctx, createUser(ctx.from));
-    }
-
-    await this.usersStore.updateUser(chatId, from.id, {
-      username: `@${from.username}`,
+    const result: ActionResult = await this.usersController.updateUserDataInChat(chat.id, from.id, {
+      username: from.username,
       firstName: from.first_name,
-      lastName: from.last_name || null,
+      lastName: from.last_name ?? null,
     });
+
+    if (result?.error instanceof NotInGameError) {
+      return ctx.reply(ctx.i18n.t('error.notInGame'));
+    }
 
     return ctx.reply(ctx.i18n.t('user.successUpdate'));
   };
 
   getScore = async (ctx: AppContext): Promise<any> => {
-    const [scoreItems, users] = await Promise.all([
-      await this.scoreService.getUsersScore(ctx.chat.id),
-      await this.usersStore.getAllUsersFromChat(ctx.chat.id),
-    ]);
+    const result: ActionResult<Score> = await this.scoreHandler.getSortedScoreForChat(ctx.chat.id);
 
-    const usersWithScore: UserWithScore[] = scoreItems
-      .map((item: ScoreItem) => {
-        const user = users.find((u: User) => u.id === item.hunterId);
-        return { user, points: item.points };
-      })
-      .sort((a: UserWithScore, b: UserWithScore) => b.points - a.points);
-
-    return ctx.reply(
-      ctx.i18n.t('user.score', {
-        score: getUsersScore(usersWithScore),
-        usersCount: users.length,
-      }),
-    );
+    if (result.ok) {
+      await ctx.reply(
+        ctx.i18n.t('user.score', {
+          score: getUsersScore(result.payload),
+        }),
+      );
+    }
   };
 
   onNewMemberInChat = async (ctx: AppContext): Promise<void> => {
     const newMembers: User[] = this.getNewMembers(ctx);
 
     for (const user of newMembers) {
-      const isUserInChat: boolean = await this.usersStore.isUserInChat(ctx.chat.id, user.id);
+      const result: ActionResult = await this.usersController.isUserInGame(ctx.chat.id, user.id);
 
-      if (isUserInChat) {
+      if (result.ok) {
         await ctx.reply(ctx.i18n.t('user.welcomeBack'));
       } else {
-        await this.addNewUser(ctx, user);
+        await this.usersController.addUserToGame(ctx.chat.id, user);
       }
     }
   };
@@ -95,15 +92,5 @@ export class UsersHandler {
   private getNewMembers = (ctx: AppContext): User[] => {
     const newUsers: TelegrafUser[] = (ctx.message?.new_chat_members ?? []).filter((user) => !user.is_bot);
     return newUsers.map(createUser);
-  };
-
-  private addNewUser = async (ctx: AppContext, user: User): Promise<void> => {
-    await this.usersStore.addUserInChat(ctx.chat.id, user);
-
-    await ctx.reply(
-      ctx.i18n.t('user.greetNew', {
-        user: getGreetingNameForUser(user),
-      }),
-    );
   };
 }

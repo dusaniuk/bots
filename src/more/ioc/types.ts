@@ -9,5 +9,8 @@ export const TYPES = {
   CATCH_SERVICE: Symbol.for('more.catch.service'),
   SCORE_SERVICE: Symbol.for('more.score.service'),
 
+  USERS_HANDLER: Symbol.for('more.users.handler'),
+  SCORE_HANDLER: Symbol.for('more.score.handler'),
+
   MORE_BOT: Symbol.for('more.bot'),
 };

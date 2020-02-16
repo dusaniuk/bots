@@ -22,7 +22,7 @@ export const createUser = (telegrafUser: TelegrafUser): User => {
 
 export const getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
   if (username) {
-    return username;
+    return `@${username}`;
   }
 
   const name = [firstName];
