@@ -4,7 +4,7 @@ import { Bot } from '../../shared/interfaces';
 
 import { TYPES } from './types';
 import { MoreBot } from '../more.bot';
-import { CatchHandler, UsersHandler, UtilsHandler } from '../handlers';
+import { CatchHandler, UsersHandler, UtilsHandler } from '../actionHandlers';
 import {
   MentionsParser,
   TelegramResponse,

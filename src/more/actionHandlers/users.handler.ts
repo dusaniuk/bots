@@ -11,7 +11,7 @@ import { UsersController } from '../core/controllers/users.controller';
 import { ActionResult } from '../core/models/actionResult';
 import { AlreadyInGameError, NotInGameError } from '../core/errors';
 import { ScoreController } from '../core/controllers/score.controller';
-import { Score } from '../core/interfaces/controllers';
+import { Score } from '../core/models/score';
 
 @injectable()
 export class UsersHandler {

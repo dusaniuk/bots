@@ -6,7 +6,7 @@ import { resolve } from 'path';
 import { CONFIG } from '../config';
 import { Bot, AppContext } from '../shared/interfaces';
 
-import { CatchHandler, UsersHandler, UtilsHandler } from './handlers';
+import { CatchHandler, UsersHandler, UtilsHandler } from './actionHandlers';
 import { Actions } from './constants/actions';
 import { Logger } from '../shared/logger';
 

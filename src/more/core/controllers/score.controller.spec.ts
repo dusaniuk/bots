@@ -4,6 +4,7 @@ import { ScoreController } from './score.controller';
 import { ScoreService } from '../../services';
 import { ScoreItem, User, UsersStore } from '../../interfaces';
 import { ActionResult } from '../models/actionResult';
+import { Score } from '../models/score';
 
 describe('ScoreController', () => {
   let controller: ScoreController;
@@ -56,7 +57,7 @@ describe('ScoreController', () => {
       scoreService.getUsersScore = jest.fn().mockResolvedValue(scoreItems);
       usersStore.getAllUsersFromChat = jest.fn().mockResolvedValue(users);
 
-      const result: ActionResult = await controller.getSortedScoreForChat(chatId);
+      const result: ActionResult<Score> = await controller.getSortedScoreForChat(chatId);
 
       expect(result.ok).toBeTruthy();
       expect(result.payload).toEqual([
