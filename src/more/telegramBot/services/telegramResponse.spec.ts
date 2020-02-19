@@ -11,8 +11,8 @@ import { Mention } from '../../core/interfaces/catch';
 import { User } from '../../core/interfaces/user';
 
 
-jest.mock('../telegramBot/keyboards/approve.keyboard');
-jest.mock('../telegramBot/utils/helpers');
+jest.mock('../keyboards/approve.keyboard');
+jest.mock('../utils/helpers');
 
 describe('TelegramResponse', () => {
   let service: TelegramResponse;

@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 
 import { ActionResult } from '../models/actionResult';
-import { TYPES } from '../../ioc/types';
+import { TYPES } from '../../types';
 import { AlreadyInGameError, NotInGameError } from '../errors';
 
 import { IUsersController } from '../interfaces/controllers';

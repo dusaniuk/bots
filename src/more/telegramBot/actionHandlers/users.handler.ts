@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 
 import { AppContext } from '../../../shared/interfaces';
 
-import { TYPES } from '../../ioc/types';
+import { TYPES } from '../../types';
 import { ChatType } from '../../core/constants/chatType';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 import { UsersController } from '../../core/controllers/users.controller';

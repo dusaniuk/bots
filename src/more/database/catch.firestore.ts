@@ -1,11 +1,11 @@
 import { firestore } from 'firebase-admin';
 import { inject, injectable } from 'inversify';
 
-import { Database } from '../../../shared/interfaces';
+import { Database } from '../../shared/interfaces';
 
-import { DATABASE_TYPES } from '../types';
-import { CatchStore } from '../../core/interfaces/store';
-import { CatchRecord } from '../../core/interfaces/catch';
+import { CatchStore } from '../core/interfaces/store';
+import { CatchRecord } from '../core/interfaces/catch';
+import { TYPES } from '../types';
 
 
 @injectable()
@@ -15,7 +15,7 @@ export class CatchFirestore implements CatchStore {
   }
 
   constructor(
-    @inject(DATABASE_TYPES.DATABASE) private db: Database,
+    @inject(TYPES.DATABASE) private db: Database,
   ) {}
 
   addCatchRecord = async (chatId: number, record: CatchRecord): Promise<string> => {

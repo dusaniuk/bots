@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 
-import { TYPES } from '../../ioc/types';
+import { TYPES } from '../../types';
 
 import { CatchStore } from '../interfaces/store';
 import { CatchRecord } from '../interfaces/catch';

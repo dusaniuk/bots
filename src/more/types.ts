@@ -1,7 +1,7 @@
-import { DATABASE_TYPES } from '../database/types';
+import { SHARED_TYPES } from '../shared/ioc/shared.types';
 
 export const TYPES = {
-  ...DATABASE_TYPES,
+  ...SHARED_TYPES,
 
   MENTION_PARSER: Symbol.for('more.mentions-parser'),
   MENTION_SERVICE: Symbol.for('more.mention.service'),
@@ -12,6 +12,9 @@ export const TYPES = {
   USERS_CONTROLLER: Symbol.for('more.users.controller'),
   SCORE_CONTROLLER: Symbol.for('more.score.controller'),
   CATCH_CONTROLLER: Symbol.for('more.catch.controller'),
+
+  CATCH_STORE: Symbol.for('more.catch.store'),
+  USERS_STORE: Symbol.for('more.users.store'),
 
   MORE_BOT: Symbol.for('more.bot'),
 };

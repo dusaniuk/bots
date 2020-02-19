@@ -6,7 +6,7 @@ import { container } from './shared/ioc';
 import { Bot } from './shared/interfaces';
 
 import { TYPES as NBR_TYPES } from './nbr/ioc/types';
-import { TYPES as MORE_TYPES } from './more/ioc/types';
+import { TYPES as MORE_TYPES } from './more/types';
 
 if (CONFIG.environment !== 'test') {
   const bots: Bot[] = [
