@@ -7,7 +7,7 @@ import { CONFIG } from '../config';
 import { Bot, AppContext } from '../shared/interfaces';
 
 import { CatchHandler, UsersHandler, UtilsHandler } from './actionHandlers';
-import { Actions } from './constants/actions';
+import { Actions } from './core/constants/actions';
 import { Logger } from '../shared/logger';
 
 @injectable()

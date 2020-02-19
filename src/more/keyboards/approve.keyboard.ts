@@ -2,7 +2,7 @@ import { Markup } from 'telegraf';
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 
 import { AppContext } from '../../shared/interfaces';
-import { Actions } from '../constants/actions';
+import { Actions } from '../core/constants/actions';
 
 export const getApproveKeyboard = ({ i18n, chat }: AppContext, catchId: string): ExtraReplyMessage => {
   return Markup.inlineKeyboard([

@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { AppContext } from '../../shared/interfaces';
 
 import { TYPES } from '../ioc/types';
-import { Actions } from '../constants/actions';
+import { Actions } from '../core/constants/actions';
 import { MentionsParser, TelegramResponse } from '../services';
 import { CatchController } from '../core/controllers/catch.controller';
 import { ActionResult } from '../core/models/actionResult';

@@ -1,4 +1,4 @@
-import { Actions } from '../../constants/actions';
+import { Actions } from '../constants/actions';
 
 import { User } from './user';
 
