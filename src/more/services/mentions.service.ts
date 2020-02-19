@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 
 import { TYPES } from '../ioc/types';
-import { CatchMentions } from '../models';
+import { CatchMentions } from '../core/models/catchMentions';
 
 import { UsersStore } from '../core/interfaces/store';
 import { Mention } from '../core/interfaces/catch';

@@ -3,7 +3,7 @@ import { inject, injectable } from 'inversify';
 import { ActionResult } from '../models/actionResult';
 import { TYPES } from '../../ioc/types';
 import { CatchService, MentionsService } from '../../services';
-import { CatchMentions } from '../../models';
+import { CatchMentions } from '../models/catchMentions';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 
 import { ICatchController } from '../interfaces/controllers';

@@ -2,7 +2,7 @@ import * as faker from 'faker';
 
 import { CatchService, MentionsService } from '../../services';
 import { ActionResult } from '../models/actionResult';
-import { CatchMentions } from '../../models';
+import { CatchMentions } from '../models/catchMentions';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 
 import { CatchSummary, Mention } from '../interfaces/catch';

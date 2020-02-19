@@ -1,7 +1,8 @@
+import { Mention } from '../interfaces/catch';
+import { User } from '../interfaces/user';
+
 import { CatchMentions } from './catchMentions';
 
-import { Mention } from '../core/interfaces/catch';
-import { User } from '../core/interfaces/user';
 
 describe('CatchMentions', () => {
   let catchMentions: CatchMentions;
