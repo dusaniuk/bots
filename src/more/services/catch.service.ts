@@ -1,13 +1,8 @@
 import { inject, injectable } from 'inversify';
 
 import { TYPES } from '../ioc/types';
-import {
-  CatchRecord,
-  CatchResult,
-  CatchStore,
-  User,
-  UsersStore,
-} from '../interfaces';
+import { CatchRecord, CatchResult, User, } from '../interfaces';
+import { CatchStore, UsersStore } from '../core/interfaces/store';
 
 @injectable()
 export class CatchService {

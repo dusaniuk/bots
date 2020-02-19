@@ -2,9 +2,10 @@ import * as faker from 'faker';
 
 import { ScoreController } from './score.controller';
 import { ScoreService } from '../../services';
-import { ScoreItem, User, UsersStore } from '../../interfaces';
+import { ScoreItem, User } from '../../interfaces';
 import { ActionResult } from '../models/actionResult';
 import { Score } from '../models/score';
+import { UsersStore } from '../interfaces/store';
 
 describe('ScoreController', () => {
   let controller: ScoreController;

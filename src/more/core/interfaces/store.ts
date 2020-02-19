@@ -1,4 +1,14 @@
-import { User } from './user.model';
+import { CatchRecord, User } from '../../interfaces';
+
+export interface CatchStore {
+  addCatchRecord(chatId: number, record: CatchRecord): Promise<string>;
+
+  getAllApprovedRecordsInRange(chatId: number, startTimestamp: number, endTimestamp: number): Promise<CatchRecord[]>;
+
+  getCatchRecord(chatId: number, recordId: string): Promise<CatchRecord>;
+
+  approveCatch(chatId: number, recordId: string): Promise<void>;
+}
 
 export interface UsersStore {
   addUserInChat(chatId: number, user: User): Promise<void>;

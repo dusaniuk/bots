@@ -1,13 +1,14 @@
 import { inject, injectable } from 'inversify';
 
 import { ICatchController } from '../interfaces/controllers';
-import { CatchResult, Mention, User, UsersStore } from '../../interfaces';
+import { CatchResult, Mention, User } from '../../interfaces';
 import { ActionResult } from '../models/actionResult';
 import { TYPES } from '../../ioc/types';
 import { CatchService, MentionsService } from '../../services';
 import { CatchMentions } from '../../models';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 import { CatchSummary } from '../interfaces/catch';
+import { UsersStore } from '../interfaces/store';
 
 
 @injectable()

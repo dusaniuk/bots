@@ -1,10 +1,11 @@
 import { inject, injectable } from 'inversify';
 
 import { IUsersController } from '../interfaces/controllers';
-import { User, UsersStore } from '../../interfaces';
+import { User } from '../../interfaces';
 import { ActionResult } from '../models/actionResult';
 import { TYPES } from '../../ioc/types';
 import { AlreadyInGameError, NotInGameError } from '../errors';
+import { UsersStore } from '../interfaces/store';
 
 @injectable()
 export class UsersController implements IUsersController {

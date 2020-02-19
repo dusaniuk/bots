@@ -1,6 +1,6 @@
 import { ContainerModule, interfaces } from 'inversify';
 
-import { CatchStore, UsersStore } from '../interfaces';
+import { CatchStore, UsersStore } from '../core/interfaces/store';
 
 import { CatchFirestore } from './firestore/catch.firestore';
 import { UsersFirestore } from './firestore/users.firestore';

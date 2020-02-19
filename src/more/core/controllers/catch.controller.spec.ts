@@ -1,12 +1,13 @@
 import * as faker from 'faker';
 
 import { CatchController} from './catch.controller';
-import { Mention, User, UsersStore } from '../../interfaces';
+import { Mention, User } from '../../interfaces';
 import { CatchService, MentionsService } from '../../services';
 import { ActionResult } from '../models/actionResult';
 import { CatchMentions } from '../../models';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 import { CatchSummary } from '../interfaces/catch';
+import { UsersStore } from '../interfaces/store';
 
 describe('CatchController', () => {
   let controller: CatchController;

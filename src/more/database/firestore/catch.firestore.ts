@@ -4,7 +4,8 @@ import { inject, injectable } from 'inversify';
 import { Database } from '../../../shared/interfaces';
 
 import { DATABASE_TYPES } from '../types';
-import { CatchRecord, CatchStore } from '../../interfaces';
+import { CatchStore } from '../../core/interfaces/store';
+import { CatchRecord } from '../../interfaces';
 
 
 @injectable()

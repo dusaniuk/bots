@@ -1,7 +1,8 @@
 import * as faker from 'faker';
 
 import { CatchService } from './catch.service';
-import { CatchResult, CatchStore, User, UsersStore } from '../interfaces';
+import { CatchStore, UsersStore } from '../core/interfaces/store';
+import { CatchResult, User } from '../interfaces';
 
 describe('CatchService', () => {
   let service: CatchService;

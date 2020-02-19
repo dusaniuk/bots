@@ -1,7 +1,8 @@
 import * as faker from 'faker';
 
 import { ScoreService } from './score.service';
-import { CatchRecord, CatchStore, ScoreItem } from '../interfaces';
+import { CatchStore } from '../core/interfaces/store';
+import { CatchRecord, ScoreItem } from '../interfaces';
 
 const makeMockCatchRecord = (hunterId: number, points: number, victims?: number[]): CatchRecord => {
   return {
