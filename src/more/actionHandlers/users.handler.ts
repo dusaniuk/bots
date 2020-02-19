@@ -16,8 +16,8 @@ import { Score } from '../core/models/score';
 @injectable()
 export class UsersHandler {
   constructor(
-    @inject(TYPES.USERS_HANDLER) private usersController: UsersController,
-    @inject(TYPES.SCORE_HANDLER) private scoreHandler: ScoreController,
+    @inject(TYPES.USERS_CONTROLLER) private usersController: UsersController,
+    @inject(TYPES.SCORE_CONTROLLER) private scoreController: ScoreController,
   ) {}
 
   register = async (ctx: AppContext): Promise<any> => {
@@ -56,7 +56,7 @@ export class UsersHandler {
   };
 
   getScore = async (ctx: AppContext): Promise<any> => {
-    const result: ActionResult<Score> = await this.scoreHandler.getSortedScoreForChat(ctx.chat.id);
+    const result: ActionResult<Score> = await this.scoreController.getSortedScoreForChat(ctx.chat.id);
 
     if (result.ok) {
       await ctx.reply(

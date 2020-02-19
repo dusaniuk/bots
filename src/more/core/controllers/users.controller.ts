@@ -1,13 +1,13 @@
 import { inject, injectable } from 'inversify';
 
-import { UsersPresenter } from '../interfaces/controllers';
+import { IUsersController } from '../interfaces/controllers';
 import { User, UsersStore } from '../../interfaces';
 import { ActionResult } from '../models/actionResult';
 import { TYPES } from '../../ioc/types';
 import { AlreadyInGameError, NotInGameError } from '../errors';
 
 @injectable()
-export class UsersController implements UsersPresenter {
+export class UsersController implements IUsersController {
   constructor(
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
   ) {}

@@ -3,9 +3,9 @@ import { injectable } from 'inversify';
 import { AppContext } from '../../shared/interfaces';
 import { Mention, User } from '../interfaces';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
-import { CatchMentions } from '../models';
 import * as utils from '../utils/helpers';
 import { Logger } from '../../shared/logger';
+import { CatchSummary } from '../core/interfaces/catch';
 
 @injectable()
 export class TelegramResponse {
@@ -17,19 +17,25 @@ export class TelegramResponse {
     }
   };
 
-  notifyAdminAboutCatch = async (ctx: AppContext, catchId: string, mentionsData: CatchMentions): Promise<void> => {
-    const keyboard = getApproveKeyboard(ctx, catchId);
+  notifyAdminAboutCatch = async (ctx: AppContext, catchSummary: CatchSummary): Promise<void> => {
+    const keyboard = getApproveKeyboard(ctx, catchSummary.catchId);
 
-    const summaryMessage: string = ctx.i18n.t('catch.summary', this.getMessageData(mentionsData));
-    await ctx.telegram.sendMessage(mentionsData.admin.id, summaryMessage, keyboard);
+    const hunter = utils.createUser(ctx.from);
+    const messageData = this.getMessageData(hunter, catchSummary.victims);
+
+    const summaryMessage: string = ctx.i18n.t('catch.summary', messageData);
+    await ctx.telegram.sendMessage(catchSummary.admin.id, summaryMessage, keyboard);
   };
 
   notifyAdminAboutHandledCatch = async (ctx: AppContext): Promise<void> => {
     await ctx.answerCbQuery(ctx.i18n.t('other.handled'));
   };
 
-  notifyChatAboutCatch = async (ctx: AppContext, mentionsData: CatchMentions): Promise<void> => {
-    await ctx.replyWithMarkdown(ctx.i18n.t('catch.message', this.getMessageData(mentionsData)));
+  notifyChatAboutCatch = async (ctx: AppContext, catchSummary: CatchSummary): Promise<void> => {
+    const hunter = utils.createUser(ctx.from);
+    const messageData = this.getMessageData(hunter, catchSummary.victims);
+
+    await ctx.replyWithMarkdown(ctx.i18n.t('catch.message', messageData));
   };
 
   noUsersToCatch = async (ctx: AppContext): Promise<void> => {
@@ -69,10 +75,10 @@ export class TelegramResponse {
     }));
   };
 
-  private getMessageData = (mentionsData: CatchMentions) => {
+  private getMessageData = (hunter: User, victims: User[]) => {
     return {
-      hunter: utils.getGreetingNameForUser(mentionsData.hunter),
-      victims: utils.getVictimsMsg(mentionsData.victims),
+      hunter: utils.getGreetingNameForUser(hunter),
+      victims: utils.getVictimsMsg(victims),
     };
   }
 }

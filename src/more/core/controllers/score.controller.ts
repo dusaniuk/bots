@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 
-import { ScorePresenter } from '../interfaces/controllers';
+import { IScoreController } from '../interfaces/controllers';
 import { TYPES } from '../../ioc/types';
 import { ScoreService } from '../../services';
 import { ScoreItem, User, UsersStore, UserWithScore } from '../../interfaces';
@@ -8,7 +8,7 @@ import { ActionResult } from '../models/actionResult';
 import { Score } from '../models/score';
 
 @injectable()
-export class ScoreController implements ScorePresenter {
+export class ScoreController implements IScoreController {
   constructor(
     @inject(TYPES.SCORE_SERVICE) private scoreService: ScoreService,
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,

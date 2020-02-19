@@ -4,48 +4,50 @@ import { AppContext } from '../../shared/interfaces';
 
 import { TYPES } from '../ioc/types';
 import { Actions } from '../constants/actions';
-import { AdminDecision } from '../interfaces';
-import { CatchService, MentionsService, TelegramResponse } from '../services';
-import { CatchMentions } from '../models';
-
+import { AdminDecision, CatchResult, Mention } from '../interfaces';
+import { MentionsParser, TelegramResponse } from '../services';
+import { CatchController } from '../core/controllers/catch.controller';
+import { ActionResult } from '../core/models/actionResult';
+import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../core/errors';
+import { Logger } from '../../shared/logger';
+import { CatchSummary } from '../core/interfaces/catch';
 
 @injectable()
 export class CatchHandler {
   constructor(
-    @inject(TYPES.CATCH_SERVICE) private catchService: CatchService,
-    @inject(TYPES.MENTION_SERVICE) private mentionsService: MentionsService,
+    @inject(TYPES.MENTION_PARSER) private parser: MentionsParser,
     @inject(TYPES.TELEGRAM_RESPONSE) private telegramResponse: TelegramResponse,
+    @inject(TYPES.CATCH_CONTROLLER) private catchController: CatchController,
   ) {}
 
   catch = async (ctx: AppContext): Promise<any> => {
-    const mentionsData: CatchMentions = await this.mentionsService.getMentionsFromContext(ctx);
+    const mentions: Mention[] = await this.parser.getMentionsFromContext(ctx);
+    const result: ActionResult<CatchSummary> = await this.catchController.registerVictimsCatch(ctx.chat.id, ctx.from.id, mentions);
 
-    if (!mentionsData.hasMentions) {
+    if (result.ok) {
+      const catchSummary: CatchSummary = result.payload;
+
+      return Promise.all([
+        this.telegramResponse.notifyAdminAboutCatch(ctx, catchSummary),
+        this.telegramResponse.notifyChatAboutCatch(ctx, catchSummary),
+      ]);
+    }
+
+    Logger.error(result.error.message);
+
+    if (result.error instanceof NoCatchError) {
       return this.telegramResponse.showCatchInstruction(ctx);
     }
 
-    if (mentionsData.isMentionedHimself) {
+    if (result.error instanceof CatchHimselfError) {
       return this.telegramResponse.rejectSelfCapture(ctx);
     }
 
-    if (mentionsData.haveUnverifiedMentions) {
-      await this.telegramResponse.showUnverifiedMentions(ctx, mentionsData.unverifiedMentions);
+    if (result.error instanceof UnverifiedMentionsError) {
+      return this.telegramResponse.showUnverifiedMentions(ctx, result.error.unverifiedMentions);
     }
 
-    if (!mentionsData.haveVictims) {
-      return this.telegramResponse.noUsersToCatch(ctx);
-    }
-
-    const catchId: string = await this.catchService.addCatchRecord(
-      ctx.chat.id,
-      mentionsData.hunter.id,
-      mentionsData.victims,
-    );
-
-    return Promise.all([
-      this.telegramResponse.notifyAdminAboutCatch(ctx, catchId, mentionsData),
-      this.telegramResponse.notifyChatAboutCatch(ctx, mentionsData),
-    ]);
+    return ctx.reply('Something bad has happened');
   };
 
   approveCatch = async (ctx: AppContext): Promise<void> => {
@@ -53,7 +55,9 @@ export class CatchHandler {
 
     await this.telegramResponse.deleteMessageFromAdminChat(ctx);
 
-    const { hunter, earnedPoints } = await this.catchService.approveCatch(chatId, catchId);
+    const result: ActionResult<CatchResult> = await this.catchController.approveCatch(chatId, catchId);
+
+    const { hunter, earnedPoints } = result.payload;
     await this.telegramResponse.sayAboutSucceededCatch(ctx, chatId, hunter, earnedPoints);
 
     await this.telegramResponse.notifyAdminAboutHandledCatch(ctx);
@@ -64,7 +68,9 @@ export class CatchHandler {
 
     await this.telegramResponse.deleteMessageFromAdminChat(ctx);
 
-    const { hunter } = await this.catchService.rejectCatch(chatId, catchId);
+    const result: ActionResult<CatchResult> = await this.catchController.rejectCatch(chatId, catchId);
+
+    const { hunter } = result.payload;
     await this.telegramResponse.sayAboutFailedCatch(ctx, chatId, hunter);
 
     await this.telegramResponse.notifyAdminAboutHandledCatch(ctx);

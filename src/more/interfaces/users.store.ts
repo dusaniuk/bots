@@ -10,4 +10,6 @@ export interface UsersStore {
   getAllUsersFromChat(chatId: number): Promise<User[]>;
 
   getUserFromChat(userId: number, chatId: number): Promise<User>;
+
+  getAdminFromChat(chatId): Promise<User>;
 }

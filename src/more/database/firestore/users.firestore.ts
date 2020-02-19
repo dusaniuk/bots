@@ -39,6 +39,21 @@ export class UsersFirestore implements UsersStore {
     await batch.commit();
   };
 
+  getAdminFromChat = async (chatId: any): Promise<User> => {
+    const usersRef = this.getUsersListRef(chatId)
+      .where('isAdmin', '==', true)
+      .limit(1);
+
+    const query = await usersRef.get();
+
+    const adminUserDocument = query.docs[0];
+
+    return {
+      ...(adminUserDocument.data() as User),
+      id: +adminUserDocument.id,
+    };
+  };
+
   getAllUsersFromChat = async (chatId: number): Promise<User[]> => {
     const usersRef = this.getUsersListRef(chatId);
     const query = await usersRef.get();

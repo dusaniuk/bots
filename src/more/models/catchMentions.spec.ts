@@ -1,5 +1,3 @@
-import * as faker from 'faker';
-
 import { CatchMentions } from './catchMentions';
 import { Mention, User } from '../interfaces';
 
@@ -8,63 +6,43 @@ describe('CatchMentions', () => {
 
   describe('hasMentions', () => {
     it('should return false if there are no mentioned users', () => {
-      catchMentions = new CatchMentions(null, null, [], []);
+      catchMentions = new CatchMentions([], []);
 
-      expect(catchMentions.hasMentions).toBeFalsy();
+      expect(catchMentions.hasAnyMentions).toBeFalsy();
     });
 
     it('should return true if there at least one mention', () => {
-      catchMentions = new CatchMentions(null, null, [{} as User], []);
+      catchMentions = new CatchMentions([{} as User], []);
 
-      expect(catchMentions.hasMentions).toBeTruthy();
+      expect(catchMentions.hasAnyMentions).toBeTruthy();
     });
   });
 
   describe('haveUnverifiedMentions', () => {
     it('should return false if all mentions are verified', () => {
-      catchMentions = new CatchMentions(null, null, [], []);
+      catchMentions = new CatchMentions([], []);
 
-      expect(catchMentions.haveUnverifiedMentions).toBeFalsy();
+      expect(catchMentions.hasUnverifiedMentions).toBeFalsy();
     });
 
     it('should return true if there are unverified mentions', () => {
-      catchMentions = new CatchMentions(null, null, [], [{} as Mention]);
+      catchMentions = new CatchMentions([], [{} as Mention]);
 
-      expect(catchMentions.haveUnverifiedMentions).toBeTruthy();
+      expect(catchMentions.hasUnverifiedMentions).toBeTruthy();
     });
   });
 
   describe('haveVictims', () => {
     it('should return false if there are no victims', () => {
-      catchMentions = new CatchMentions(null, null, [], []);
+      catchMentions = new CatchMentions([], []);
 
       expect(catchMentions.haveVictims).toBeFalsy();
     });
 
     it('should return true if there are victims', () => {
-      catchMentions = new CatchMentions(null, null, [{} as User], []);
+      catchMentions = new CatchMentions([{} as User], []);
 
       expect(catchMentions.haveVictims).toBeTruthy();
-    });
-  });
-
-  describe('isMentionedHimself', () => {
-    let hunter: User;
-
-    beforeEach(() => {
-      hunter = { id: faker.random.number() } as User;
-    });
-
-    it('should return false if victims does not includes hunter', () => {
-      catchMentions = new CatchMentions(null, hunter, [], []);
-
-      expect(catchMentions.isMentionedHimself).toBeFalsy();
-    });
-
-    it('should return false if victims does not includes hunter', () => {
-      catchMentions = new CatchMentions(null, hunter, [hunter], []);
-
-      expect(catchMentions.isMentionedHimself).toBeTruthy();
     });
   });
 });
