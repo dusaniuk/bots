@@ -1,4 +1,5 @@
-import { Mention, User } from '../interfaces';
+import { Mention } from '../core/interfaces/catch';
+import { User } from '../core/interfaces/user';
 
 export class CatchMentions {
   public get hasAnyMentions(): boolean {

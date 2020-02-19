@@ -1,8 +1,11 @@
 import * as faker from 'faker';
 
-import { MentionsService } from './mentions.service';
-import { Mention, User } from '../interfaces';
 import { UsersStore } from '../core/interfaces/store';
+import { Mention } from '../core/interfaces/catch';
+import { User } from '../core/interfaces/user';
+
+import { MentionsService } from './mentions.service';
+
 
 describe('MentionsService', () => {
   let service: MentionsService;

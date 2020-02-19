@@ -1,12 +1,13 @@
 import { inject, injectable } from 'inversify';
 
-import { IScoreController } from '../interfaces/controllers';
 import { TYPES } from '../../ioc/types';
 import { ScoreService } from '../../services';
-import { ScoreItem, User, UserWithScore } from '../../interfaces';
 import { ActionResult } from '../models/actionResult';
-import { Score } from '../models/score';
+
 import { UsersStore } from '../interfaces/store';
+import { IScoreController } from '../interfaces/controllers';
+import { Score, ScoreItem, User, UserWithScore } from '../interfaces/user';
+
 
 @injectable()
 export class ScoreController implements IScoreController {

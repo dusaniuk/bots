@@ -1,4 +1,6 @@
-import { CatchRecord, User } from '../../interfaces';
+import { CatchRecord } from './catch';
+import { User } from './user';
+
 
 export interface CatchStore {
   addCatchRecord(chatId: number, record: CatchRecord): Promise<string>;

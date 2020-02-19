@@ -1,9 +1,12 @@
 import { inject, injectable } from 'inversify';
 
 import { TYPES } from '../ioc/types';
-import { Mention, User } from '../interfaces';
 import { CatchMentions } from '../models';
+
 import { UsersStore } from '../core/interfaces/store';
+import { Mention } from '../core/interfaces/catch';
+import { User } from '../core/interfaces/user';
+
 
 @injectable()
 export class MentionsService {

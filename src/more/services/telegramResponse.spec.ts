@@ -4,10 +4,12 @@ import { TelegramResponse } from './telegramResponse';
 import { AppContext } from '../../shared/interfaces';
 
 import { createMockContext } from '../../../test/context.mock';
-import { CatchMentions } from '../models';
-import { Mention, User } from '../interfaces';
 import { getGreetingNameForUser } from '../utils/helpers';
 import { Logger } from '../../shared/logger';
+
+import { Mention } from '../core/interfaces/catch';
+import { User } from '../core/interfaces/user';
+
 
 jest.mock('../keyboards/approve.keyboard');
 jest.mock('../utils/helpers');

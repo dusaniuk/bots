@@ -5,7 +5,7 @@ import { Database } from '../../../shared/interfaces';
 
 import { DATABASE_TYPES } from '../types';
 import { CatchStore } from '../../core/interfaces/store';
-import { CatchRecord } from '../../interfaces';
+import { CatchRecord } from '../../core/interfaces/catch';
 
 
 @injectable()

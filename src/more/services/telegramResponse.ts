@@ -1,11 +1,13 @@
 import { injectable } from 'inversify';
 
 import { AppContext } from '../../shared/interfaces';
-import { Mention, User } from '../interfaces';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
 import * as utils from '../utils/helpers';
 import { Logger } from '../../shared/logger';
-import { CatchSummary } from '../core/interfaces/catch';
+
+import { CatchSummary, Mention } from '../core/interfaces/catch';
+import { User } from '../core/interfaces/user';
+
 
 @injectable()
 export class TelegramResponse {

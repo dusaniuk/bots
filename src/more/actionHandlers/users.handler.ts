@@ -5,13 +5,14 @@ import { AppContext } from '../../shared/interfaces';
 
 import { TYPES } from '../ioc/types';
 import { ChatType } from '../constants/chatType';
-import { User } from '../interfaces';
 import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 import { UsersController } from '../core/controllers/users.controller';
 import { ActionResult } from '../core/models/actionResult';
 import { AlreadyInGameError, NotInGameError } from '../core/errors';
+
 import { ScoreController } from '../core/controllers/score.controller';
-import { Score } from '../core/models/score';
+import { User, Score } from '../core/interfaces/user';
+
 
 @injectable()
 export class UsersHandler {

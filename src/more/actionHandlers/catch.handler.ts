@@ -4,13 +4,12 @@ import { AppContext } from '../../shared/interfaces';
 
 import { TYPES } from '../ioc/types';
 import { Actions } from '../constants/actions';
-import { AdminDecision, CatchResult, Mention } from '../interfaces';
 import { MentionsParser, TelegramResponse } from '../services';
 import { CatchController } from '../core/controllers/catch.controller';
 import { ActionResult } from '../core/models/actionResult';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../core/errors';
 import { Logger } from '../../shared/logger';
-import { CatchSummary } from '../core/interfaces/catch';
+import { AdminDecision, CatchResult, CatchSummary, Mention } from '../core/interfaces/catch';
 
 @injectable()
 export class CatchHandler {

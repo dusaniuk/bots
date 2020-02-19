@@ -4,8 +4,8 @@ import { inject, injectable } from 'inversify';
 import { Database } from '../../../shared/interfaces';
 
 import { DATABASE_TYPES } from '../types';
-import { User } from '../../interfaces';
 import { UsersStore } from '../../core/interfaces/store';
+import { User } from '../../core/interfaces/user';
 
 
 @injectable()

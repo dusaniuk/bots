@@ -1,7 +1,8 @@
-import { CatchResult, Mention, User } from '../../interfaces';
 import { ActionResult } from '../models/actionResult';
-import { Score } from '../models/score';
-import { CatchSummary } from './catch';
+
+import { CatchResult, CatchSummary, Mention } from './catch';
+import { User, Score } from './user';
+
 
 export interface IUsersController {
   isUserInGame(chatId: number, userId: number): Promise<ActionResult>;
