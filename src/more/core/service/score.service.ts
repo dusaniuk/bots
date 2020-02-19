@@ -1,10 +1,10 @@
 import { inject, injectable } from 'inversify';
 
-import { TYPES } from '../ioc/types';
+import { TYPES } from '../../ioc/types';
 
-import { CatchStore } from '../core/interfaces/store';
-import { CatchRecord } from '../core/interfaces/catch';
-import { ScoreItem } from '../core/interfaces/user';
+import { CatchStore } from '../interfaces/store';
+import { CatchRecord } from '../interfaces/catch';
+import { ScoreItem } from '../interfaces/user';
 
 interface ScoreObject {
   [key: number]: number;

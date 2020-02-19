@@ -4,7 +4,7 @@ import { AppContext } from '../../../shared/interfaces';
 
 import { TYPES } from '../../ioc/types';
 import { Actions } from '../../core/constants/actions';
-import { MentionsParser, TelegramResponse } from '../../services';
+import { MentionsParser, TelegramResponse } from '../services';
 import { CatchController } from '../../core/controllers/catch.controller';
 import { ActionResult } from '../../core/models/actionResult';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../../core/errors';

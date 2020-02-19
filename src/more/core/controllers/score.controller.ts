@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 
 import { TYPES } from '../../ioc/types';
-import { ScoreService } from '../../services';
+import { ScoreService } from '../service';
 import { ActionResult } from '../models/actionResult';
 
 import { UsersStore } from '../interfaces/store';

@@ -1,14 +1,14 @@
 import * as faker from 'faker';
 
 import { TelegramResponse } from './telegramResponse';
-import { AppContext } from '../../shared/interfaces';
+import { AppContext } from '../../../shared/interfaces';
 
-import { createMockContext } from '../../../test/context.mock';
-import { getGreetingNameForUser } from '../telegramBot/utils/helpers';
-import { Logger } from '../../shared/logger';
+import { createMockContext } from '../../../../test/context.mock';
+import { getGreetingNameForUser } from '../utils/helpers';
+import { Logger } from '../../../shared/logger';
 
-import { Mention } from '../core/interfaces/catch';
-import { User } from '../core/interfaces/user';
+import { Mention } from '../../core/interfaces/catch';
+import { User } from '../../core/interfaces/user';
 
 
 jest.mock('../telegramBot/keyboards/approve.keyboard');

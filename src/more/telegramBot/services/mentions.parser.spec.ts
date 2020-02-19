@@ -1,10 +1,10 @@
 import * as faker from 'faker';
 
-import { AppContext } from '../../shared/interfaces';
+import { AppContext } from '../../../shared/interfaces';
 import { MentionsParser } from './mentions.parser';
-import { Mention } from '../core/interfaces/catch';
+import { Mention } from '../../core/interfaces/catch';
 
-import { createMockContext } from '../../../test/context.mock';
+import { createMockContext } from '../../../../test/context.mock';
 
 describe('MentionService', () => {
   let service: MentionsParser;

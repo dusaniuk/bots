@@ -5,18 +5,13 @@ import { Bot } from '../../shared/interfaces';
 import { TYPES } from './types';
 import { MoreBot } from '../telegramBot/more.bot';
 import { CatchHandler, UsersHandler, UtilsHandler } from '../telegramBot/actionHandlers';
-import {
-  MentionsParser,
-  TelegramResponse,
-  MentionsService,
-  CatchService,
-  ScoreService,
-} from '../services';
+import { MentionsParser, TelegramResponse } from '../telegramBot/services';
 
 import { ICatchController, IScoreController, IUsersController } from '../core/interfaces/controllers';
 import { UsersController } from '../core/controllers/users.controller';
 import { ScoreController } from '../core/controllers/score.controller';
 import { CatchController } from '../core/controllers/catch.controller';
+import { CatchService, MentionsService, ScoreService } from '../core/service';
 
 
 export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {

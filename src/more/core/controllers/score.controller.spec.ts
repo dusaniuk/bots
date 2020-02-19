@@ -1,7 +1,7 @@
 import * as faker from 'faker';
 
 import { ScoreController } from './score.controller';
-import { ScoreService } from '../../services';
+import { ScoreService } from '../service';
 import { ActionResult } from '../models/actionResult';
 
 import { UsersStore } from '../interfaces/store';

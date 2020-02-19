@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import { IncomingMessage, MessageEntity } from 'telegraf/typings/telegram-types';
 
-import { AppContext } from '../../shared/interfaces';
-import { Mention } from '../core/interfaces/catch';
+import { AppContext } from '../../../shared/interfaces';
+import { Mention } from '../../core/interfaces/catch';
 
 enum MentionType {
   Username = 'mention',

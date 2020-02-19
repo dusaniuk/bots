@@ -1,6 +1,6 @@
 import * as faker from 'faker';
 
-import { CatchService, MentionsService } from '../../services';
+import { CatchService, MentionsService } from '../service';
 import { ActionResult } from '../models/actionResult';
 import { CatchMentions } from '../models/catchMentions';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
