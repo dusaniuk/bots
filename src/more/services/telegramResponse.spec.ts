@@ -4,15 +4,15 @@ import { TelegramResponse } from './telegramResponse';
 import { AppContext } from '../../shared/interfaces';
 
 import { createMockContext } from '../../../test/context.mock';
-import { getGreetingNameForUser } from '../utils/helpers';
+import { getGreetingNameForUser } from '../telegramBot/utils/helpers';
 import { Logger } from '../../shared/logger';
 
 import { Mention } from '../core/interfaces/catch';
 import { User } from '../core/interfaces/user';
 
 
-jest.mock('../keyboards/approve.keyboard');
-jest.mock('../utils/helpers');
+jest.mock('../telegramBot/keyboards/approve.keyboard');
+jest.mock('../telegramBot/utils/helpers');
 
 describe('TelegramResponse', () => {
   let service: TelegramResponse;

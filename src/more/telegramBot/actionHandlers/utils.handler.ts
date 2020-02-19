@@ -1,7 +1,7 @@
 import { Message } from 'telegraf/typings/telegram-types';
 import { injectable } from 'inversify';
 
-import { AppContext } from '../../shared/interfaces';
+import { AppContext } from '../../../shared/interfaces';
 
 
 @injectable()

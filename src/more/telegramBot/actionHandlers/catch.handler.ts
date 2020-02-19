@@ -1,15 +1,15 @@
 import { inject, injectable } from 'inversify';
 
-import { AppContext } from '../../shared/interfaces';
+import { AppContext } from '../../../shared/interfaces';
 
-import { TYPES } from '../ioc/types';
-import { Actions } from '../core/constants/actions';
-import { MentionsParser, TelegramResponse } from '../services';
-import { CatchController } from '../core/controllers/catch.controller';
-import { ActionResult } from '../core/models/actionResult';
-import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../core/errors';
-import { Logger } from '../../shared/logger';
-import { AdminDecision, CatchResult, CatchSummary, Mention } from '../core/interfaces/catch';
+import { TYPES } from '../../ioc/types';
+import { Actions } from '../../core/constants/actions';
+import { MentionsParser, TelegramResponse } from '../../services';
+import { CatchController } from '../../core/controllers/catch.controller';
+import { ActionResult } from '../../core/models/actionResult';
+import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../../core/errors';
+import { Logger } from '../../../shared/logger';
+import { AdminDecision, CatchResult, CatchSummary, Mention } from '../../core/interfaces/catch';
 
 @injectable()
 export class CatchHandler {

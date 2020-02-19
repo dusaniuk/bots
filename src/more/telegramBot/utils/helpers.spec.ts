@@ -2,7 +2,7 @@ import * as faker from 'faker';
 
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import * as helpers from './helpers';
-import { User } from '../core/interfaces/user';
+import { User } from '../../core/interfaces/user';
 
 describe('helpers', () => {
   describe('createUser', () => {

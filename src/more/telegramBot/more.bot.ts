@@ -3,12 +3,12 @@ import { inject, injectable } from 'inversify';
 import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
 
-import { CONFIG } from '../config';
-import { Bot, AppContext } from '../shared/interfaces';
+import { CONFIG } from '../../config';
+import { Bot, AppContext } from '../../shared/interfaces';
 
 import { CatchHandler, UsersHandler, UtilsHandler } from './actionHandlers';
-import { Actions } from './core/constants/actions';
-import { Logger } from '../shared/logger';
+import { Actions } from '../core/constants/actions';
+import { Logger } from '../../shared/logger';
 
 @injectable()
 export class MoreBot implements Bot {

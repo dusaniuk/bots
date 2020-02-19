@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 
 import { AppContext } from '../../shared/interfaces';
-import { getApproveKeyboard } from '../keyboards/approve.keyboard';
-import * as utils from '../utils/helpers';
+import { getApproveKeyboard } from '../telegramBot/keyboards/approve.keyboard';
+import * as utils from '../telegramBot/utils/helpers';
 import { Logger } from '../../shared/logger';
 
 import { CatchSummary, Mention } from '../core/interfaces/catch';

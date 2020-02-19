@@ -1,6 +1,6 @@
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
-import { Score, User, UserWithScore } from '../core/interfaces/user';
+import { Score, User, UserWithScore } from '../../core/interfaces/user';
 
 
 export const createUser = (telegrafUser: TelegrafUser): User => {

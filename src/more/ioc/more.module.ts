@@ -3,8 +3,8 @@ import { ContainerModule, interfaces } from 'inversify';
 import { Bot } from '../../shared/interfaces';
 
 import { TYPES } from './types';
-import { MoreBot } from '../more.bot';
-import { CatchHandler, UsersHandler, UtilsHandler } from '../actionHandlers';
+import { MoreBot } from '../telegramBot/more.bot';
+import { CatchHandler, UsersHandler, UtilsHandler } from '../telegramBot/actionHandlers';
 import {
   MentionsParser,
   TelegramResponse,
