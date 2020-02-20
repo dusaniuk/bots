@@ -4,9 +4,9 @@ import { AppContext } from '../../../shared/interfaces';
 import { Logger } from '../../../shared/logger';
 import { TYPES } from '../../types';
 
-import { Actions } from '../constants/actions';
-import { CatchController } from '../../core/controllers';
+import { User } from '../../core/interfaces/user';
 import { ActionResult } from '../../core/models/actionResult';
+import { ICatchController } from '../../core/interfaces/controllers';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../../core/errors';
 import {
   AdminDecision,
@@ -15,15 +15,16 @@ import {
   Mention,
 } from '../../core/interfaces/catch';
 
-import { MentionsParser, TelegramResponse } from '../services';
+import { Actions } from '../constants/actions';
+import { ContextParser, TelegramResponse } from '../services';
 
 
 @injectable()
 export class CatchHandler {
   constructor(
-    @inject(TYPES.MENTION_PARSER) private parser: MentionsParser,
+    @inject(TYPES.CONTEXT_PARSER) private parser: ContextParser,
     @inject(TYPES.TELEGRAM_RESPONSE) private telegramResponse: TelegramResponse,
-    @inject(TYPES.CATCH_CONTROLLER) private catchController: CatchController,
+    @inject(TYPES.CATCH_CONTROLLER) private catchController: ICatchController,
   ) {}
 
   catch = async (ctx: AppContext): Promise<any> => {
@@ -32,10 +33,11 @@ export class CatchHandler {
 
     if (result.ok) {
       const catchSummary: CatchSummary = result.payload;
+      const hunter: User = this.parser.mapToUserEntity(ctx.from);
 
       return Promise.all([
-        this.telegramResponse.notifyAdminAboutCatch(ctx, catchSummary),
-        this.telegramResponse.notifyChatAboutCatch(ctx, catchSummary),
+        this.telegramResponse.notifyAdminAboutCatch(ctx, hunter, catchSummary),
+        this.telegramResponse.notifyChatAboutCatch(ctx, hunter, catchSummary),
       ]);
     }
 

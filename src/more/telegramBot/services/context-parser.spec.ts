@@ -1,24 +1,70 @@
 import * as faker from 'faker';
+import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
 import { createMockContext } from '../../../../test/context.mock';
 
 import { AppContext } from '../../../shared/interfaces';
 import { Mention } from '../../core/interfaces/catch';
+import { User } from '../../core/interfaces/user';
 
-import { MentionsParser } from './mentions.parser';
+import { ContextParser } from './context-parser';
 
 
-describe('MentionService', () => {
-  let service: MentionsParser;
+describe('ContextParser', () => {
+  let service: ContextParser;
 
   let ctx: AppContext;
 
   beforeEach(() => {
     jest.clearAllMocks();
 
-    service = new MentionsParser();
+    service = new ContextParser();
 
     ctx = createMockContext();
+  });
+
+  describe('mapToUserEntity', () => {
+    it('should create user', () => {
+      const telegrafUser: TelegrafUser = {
+        id: faker.random.number(),
+        first_name: faker.name.firstName(),
+        last_name: faker.name.lastName(),
+        username: faker.internet.userName(),
+      } as TelegrafUser;
+
+      const user: User = service.mapToUserEntity(telegrafUser);
+
+      expect(user).toEqual({
+        id: telegrafUser.id,
+        firstName: telegrafUser.first_name,
+        lastName: telegrafUser.last_name,
+        username: telegrafUser.username,
+      });
+    });
+
+    it('should create user without username', () => {
+      const telegrafUser = {
+        id: faker.random.number(),
+        first_name: faker.name.firstName(),
+        last_name: faker.name.lastName(),
+      } as TelegrafUser;
+
+      const user: User = service.mapToUserEntity(telegrafUser);
+
+      expect(user.username).toBeUndefined();
+    });
+
+    it('should create user without last name', () => {
+      const telegrafUser: TelegrafUser = {
+        id: faker.random.number(),
+        first_name: faker.name.firstName(),
+        username: faker.internet.userName(),
+      } as TelegrafUser;
+
+      const user: User = service.mapToUserEntity(telegrafUser);
+
+      expect(user.lastName).toBeUndefined();
+    });
   });
 
   describe('getMentionedUsers', () => {

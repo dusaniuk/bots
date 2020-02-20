@@ -1,24 +1,5 @@
-import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
-
 import { Score, User, UserWithScore } from '../../core/interfaces/user';
 
-
-export const createUser = (telegrafUser: TelegrafUser): User => {
-  const user: User = {
-    id: telegrafUser.id,
-    firstName: telegrafUser.first_name,
-  };
-
-  if (telegrafUser.username) {
-    user.username = telegrafUser.username;
-  }
-
-  if (telegrafUser.last_name) {
-    user.lastName = telegrafUser.last_name;
-  }
-
-  return user;
-};
 
 export const getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
   if (username) {

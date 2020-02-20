@@ -1,54 +1,10 @@
 import * as faker from 'faker';
 
-import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
-import * as helpers from './helpers';
 import { User } from '../../core/interfaces/user';
 
+import * as helpers from './helpers';
+
 describe('helpers', () => {
-  describe('createUser', () => {
-    it('should create user', () => {
-      const telegrafUser: TelegrafUser = {
-        id: faker.random.number(),
-        first_name: faker.name.firstName(),
-        last_name: faker.name.lastName(),
-        username: faker.internet.userName(),
-      } as TelegrafUser;
-
-      const user: User = helpers.createUser(telegrafUser);
-
-      expect(user).toEqual({
-        id: telegrafUser.id,
-        firstName: telegrafUser.first_name,
-        lastName: telegrafUser.last_name,
-        username: telegrafUser.username,
-      });
-    });
-
-    it('should create user without username', () => {
-      const telegrafUser = {
-        id: faker.random.number(),
-        first_name: faker.name.firstName(),
-        last_name: faker.name.lastName(),
-      } as TelegrafUser;
-
-      const user: User = helpers.createUser(telegrafUser);
-
-      expect(user.username).toBeUndefined();
-    });
-
-    it('should create user without last name', () => {
-      const telegrafUser: TelegrafUser = {
-        id: faker.random.number(),
-        first_name: faker.name.firstName(),
-        username: faker.internet.userName(),
-      } as TelegrafUser;
-
-      const user: User = helpers.createUser(telegrafUser);
-
-      expect(user.lastName).toBeUndefined();
-    });
-  });
-
   describe('getGreetingNameForUser', () => {
     it('should return username as user name if it has been set', () => {
       const user: User = {

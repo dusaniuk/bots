@@ -8,16 +8,18 @@ import { ChatType } from '../constants/chatType';
 import { User, Score } from '../../core/interfaces/user';
 import { ActionResult } from '../../core/models/actionResult';
 import { AlreadyInGameError, NotInGameError } from '../../core/errors';
-import { UsersController, ScoreController } from '../../core/controllers';
+import { IScoreController, IUsersController } from '../../core/interfaces/controllers';
 
-import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
+import { getGreetingNameForUser, getUsersScore } from '../utils/helpers';
+import { ContextParser } from '../services';
 
 
 @injectable()
 export class UsersHandler {
   constructor(
-    @inject(TYPES.USERS_CONTROLLER) private usersController: UsersController,
-    @inject(TYPES.SCORE_CONTROLLER) private scoreController: ScoreController,
+    @inject(TYPES.CONTEXT_PARSER) private parser: ContextParser,
+    @inject(TYPES.USERS_CONTROLLER) private usersController: IUsersController,
+    @inject(TYPES.SCORE_CONTROLLER) private scoreController: IScoreController,
   ) {}
 
   register = async (ctx: AppContext): Promise<any> => {
@@ -25,7 +27,7 @@ export class UsersHandler {
       return ctx.reply(ctx.i18n.t('error.rejectPrivate'));
     }
 
-    const user: User = createUser(ctx.from);
+    const user: User = this.parser.mapToUserEntity(ctx.from);
     const result: ActionResult = await this.usersController.addUserToGame(ctx.chat.id, user);
 
     if (result?.error instanceof AlreadyInGameError) {
@@ -82,7 +84,7 @@ export class UsersHandler {
   };
 
   onLeftChatMember = async (ctx: AppContext): Promise<any> => {
-    const leftMember = createUser(ctx.message.left_chat_member);
+    const leftMember = this.parser.mapToUserEntity(ctx.message.left_chat_member);
 
     await ctx.reply(ctx.i18n.t('user.onLeft', {
       user: getGreetingNameForUser(leftMember),
@@ -91,6 +93,6 @@ export class UsersHandler {
 
   private getNewMembers = (ctx: AppContext): User[] => {
     const newUsers: TelegrafUser[] = (ctx.message?.new_chat_members ?? []).filter((user) => !user.is_bot);
-    return newUsers.map(createUser);
+    return newUsers.map(this.parser.mapToUserEntity);
   };
 }

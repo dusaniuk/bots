@@ -19,10 +19,9 @@ export class TelegramResponse {
     }
   };
 
-  notifyAdminAboutCatch = async (ctx: AppContext, catchSummary: CatchSummary): Promise<void> => {
+  notifyAdminAboutCatch = async (ctx: AppContext, hunter: User, catchSummary: CatchSummary): Promise<void> => {
     const keyboard = getApproveKeyboard(ctx, catchSummary.catchId);
 
-    const hunter = utils.createUser(ctx.from);
     const messageData = this.getMessageData(hunter, catchSummary.victims);
 
     const summaryMessage: string = ctx.i18n.t('catch.summary', messageData);
@@ -33,8 +32,7 @@ export class TelegramResponse {
     await ctx.answerCbQuery(ctx.i18n.t('other.handled'));
   };
 
-  notifyChatAboutCatch = async (ctx: AppContext, catchSummary: CatchSummary): Promise<void> => {
-    const hunter = utils.createUser(ctx.from);
+  notifyChatAboutCatch = async (ctx: AppContext, hunter: User, catchSummary: CatchSummary): Promise<void> => {
     const messageData = this.getMessageData(hunter, catchSummary.victims);
 
     await ctx.replyWithMarkdown(ctx.i18n.t('catch.message', messageData));

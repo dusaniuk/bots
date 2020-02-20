@@ -1,13 +1,33 @@
 import { injectable } from 'inversify';
-import { IncomingMessage, MessageEntity } from 'telegraf/typings/telegram-types';
+import { IncomingMessage, MessageEntity, User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
-import { Mention } from '../../core/interfaces/catch';
-import { MentionType } from '../constants/mentionType';
 import { AppContext } from '../../../shared/interfaces';
+
+import { User } from '../../core/interfaces/user';
+import { Mention } from '../../core/interfaces/catch';
+
+import { MentionType } from '../constants/mentionType';
 
 
 @injectable()
-export class MentionsParser {
+export class ContextParser {
+  mapToUserEntity = (telegrafUser: TelegrafUser): User => {
+    const user: User = {
+      id: telegrafUser.id,
+      firstName: telegrafUser.first_name,
+    };
+
+    if (telegrafUser.username) {
+      user.username = telegrafUser.username;
+    }
+
+    if (telegrafUser.last_name) {
+      user.lastName = telegrafUser.last_name;
+    }
+
+    return user;
+  };
+
   getMentionsFromContext = (ctx: AppContext): Mention[] => {
     const mentions: Mention[] = this.parseMentions(ctx);
 
