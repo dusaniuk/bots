@@ -20,10 +20,8 @@ export class MentionsService {
     const victims: User[] = [];
     const unverifiedMentions: Mention[] = [];
 
-    mentions.forEach((mention) => {
-      const user = chatMembers.find(({ id, username }: User) => {
-        return id === mention.id || (!!username && username === mention.username);
-      });
+    mentions.forEach((mention: Mention) => {
+      const user: User = this.findMentionedUser(chatMembers, mention);
 
       if (user) {
         victims.push(user);
@@ -33,5 +31,13 @@ export class MentionsService {
     });
 
     return new CatchMentions(victims, unverifiedMentions);
-  }
+  };
+
+  private findMentionedUser = (chatMembers: User[], mention: Mention): User => {
+    if (mention.id) {
+      return chatMembers.find(({ id }: User) => id === mention.id);
+    }
+
+    return chatMembers.find(({ username }: User) => username === mention.username);
+  };
 }
