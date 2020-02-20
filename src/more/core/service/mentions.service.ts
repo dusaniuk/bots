@@ -22,7 +22,7 @@ export class MentionsService {
 
     mentions.forEach((mention) => {
       const user = chatMembers.find(({ id, username }: User) => {
-        return id === mention.id || username === mention.username;
+        return id === mention.id || (!!username && username === mention.username);
       });
 
       if (user) {
