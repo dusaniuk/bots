@@ -2,7 +2,7 @@ import * as faker from 'faker';
 
 import { ScoreService } from '../service';
 import { UsersStore } from '../interfaces/store';
-import { ActionResult } from '../models/actionResult';
+import { ActionResult } from '../models/action-result';
 import { Score, ScoreItem, User } from '../interfaces/user';
 
 import { ScoreController } from './score.controller';

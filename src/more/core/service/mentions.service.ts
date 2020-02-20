@@ -5,7 +5,7 @@ import { TYPES } from '../../types';
 import { User } from '../interfaces/user';
 import { Mention } from '../interfaces/catch';
 import { UsersStore } from '../interfaces/store';
-import { CatchMentions } from '../models/catchMentions';
+import { CatchMentions } from '../models/catch-mentions';
 
 
 @injectable()

@@ -8,7 +8,7 @@ import { Logger } from '../../shared/logger';
 import { Bot, AppContext } from '../../shared/interfaces';
 
 import { Actions } from './constants/actions';
-import { CatchHandler, UsersHandler, UtilsHandler } from './actionHandlers';
+import { CatchHandler, UsersHandler, UtilsHandler } from './action-handlers';
 
 
 @injectable()

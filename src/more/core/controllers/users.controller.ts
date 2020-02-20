@@ -4,7 +4,7 @@ import { TYPES } from '../../types';
 
 import { User } from '../interfaces/user';
 import { UsersStore } from '../interfaces/store';
-import { ActionResult } from '../models/actionResult';
+import { ActionResult } from '../models/action-result';
 import { IUsersController } from '../interfaces/controllers';
 import { AlreadyInGameError, NotInGameError } from '../errors';
 

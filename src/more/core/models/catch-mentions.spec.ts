@@ -1,7 +1,7 @@
 import { Mention } from '../interfaces/catch';
 import { User } from '../interfaces/user';
 
-import { CatchMentions } from './catchMentions';
+import { CatchMentions } from './catch-mentions';
 
 
 describe('CatchMentions', () => {

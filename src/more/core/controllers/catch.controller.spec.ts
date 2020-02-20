@@ -2,8 +2,8 @@ import * as faker from 'faker';
 
 import { User } from '../interfaces/user';
 import { UsersStore } from '../interfaces/store';
-import { ActionResult } from '../models/actionResult';
-import { CatchMentions } from '../models/catchMentions';
+import { ActionResult } from '../models/action-result';
+import { CatchMentions } from '../models/catch-mentions';
 import { CatchService, MentionsService } from '../service';
 import { CatchSummary, Mention } from '../interfaces/catch';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';

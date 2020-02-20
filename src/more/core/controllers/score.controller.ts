@@ -4,7 +4,7 @@ import { TYPES } from '../../types';
 
 import { ScoreService } from '../service';
 import { UsersStore } from '../interfaces/store';
-import { ActionResult } from '../models/actionResult';
+import { ActionResult } from '../models/action-result';
 import { IScoreController } from '../interfaces/controllers';
 import {
   Score,

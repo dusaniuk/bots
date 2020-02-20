@@ -4,9 +4,9 @@ import { inject, injectable } from 'inversify';
 import { AppContext } from '../../../shared/interfaces';
 import { TYPES } from '../../types';
 
-import { ChatType } from '../constants/chatType';
+import { ChatType } from '../constants/chat-type';
 import { User, Score } from '../../core/interfaces/user';
-import { ActionResult } from '../../core/models/actionResult';
+import { ActionResult } from '../../core/models/action-result';
 import { AlreadyInGameError, NotInGameError } from '../../core/errors';
 import { IScoreController, IUsersController } from '../../core/interfaces/controllers';
 

@@ -4,8 +4,8 @@ import { TYPES } from '../../types';
 
 import { User } from '../interfaces/user';
 import { UsersStore } from '../interfaces/store';
-import { ActionResult } from '../models/actionResult';
-import { CatchMentions } from '../models/catchMentions';
+import { ActionResult } from '../models/action-result';
+import { CatchMentions } from '../models/catch-mentions';
 import { CatchService, MentionsService } from '../service';
 import { ICatchController } from '../interfaces/controllers';
 import { CatchResult, CatchSummary, Mention } from '../interfaces/catch';

@@ -6,7 +6,7 @@ import { AppContext } from '../../../shared/interfaces';
 import { User } from '../../core/interfaces/user';
 import { Mention } from '../../core/interfaces/catch';
 
-import { MentionType } from '../constants/mentionType';
+import { MentionType } from '../constants/mention-type';
 
 
 @injectable()

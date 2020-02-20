@@ -1,6 +1,6 @@
 import * as faker from 'faker';
 
-import { TelegramResponse } from './telegramResponse';
+import { TelegramResponse } from './telegram-response';
 import { AppContext } from '../../../shared/interfaces';
 
 import { createMockContext } from '../../../../test/context.mock';

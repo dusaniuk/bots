@@ -1,4 +1,4 @@
-import { ActionResult } from '../models/actionResult';
+import { ActionResult } from '../models/action-result';
 import { CatchResult, CatchSummary, Mention } from './catch';
 import { User, Score } from './user';
 

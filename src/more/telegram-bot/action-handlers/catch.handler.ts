@@ -5,7 +5,7 @@ import { Logger } from '../../../shared/logger';
 import { TYPES } from '../../types';
 
 import { User } from '../../core/interfaces/user';
-import { ActionResult } from '../../core/models/actionResult';
+import { ActionResult } from '../../core/models/action-result';
 import { ICatchController } from '../../core/interfaces/controllers';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../../core/errors';
 import {

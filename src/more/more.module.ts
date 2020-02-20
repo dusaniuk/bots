@@ -4,9 +4,9 @@ import { TYPES } from './types';
 
 import { Bot } from '../shared/interfaces';
 
-import { MoreBot } from './telegramBot/more.bot';
-import { CatchHandler, UsersHandler, UtilsHandler } from './telegramBot/actionHandlers';
-import { ContextParser, TelegramResponse } from './telegramBot/services';
+import { MoreBot } from './telegram-bot/more.bot';
+import { CatchHandler, UsersHandler, UtilsHandler } from './telegram-bot/action-handlers';
+import { ContextParser, TelegramResponse } from './telegram-bot/services';
 
 import { ICatchController, IScoreController, IUsersController } from './core/interfaces/controllers';
 import { CatchController, ScoreController, UsersController } from './core/controllers';

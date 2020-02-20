@@ -1,4 +1,4 @@
-import { Actions } from '../../telegramBot/constants/actions';
+import { Actions } from '../../telegram-bot/constants/actions';
 import { User } from './user';
 
 
