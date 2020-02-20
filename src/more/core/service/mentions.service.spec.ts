@@ -1,8 +1,8 @@
 import * as faker from 'faker';
 
-import { UsersStore } from '../interfaces/store';
-import { Mention } from '../interfaces/catch';
 import { User } from '../interfaces/user';
+import { Mention } from '../interfaces/catch';
+import { UsersStore } from '../interfaces/store';
 
 import { MentionsService } from './mentions.service';
 

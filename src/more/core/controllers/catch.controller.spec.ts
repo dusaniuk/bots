@@ -1,13 +1,12 @@
 import * as faker from 'faker';
 
-import { CatchService, MentionsService } from '../service';
+import { User } from '../interfaces/user';
+import { UsersStore } from '../interfaces/store';
 import { ActionResult } from '../models/actionResult';
 import { CatchMentions } from '../models/catchMentions';
-import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
-
+import { CatchService, MentionsService } from '../service';
 import { CatchSummary, Mention } from '../interfaces/catch';
-import { UsersStore } from '../interfaces/store';
-import { User } from '../interfaces/user';
+import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 
 import { CatchController } from './catch.controller';
 

@@ -4,11 +4,12 @@ import I18n from 'telegraf-i18n';
 import { resolve } from 'path';
 
 import { CONFIG } from '../../config';
+import { Logger } from '../../shared/logger';
 import { Bot, AppContext } from '../../shared/interfaces';
 
+import { Actions } from './constants/actions';
 import { CatchHandler, UsersHandler, UtilsHandler } from './actionHandlers';
-import { Actions } from '../core/constants/actions';
-import { Logger } from '../../shared/logger';
+
 
 @injectable()
 export class MoreBot implements Bot {
@@ -32,9 +33,8 @@ export class MoreBot implements Bot {
     this.bot.use(session());
     this.bot.use(i18n.middleware());
 
-    this.bindUsersActions();
-    this.bindCatchActions();
-    this.bindUtilActions();
+    this.bindActionHandlersToCommands();
+    this.bindActionHandlersToUpdateTypes();
 
     this.bot
       .launch()
@@ -44,28 +44,25 @@ export class MoreBot implements Bot {
       });
   };
 
-  private bindUsersActions = (): void => {
+  private bindActionHandlersToCommands = (): void => {
     this.bot.command('reg', this.usersHandler.register);
     this.bot.command('update', this.usersHandler.update);
     this.bot.command('score', this.usersHandler.getScore);
 
+    this.bot.command(['catch', 'c'], this.catchHandler.catch);
+    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.catchHandler.approveCatch);
+    this.bot.action(this.checkForAction(Actions.RejectCatch), this.catchHandler.rejectCatch);
+
+    this.bot.command('ping', this.utilsHandler.pong);
+    this.bot.help(this.utilsHandler.getHelp);
+  };
+
+  private bindActionHandlersToUpdateTypes = (): void => {
     this.bot.on('new_chat_members', this.usersHandler.onNewMemberInChat);
     this.bot.on('left_chat_member', this.usersHandler.onLeftChatMember);
   };
 
-  private bindCatchActions = (): void => {
-    this.bot.command(['catch', 'c'], this.catchHandler.catch);
-
-    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.catchHandler.approveCatch);
-    this.bot.action(this.checkForAction(Actions.RejectCatch), this.catchHandler.rejectCatch);
-  };
-
   private checkForAction = (action: Actions) => {
     return (trigger: string): boolean => trigger.startsWith(action);
-  };
-
-  private bindUtilActions = (): void => {
-    this.bot.command('ping', this.utilsHandler.pong);
-    this.bot.help(this.utilsHandler.getHelp);
   };
 }

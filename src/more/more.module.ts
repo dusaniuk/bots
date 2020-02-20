@@ -1,18 +1,18 @@
 import { ContainerModule, interfaces } from 'inversify';
 
+import { TYPES } from './types';
+
 import { Bot } from '../shared/interfaces';
 
-import { TYPES } from './types';
 import { MoreBot } from './telegramBot/more.bot';
 import { CatchHandler, UsersHandler, UtilsHandler } from './telegramBot/actionHandlers';
 import { MentionsParser, TelegramResponse } from './telegramBot/services';
 
 import { ICatchController, IScoreController, IUsersController } from './core/interfaces/controllers';
-import { UsersController } from './core/controllers/users.controller';
-import { ScoreController } from './core/controllers/score.controller';
-import { CatchController } from './core/controllers/catch.controller';
+import { CatchController, ScoreController, UsersController } from './core/controllers';
 import { CatchService, MentionsService, ScoreService } from './core/service';
 import { CatchStore, UsersStore } from './core/interfaces/store';
+
 import { CatchFirestore } from './database/catch.firestore';
 import { UsersFirestore } from './database/users.firestore';
 
@@ -39,5 +39,6 @@ export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
   bind<CatchStore>(TYPES.CATCH_STORE).to(CatchFirestore);
   bind<UsersStore>(TYPES.USERS_STORE).to(UsersFirestore);
 
+  // the MR bot himself
   bind<Bot>(TYPES.MORE_BOT).to(MoreBot);
 });

@@ -1,11 +1,11 @@
 import { inject, injectable } from 'inversify';
 
 import { TYPES } from '../../types';
-import { CatchMentions } from '../models/catchMentions';
 
-import { UsersStore } from '../interfaces/store';
-import { Mention } from '../interfaces/catch';
 import { User } from '../interfaces/user';
+import { Mention } from '../interfaces/catch';
+import { UsersStore } from '../interfaces/store';
+import { CatchMentions } from '../models/catchMentions';
 
 
 @injectable()

@@ -2,16 +2,15 @@ import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 import { inject, injectable } from 'inversify';
 
 import { AppContext } from '../../../shared/interfaces';
-
 import { TYPES } from '../../types';
-import { ChatType } from '../../core/constants/chatType';
-import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
-import { UsersController } from '../../core/controllers/users.controller';
+
+import { ChatType } from '../constants/chatType';
+import { User, Score } from '../../core/interfaces/user';
 import { ActionResult } from '../../core/models/actionResult';
 import { AlreadyInGameError, NotInGameError } from '../../core/errors';
+import { UsersController, ScoreController } from '../../core/controllers';
 
-import { ScoreController } from '../../core/controllers/score.controller';
-import { User, Score } from '../../core/interfaces/user';
+import { createUser, getGreetingNameForUser, getUsersScore } from '../utils/helpers';
 
 
 @injectable()

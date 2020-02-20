@@ -1,15 +1,15 @@
 import { inject, injectable } from 'inversify';
 
-import { ActionResult } from '../models/actionResult';
 import { TYPES } from '../../types';
-import { CatchService, MentionsService } from '../service';
-import { CatchMentions } from '../models/catchMentions';
-import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 
+import { User } from '../interfaces/user';
+import { UsersStore } from '../interfaces/store';
+import { ActionResult } from '../models/actionResult';
+import { CatchMentions } from '../models/catchMentions';
+import { CatchService, MentionsService } from '../service';
 import { ICatchController } from '../interfaces/controllers';
 import { CatchResult, CatchSummary, Mention } from '../interfaces/catch';
-import { UsersStore } from '../interfaces/store';
-import { User } from '../interfaces/user';
+import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 
 
 @injectable()

@@ -1,6 +1,6 @@
-import { Actions } from '../constants/actions';
-
+import { Actions } from '../../telegramBot/constants/actions';
 import { User } from './user';
+
 
 export interface AdminDecision {
   action: Actions;

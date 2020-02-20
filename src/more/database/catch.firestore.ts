@@ -2,10 +2,10 @@ import { firestore } from 'firebase-admin';
 import { inject, injectable } from 'inversify';
 
 import { Database } from '../../shared/interfaces';
+import { TYPES } from '../types';
 
 import { CatchStore } from '../core/interfaces/store';
 import { CatchRecord } from '../core/interfaces/catch';
-import { TYPES } from '../types';
 
 
 @injectable()

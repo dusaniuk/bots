@@ -1,12 +1,17 @@
 import { inject, injectable } from 'inversify';
 
 import { TYPES } from '../../types';
-import { ScoreService } from '../service';
-import { ActionResult } from '../models/actionResult';
 
+import { ScoreService } from '../service';
 import { UsersStore } from '../interfaces/store';
+import { ActionResult } from '../models/actionResult';
 import { IScoreController } from '../interfaces/controllers';
-import { Score, ScoreItem, User, UserWithScore } from '../interfaces/user';
+import {
+  Score,
+  ScoreItem,
+  User,
+  UserWithScore,
+} from '../interfaces/user';
 
 
 @injectable()

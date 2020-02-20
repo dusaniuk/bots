@@ -2,13 +2,14 @@ import { inject, injectable } from 'inversify';
 
 import { TYPES } from '../../types';
 
+import { ScoreItem } from '../interfaces/user';
 import { CatchStore } from '../interfaces/store';
 import { CatchRecord } from '../interfaces/catch';
-import { ScoreItem } from '../interfaces/user';
 
 interface ScoreObject {
   [key: number]: number;
 }
+
 
 @injectable()
 export class ScoreService {

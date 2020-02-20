@@ -1,11 +1,11 @@
 import * as faker from 'faker';
 
-import { UsersController } from './users.controller';
+import { User } from '../interfaces/user';
+import { UsersStore } from '../interfaces/store';
 import { ActionResult } from '../models/actionResult';
 import { AlreadyInGameError, NotInGameError } from '../errors';
 
-import { User } from '../interfaces/user';
-import { UsersStore } from '../interfaces/store';
+import { UsersController } from './users.controller';
 
 describe('UsersController', () => {
   let controller: UsersController;
