@@ -3,9 +3,7 @@ import { SHARED_TYPES } from '../shared/ioc/shared.types';
 export const TYPES = {
   ...SHARED_TYPES,
 
-  ACTIVITIES_ID: Symbol.for('nbr.activities-scene.id'),
-  ANNOUNCE_ID: Symbol.for('nbr.announce-scene.id'),
-  DELETE_ANNOUNCE_ID: Symbol.for('nbr.delete-announce-scene.id'),
+  SCENE_FACTORY: Symbol.for('nbr.scene-factory'),
 
   ACTIVITIES_SCENE: Symbol.for('nbr.activities.scene'),
   ANNOUNCE_SCENE: Symbol.for('nbr.announce.scene'),

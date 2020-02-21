@@ -1,7 +1,7 @@
 import { Stage } from 'telegraf';
 import { inject, injectable } from 'inversify';
 
-import { Actions, Activity } from '../constants/enums';
+import { Actions, Activity, Scene } from '../constants/enums';
 import { getActivitiesKeyboard, getApproveKeyboard } from '../keyboards';
 import { extractSelectedActivities, stringifySelectedActivities } from '../utils/activities.utils';
 import { AppContext } from '../../../shared/interfaces';
@@ -18,10 +18,9 @@ interface ActivitiesState {
 @injectable()
 export class ActivitiesScene extends TelegramScene {
   constructor(
-    @inject(TYPES.ACTIVITIES_ID) private sceneId: string,
     @inject(TYPES.ACTIVITIES_STORE) private activitiesStore: ActivitiesStore,
   ) {
-    super(sceneId);
+    super(Scene.Activities);
   }
 
   protected attachHookListeners = (): void => {

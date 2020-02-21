@@ -1,7 +1,7 @@
 import { CallbackButton, Markup } from 'telegraf';
 import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
 
-import { MessageMetadata } from '../interfaces';
+import { MessageMetadata } from '../../core/interfaces/messages';
 
 export const getDeleteMessagesKeyboard = (metadata: MessageMetadata[]): ExtraReplyMessage => {
   const buttons: CallbackButton[][] = metadata.map((data: MessageMetadata) => [Markup.callbackButton(data.topic, `delete ${data.id}`)]).reverse();

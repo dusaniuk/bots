@@ -1,30 +1,29 @@
 import { ContainerModule, interfaces } from 'inversify';
 
-import { Bot } from '../shared/interfaces/bot';
-
+import { Bot } from '../shared/interfaces';
 import { TYPES } from './types';
-import { NbrBot } from './telegram-bot/nbr.bot';
-import { ActivitiesFirestore } from './database/activities.firestore';
-import { UsersFirestore } from './database/users.firestore';
-import { MessagingFirestore } from './database/messaging.firestore';
-import { Scene } from './telegram-bot/constants/enums';
-import { AnnounceScene } from './telegram-bot/scenes/announce.scene';
-import { ActivitiesScene } from './telegram-bot/scenes/activities.scene';
-import { DeleteAnnounceScene } from './telegram-bot/scenes/deleteAnnounce.scene';
 
 import { ActivitiesStore, MessageStore, UsersStore } from './core/interfaces/store';
 
+import { ActivitiesFirestore } from './database/activities.firestore';
+import { UsersFirestore } from './database/users.firestore';
+import { MessagingFirestore } from './database/messaging.firestore';
+
+import { NbrBot } from './telegram-bot/nbr.bot';
+import { SceneFactory } from './telegram-bot/services/scene-factory';
+import { AnnounceScene } from './telegram-bot/scenes/announce.scene';
 import { TelegramScene } from './telegram-bot/interfaces/telegramScene';
+import { ActivitiesScene } from './telegram-bot/scenes/activities.scene';
+import { DeleteAnnounceScene } from './telegram-bot/scenes/deleteAnnounce.scene';
+import { ISceneFactory } from './telegram-bot/interfaces/scene-factory';
+
 
 export const nbrDependencies = new ContainerModule((bind: interfaces.Bind) => {
   // scenes
-  bind(TYPES.ACTIVITIES_ID).toConstantValue(Scene.Activities);
+  bind<ISceneFactory>(TYPES.SCENE_FACTORY).to(SceneFactory);
+
   bind<TelegramScene>(TYPES.ACTIVITIES_SCENE).to(ActivitiesScene);
-
-  bind(TYPES.ANNOUNCE_ID).toConstantValue(Scene.Announce);
   bind<TelegramScene>(TYPES.ANNOUNCE_SCENE).to(AnnounceScene);
-
-  bind(TYPES.DELETE_ANNOUNCE_ID).toConstantValue(Scene.DeleteAnnounce);
   bind<TelegramScene>(TYPES.DELETE_ANNOUNCE_SCENE).to(DeleteAnnounceScene);
 
   // DB interaction

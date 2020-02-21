@@ -9,7 +9,7 @@ import {
   stringifySelectedActivities,
 } from '../utils/activities.utils';
 import { stringifyUserGreeting } from '../utils/user.utils';
-import { Actions, Activity } from '../constants/enums';
+import { Actions, Activity, Scene } from '../constants/enums';
 import { AppContext } from '../../../shared/interfaces';
 import { TYPES } from '../../types';
 import { ActivitiesStore, MessageStore, UsersStore } from '../../core/interfaces/store';
@@ -32,12 +32,11 @@ export class AnnounceScene extends TelegramScene {
   private messageText: string;
 
   constructor(
-    @inject(TYPES.ANNOUNCE_ID) private sceneId: string,
     @inject(TYPES.ACTIVITIES_STORE) private activitiesStore: ActivitiesStore,
     @inject(TYPES.MESSAGE_STORE) private messageStore: MessageStore,
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
   ) {
-    super(sceneId);
+    super(Scene.Announce);
   }
 
   protected attachHookListeners = (): void => {

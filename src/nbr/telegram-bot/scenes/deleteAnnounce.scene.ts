@@ -1,15 +1,16 @@
 import { Stage } from 'telegraf';
 import { inject, injectable } from 'inversify';
 
-import { AppContext } from '../../../shared/interfaces';
-import {
-  MessageMetadata,
-  TelegramScene,
-} from '../interfaces';
-import { getApproveKeyboard, getDeleteMessagesKeyboard } from '../keyboards';
-import { Actions } from '../constants/enums';
 import { TYPES } from '../../types';
+import { AppContext } from '../../../shared/interfaces';
+
 import { MessageStore, UsersStore } from '../../core/interfaces/store';
+import { MessageMetadata } from '../../core/interfaces/messages';
+
+import { TelegramScene } from '../interfaces/telegramScene';
+import { getApproveKeyboard, getDeleteMessagesKeyboard } from '../keyboards';
+import { Actions, Scene } from '../constants/enums';
+
 
 export interface DeleteAnnounceState {
   messages: MessageMetadata[];
@@ -19,11 +20,10 @@ export interface DeleteAnnounceState {
 @injectable()
 export class DeleteAnnounceScene extends TelegramScene {
   constructor(
-    @inject(TYPES.DELETE_ANNOUNCE_ID) private sceneId: string,
     @inject(TYPES.MESSAGE_STORE) private messageStore: MessageStore,
     @inject(TYPES.USERS_STORE) private usersStore: UsersStore,
   ) {
-    super(sceneId);
+    super(Scene.DeleteAnnounce);
   }
 
   protected attachHookListeners = (): void => {
