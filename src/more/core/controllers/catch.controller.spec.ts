@@ -5,7 +5,7 @@ import { UsersStore } from '../interfaces/store';
 import { ActionResult } from '../models/action-result';
 import { CatchMentions } from '../models/catch-mentions';
 import { CatchService, MentionsService } from '../service';
-import { CatchSummary, Mention } from '../interfaces/catch';
+import { CatchResult, CatchSummary, Mention } from '../interfaces/catch';
 import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../errors';
 
 import { CatchController } from './catch.controller';
@@ -24,6 +24,8 @@ describe('CatchController', () => {
 
     catchService = {
       addCatchRecord: jest.fn().mockResolvedValue(''),
+      approveCatch: jest.fn().mockResolvedValue({}),
+      rejectCatch: jest.fn().mockResolvedValue({}),
     } as any;
 
     mentionService = {
@@ -33,6 +35,57 @@ describe('CatchController', () => {
     controller = new CatchController(usersStore, catchService, mentionService);
   });
 
+  describe('approveCatch', () => {
+    let chatId: number;
+    let catchId: string;
+
+    beforeEach(() => {
+      chatId = faker.random.number();
+      catchId = faker.random.uuid();
+    });
+
+    it('should call service to approve catch', async () => {
+      await controller.approveCatch(chatId, catchId);
+
+      expect(catchService.approveCatch).toHaveBeenCalledWith(chatId, catchId);
+    });
+
+    it('should return success response', async () => {
+      const catchResult: CatchResult = {} as CatchResult;
+      catchService.approveCatch = jest.fn().mockResolvedValue(catchResult);
+
+      const result: ActionResult = await controller.approveCatch(chatId, catchId);
+
+      expect(result.ok).toBeTruthy();
+      expect(result.payload).toEqual(catchResult);
+    });
+  });
+
+  describe('rejectCatch', () => {
+    let chatId: number;
+    let catchId: string;
+
+    beforeEach(() => {
+      chatId = faker.random.number();
+      catchId = faker.random.uuid();
+    });
+
+    it('should call service to reject catch', async () => {
+      await controller.rejectCatch(chatId, catchId);
+
+      expect(catchService.rejectCatch).toHaveBeenCalledWith(chatId, catchId);
+    });
+
+    it('should return success response', async () => {
+      const catchResult: CatchResult = {} as CatchResult;
+      catchService.rejectCatch = jest.fn().mockResolvedValue(catchResult);
+
+      const result: ActionResult = await controller.rejectCatch(chatId, catchId);
+
+      expect(result.ok).toBeTruthy();
+      expect(result.payload).toEqual(catchResult);
+    });
+  });
   describe('registerVictimsCatch', () => {
     let chatId: number;
     let hunterId: number;
