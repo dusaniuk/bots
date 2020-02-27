@@ -6,7 +6,7 @@ import { AppContext } from '../../../shared/interfaces';
 import { User } from '../../core/interfaces/user';
 import { Mention } from '../../core/interfaces/catch';
 
-import { MentionType } from '../constants/mention-type';
+import { MessageEntityType } from '../constants/message-entity-type';
 
 
 @injectable()
@@ -46,12 +46,12 @@ export class ContextParser {
   };
 
   private isUserMentioned = (entity: MessageEntity): boolean => {
-    return entity.type === MentionType.Text
-      || entity.type === MentionType.Username;
+    return entity.type === MessageEntityType.Text
+      || entity.type === MessageEntityType.Username;
   };
 
   private mapMessageEntityToMention = (entity: MessageEntity, messageText: string): Mention => {
-    if (entity.type === MentionType.Text) {
+    if (entity.type === MessageEntityType.Text) {
       return { id: entity.user.id };
     }
 

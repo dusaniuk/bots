@@ -24,8 +24,6 @@ export class RegisterHandler implements ActionHandler {
   ) {}
 
   handleAction = async (ctx: AppContext): Promise<any> => {
-    Logger.info(`[more] chat: ${ctx.chat.id} | register action is called by ${ctx.from.first_name} (${ctx.from.id})`);
-
     this.replyService = new TelegramReplyService(ctx);
 
     if (this.isChatPrivate(ctx)) {

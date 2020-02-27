@@ -10,6 +10,7 @@ import { AppContext, Bot } from '../../shared/interfaces';
 import { Actions } from './constants/actions';
 import { TYPES } from '../types';
 import { ActionHandler } from './interfaces/action-handler';
+import { actionsLogger } from './middleware/action-logger.middleware';
 
 
 @injectable()
@@ -42,6 +43,7 @@ export class MoreBot implements Bot {
 
     this.bot.use(session());
     this.bot.use(i18n.middleware());
+    this.bot.use(actionsLogger());
 
     this.bindActionHandlersToCommands();
     this.bindActionHandlersToUpdateTypes();
