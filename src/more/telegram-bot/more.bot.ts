@@ -5,21 +5,31 @@ import { resolve } from 'path';
 
 import { CONFIG } from '../../config';
 import { Logger } from '../../shared/logger';
-import { Bot, AppContext } from '../../shared/interfaces';
+import { AppContext, Bot } from '../../shared/interfaces';
 
 import { Actions } from './constants/actions';
-import { CatchHandler, UsersHandler, UtilsHandler } from './action-handlers';
+import { TYPES } from '../types';
+import { ActionHandler } from './interfaces/action-handler';
 
 
 @injectable()
 export class MoreBot implements Bot {
   private readonly bot: Telegraf<AppContext>;
 
-  constructor(
-    @inject(UtilsHandler) private utilsHandler: UtilsHandler,
-    @inject(UsersHandler) private usersHandler: UsersHandler,
-    @inject(CatchHandler) private catchHandler: CatchHandler,
-  ) {
+  @inject(TYPES.REGISTER_HANDLER) private registerHandler: ActionHandler;
+  @inject(TYPES.UPDATE_HANDLER) private updateHandler: ActionHandler;
+  @inject(TYPES.SCORE_HANDLER) private scoreHandler: ActionHandler;
+  @inject(TYPES.NEW_MEMBER_HANDLER) private newMemberHandler: ActionHandler;
+  @inject(TYPES.LEFT_MEMBER_HANDLER) private leftMemberHandler: ActionHandler;
+
+  @inject(TYPES.PING_HANDLER) private pingHandler: ActionHandler;
+  @inject(TYPES.HELP_HANDLER) private helpHandler: ActionHandler;
+
+  @inject(TYPES.CATCH_HANDLER) private catchHandler: ActionHandler;
+  @inject(TYPES.APPROVE_CATCH_HANDLER) private approveCatchHandler: ActionHandler;
+  @inject(TYPES.REJECT_CATCH_HANDLER) private rejectCatchHandler: ActionHandler;
+
+  constructor() {
     this.bot = new Telegraf(CONFIG.more.botToken);
   }
 
@@ -45,21 +55,21 @@ export class MoreBot implements Bot {
   };
 
   private bindActionHandlersToCommands = (): void => {
-    this.bot.command('reg', this.usersHandler.register);
-    this.bot.command('update', this.usersHandler.update);
-    this.bot.command('score', this.usersHandler.getScore);
+    this.bot.command(['reg', 'register'], this.registerHandler.handleAction);
+    this.bot.command('update', this.updateHandler.handleAction);
+    this.bot.command('score', this.scoreHandler.handleAction);
 
-    this.bot.command(['catch', 'c'], this.catchHandler.catch);
-    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.catchHandler.approveCatch);
-    this.bot.action(this.checkForAction(Actions.RejectCatch), this.catchHandler.rejectCatch);
+    this.bot.command(['catch', 'c'], this.catchHandler.handleAction);
+    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.approveCatchHandler.handleAction);
+    this.bot.action(this.checkForAction(Actions.RejectCatch), this.rejectCatchHandler.handleAction);
 
-    this.bot.command('ping', this.utilsHandler.pong);
-    this.bot.help(this.utilsHandler.getHelp);
+    this.bot.command('ping', this.pingHandler.handleAction);
+    this.bot.help(this.helpHandler.handleAction);
   };
 
   private bindActionHandlersToUpdateTypes = (): void => {
-    this.bot.on('new_chat_members', this.usersHandler.onNewMemberInChat);
-    this.bot.on('left_chat_member', this.usersHandler.onLeftChatMember);
+    this.bot.on('new_chat_members', this.newMemberHandler.handleAction);
+    this.bot.on('left_chat_member', this.leftMemberHandler.handleAction);
   };
 
   private checkForAction = (action: Actions) => {

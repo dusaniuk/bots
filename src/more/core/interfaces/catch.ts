@@ -1,9 +1,7 @@
-import { Actions } from '../../telegram-bot/constants/actions';
 import { User } from './user';
 
 
-export interface AdminDecision {
-  action: Actions;
+export interface CatchResultContextData {
   catchId: string;
   chatId: number;
 }

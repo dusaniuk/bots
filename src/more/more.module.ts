@@ -5,8 +5,20 @@ import { TYPES } from './types';
 import { Bot } from '../shared/interfaces';
 
 import { MoreBot } from './telegram-bot/more.bot';
-import { CatchHandler, UsersHandler, UtilsHandler } from './telegram-bot/action-handlers';
-import { ContextParser, TelegramResponse } from './telegram-bot/services';
+import {
+  ApproveCatchHandler,
+  CatchHandler,
+  HelpHandler,
+  LeftMemberHandler,
+  NewMemberHandler,
+  PingHandler,
+  RegisterHandler,
+  RejectCatchHandler,
+  ScoreHandler,
+  UpdateHandler,
+} from './telegram-bot/action-handlers';
+import { ContextParser } from './telegram-bot/services';
+import { ActionHandler } from './telegram-bot/interfaces/action-handler';
 
 import { ICatchController, IScoreController, IUsersController } from './core/interfaces/controllers';
 import { CatchController, ScoreController, UsersController } from './core/controllers';
@@ -18,10 +30,17 @@ import { UsersFirestore } from './database/users.firestore';
 
 
 export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
-  // bot action handlers
-  bind<UtilsHandler>(UtilsHandler).toSelf();
-  bind<UsersHandler>(UsersHandler).toSelf();
-  bind<CatchHandler>(CatchHandler).toSelf();
+  // action handlers
+  bind<ActionHandler>(TYPES.REGISTER_HANDLER).to(RegisterHandler);
+  bind<ActionHandler>(TYPES.UPDATE_HANDLER).to(UpdateHandler);
+  bind<ActionHandler>(TYPES.SCORE_HANDLER).to(ScoreHandler);
+  bind<ActionHandler>(TYPES.NEW_MEMBER_HANDLER).to(NewMemberHandler);
+  bind<ActionHandler>(TYPES.LEFT_MEMBER_HANDLER).to(LeftMemberHandler);
+  bind<ActionHandler>(TYPES.HELP_HANDLER).to(HelpHandler);
+  bind<ActionHandler>(TYPES.PING_HANDLER).to(PingHandler);
+  bind<ActionHandler>(TYPES.CATCH_HANDLER).to(CatchHandler);
+  bind<ActionHandler>(TYPES.APPROVE_CATCH_HANDLER).to(ApproveCatchHandler);
+  bind<ActionHandler>(TYPES.REJECT_CATCH_HANDLER).to(RejectCatchHandler);
 
   // controllers
   bind<IUsersController>(TYPES.USERS_CONTROLLER).to(UsersController);
@@ -32,7 +51,6 @@ export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
   bind<CatchService>(TYPES.CATCH_SERVICE).to(CatchService);
   bind<ContextParser>(TYPES.CONTEXT_PARSER).to(ContextParser);
   bind<MentionsService>(TYPES.MENTION_SERVICE).to(MentionsService);
-  bind<TelegramResponse>(TYPES.TELEGRAM_RESPONSE).to(TelegramResponse);
   bind<ScoreService>(TYPES.SCORE_SERVICE).to(ScoreService);
 
   // database
