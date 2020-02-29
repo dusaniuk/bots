@@ -80,7 +80,7 @@ describe('TelegramResponse', () => {
     it('should reject self capture', async () => {
       await service.rejectSelfCapture();
 
-      expect(ctx.reply).toHaveBeenCalledWith('error.selfCatch');
+      expect(ctx.replyWithMarkdown).toHaveBeenCalledWith('error.selfCatch');
     });
   });
 
@@ -88,7 +88,7 @@ describe('TelegramResponse', () => {
     it('should send catch instruction', async () => {
       await service.showCatchInstruction();
 
-      expect(ctx.reply).toHaveBeenCalledWith('other.howToCatch');
+      expect(ctx.replyWithMarkdown).toHaveBeenCalledWith('other.howToCatch');
     });
   });
 

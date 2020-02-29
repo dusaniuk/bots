@@ -18,7 +18,7 @@ describe('PingHandler', () => {
     it('should reply with other.ping message', async () => {
       await handler.handleAction(ctx);
 
-      expect(ctx.reply).toHaveBeenCalledWith('other.ping');
+      expect(ctx.replyWithMarkdown).toHaveBeenCalledWith('other.ping');
     });
   });
 });
