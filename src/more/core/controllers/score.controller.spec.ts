@@ -2,7 +2,6 @@ import * as faker from 'faker';
 
 import { ScoreService } from '../service';
 import { UsersStore } from '../interfaces/store';
-import { ActionResult } from '../models/action-result';
 import { Score, ScoreItem, User } from '../interfaces/user';
 
 import { ScoreController } from './score.controller';
@@ -59,10 +58,9 @@ describe('ScoreController', () => {
       scoreService.getUsersScore = jest.fn().mockResolvedValue(scoreItems);
       usersStore.getAllUsersFromChat = jest.fn().mockResolvedValue(users);
 
-      const result: ActionResult<Score> = await controller.getSortedScoreForChat(chatId);
+      const result: Score = await controller.getSortedScoreForChat(chatId);
 
-      expect(result.ok).toBeTruthy();
-      expect(result.payload).toEqual([
+      expect(result).toEqual([
         { user: users[1], points: scoreItems[1].points },
         { user: users[0], points: scoreItems[0].points },
       ]);

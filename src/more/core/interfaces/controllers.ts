@@ -12,7 +12,7 @@ export interface IUsersController {
 }
 
 export interface IScoreController {
-  getSortedScoreForChat(chatId: number): Promise<ActionResult<Score>>;
+  getSortedScoreForChat(chatId: number): Promise<Score>;
 }
 
 export interface ICatchController {
