@@ -1,9 +1,9 @@
 import { inject, injectable } from 'inversify';
 
 import { AppContext } from '../../../shared/interfaces';
+import { Logger } from '../../../shared/logger';
 import { TYPES } from '../../types';
 
-import { ActionResult } from '../../core/models/action-result';
 import { ICatchController } from '../../core/interfaces/controllers';
 import { CatchResultContextData, CatchResult } from '../../core/interfaces/catch';
 
@@ -21,17 +21,14 @@ export class ApproveCatchHandler implements ActionHandler {
   ) {}
 
   handleAction = async (ctx: AppContext): Promise<any> => {
-    this.replyService = new TelegramReplyService(ctx);
+    try {
+      this.replyService = new TelegramReplyService(ctx);
+      const { catchId, chatId } = this.getCatchResultData(ctx);
 
-    await this.replyService.deleteMessageFromAdminChat();
-
-    const { catchId, chatId } = this.getCatchResultData(ctx);
-    const result: ActionResult<CatchResult> = await this.catchController.approveCatch(chatId, catchId);
-
-    const { hunter, earnedPoints }: CatchResult = result.payload;
-    await this.replyService.sayAboutSucceededCatch(chatId, hunter, earnedPoints);
-
-    await this.replyService.notifyAdminAboutHandledCatch();
+      await this.tryToApproveCatch(catchId, chatId);
+    } catch (error) {
+      await this.handleActionError(error);
+    }
   };
 
   private getCatchResultData = (ctx: AppContext): CatchResultContextData => {
@@ -41,5 +38,25 @@ export class ApproveCatchHandler implements ActionHandler {
       chatId: +chatId,
       catchId,
     };
+  };
+
+  private tryToApproveCatch = async (catchId: string, chatId: number): Promise<void> => {
+    await this.replyService.deleteMessageFromAdminChat();
+
+    const catchResult: CatchResult = await this.catchController.approveCatch(chatId, catchId);
+
+    await this.replyService.sayAboutSucceededCatch(
+      chatId,
+      catchResult.hunter,
+      catchResult.earnedPoints,
+    );
+
+    await this.replyService.notifyAdminAboutHandledCatch();
+  };
+
+  private handleActionError = async (error: Error): Promise<void> => {
+    Logger.error(error.message);
+
+    await this.replyService.showUnexpectedError();
   };
 }

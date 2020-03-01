@@ -16,9 +16,9 @@ export interface IScoreController {
 }
 
 export interface ICatchController {
-  registerVictimsCatch(chatId: number, hunterId: number, mentions: Mention[]): Promise<ActionResult<CatchSummary>>;
+  approveCatch(chatId: number, catchId: string): Promise<CatchResult>;
 
-  approveCatch(chatId: number, catchId: string): Promise<ActionResult<CatchResult>>;
+  rejectCatch(chatId: number, catchId: string): Promise<CatchResult>;
 
-  rejectCatch(chatId: number, catchId: string): Promise<ActionResult<CatchResult>>;
+  registerVictimsCatch(chatId: number, hunterId: number, mentions: Mention[]): Promise<CatchSummary>;
 }
