@@ -7,7 +7,7 @@ import { CONFIG } from '../../config';
 import { Logger } from '../../shared/logger';
 import { AppContext, Bot } from '../../shared/interfaces';
 
-import { Actions } from './constants/actions';
+import { AdminCatchDecision } from './constants/admin-catch-decision';
 import { TYPES } from '../types';
 import { ActionHandler } from './interfaces/action-handler';
 import { actionsLogger } from './middleware/action-logger.middleware';
@@ -62,8 +62,8 @@ export class MoreBot implements Bot {
     this.bot.command('score', this.scoreHandler.execute);
 
     this.bot.command(['catch', 'c'], this.catchHandler.execute);
-    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.approveCatchHandler.execute);
-    this.bot.action(this.checkForAction(Actions.RejectCatch), this.rejectCatchHandler.execute);
+    this.bot.action(this.checkForAction(AdminCatchDecision.Approve), this.approveCatchHandler.execute);
+    this.bot.action(this.checkForAction(AdminCatchDecision.Reject), this.rejectCatchHandler.execute);
 
     this.bot.command('ping', this.pingHandler.execute);
     this.bot.help(this.helpHandler.execute);
@@ -74,7 +74,7 @@ export class MoreBot implements Bot {
     this.bot.on('left_chat_member', this.leftMemberHandler.execute);
   };
 
-  private checkForAction = (action: Actions) => {
+  private checkForAction = (action: AdminCatchDecision) => {
     return (trigger: string): boolean => trigger.startsWith(action);
   };
 }
