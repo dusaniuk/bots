@@ -9,7 +9,7 @@
     "test": "ENVIRONMENT=test jest",
     "test:more": "yarn test src/more/",
     "test:nbr": "yarn test src/nbr/",
-    "coverage": "yarn test --collectCoverage",
+    "test:coverage": "yarn test --collectCoverage",
     "tdd": "yarn test --watch",
     "lint": "./node_modules/.bin/eslint **/*.ts"
   },
