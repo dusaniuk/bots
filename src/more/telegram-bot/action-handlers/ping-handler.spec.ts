@@ -16,7 +16,7 @@ describe('PingHandler', () => {
 
   describe('handleAction', () => {
     it('should reply with other.ping message', async () => {
-      await handler.handleAction(ctx);
+      await handler.execute(ctx);
 
       expect(ctx.replyWithMarkdown).toHaveBeenCalledWith('other.ping');
     });

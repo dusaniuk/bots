@@ -2,65 +2,40 @@ import { inject, injectable } from 'inversify';
 
 import { AppContext } from '../../../shared/interfaces';
 import { TYPES } from '../../types';
-import { Logger } from '../../../shared/logger';
 
 import { User } from '../../core/interfaces/user';
 import { CatchSummary, Mention } from '../../core/interfaces/catch';
 import { ICatchController } from '../../core/interfaces/controllers';
-import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../../core/errors';
 
-import { ActionHandler } from '../interfaces/action-handler';
-import { ContextParser, TelegramReplyService } from '../services';
+import { ContextParser } from '../services';
+import { BaseActionHandler } from './base/base-action-handler';
 
 
 @injectable()
-export class CatchHandler implements ActionHandler {
-  private telegramResponse: TelegramReplyService;
-
+export class CatchHandler extends BaseActionHandler {
   constructor(
     @inject(TYPES.CONTEXT_PARSER) private parser: ContextParser,
     @inject(TYPES.CATCH_CONTROLLER) private catchController: ICatchController,
-  ) {}
+  ) {
+    super();
+  }
 
 
-  handleAction = async (ctx: AppContext): Promise<any> => {
-    this.telegramResponse = new TelegramReplyService(ctx);
-
-    try {
-      await this.tryCatchVictims(ctx);
-    } catch (error) {
-      await this.handleCatchError(error);
-    }
+  protected handleAction = async (ctx: AppContext): Promise<void> => {
+    await this.catchVictims(ctx);
   };
 
-  private tryCatchVictims = async (ctx: AppContext): Promise<void> => {
+  private catchVictims = async (ctx: AppContext): Promise<void> => {
     const { chat: { id: chatId }, from }: AppContext = ctx;
     const mentions: Mention[] = await this.parser.getMentionsFromContext(ctx);
 
-    const catchSummary: CatchSummary = await this.catchController.registerVictimsCatch(chatId, from.id, mentions);
+    // TODO: add chat entity and refer it in hunter entity
     const hunter: User = this.parser.mapToUserEntity(from);
+    const catchSummary: CatchSummary = await this.catchController.registerVictimsCatch(chatId, hunter.id, mentions);
 
     await Promise.all([
-      this.telegramResponse.notifyAdminAboutCatch(hunter, catchSummary),
-      this.telegramResponse.notifyChatAboutCatch(hunter, catchSummary),
+      this.replyService.notifyAdminAboutCatch(hunter, catchSummary),
+      this.replyService.notifyChatAboutCatch(hunter, catchSummary),
     ]);
-  };
-
-  private handleCatchError = async (error: Error): Promise<void> => {
-    Logger.error(error.message);
-
-    if (error instanceof NoCatchError) {
-      return this.telegramResponse.showCatchInstruction();
-    }
-
-    if (error instanceof CatchHimselfError) {
-      return this.telegramResponse.rejectSelfCapture();
-    }
-
-    if (error instanceof UnverifiedMentionsError) {
-      return this.telegramResponse.showUnverifiedMentions(error.unverifiedMentions);
-    }
-
-    return this.telegramResponse.showUnexpectedError();
   };
 }

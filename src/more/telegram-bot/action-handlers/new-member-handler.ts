@@ -10,28 +10,26 @@ import { IUsersController } from '../../core/interfaces/controllers';
 
 import { ContextParser, TelegramReplyService } from '../services';
 import { ActionHandler } from '../interfaces/action-handler';
+import { BaseActionHandler } from './base/base-action-handler';
 
 
 @injectable()
-export class NewMemberHandler implements ActionHandler {
-  private telegrafReply: TelegramReplyService;
-
+export class NewMemberHandler extends BaseActionHandler {
   constructor(
     @inject(TYPES.CONTEXT_PARSER) private parser: ContextParser,
     @inject(TYPES.USERS_CONTROLLER) private usersController: IUsersController,
-  ) {}
+  ) {
+    super();
+  }
 
-
-  handleAction = async (ctx: AppContext): Promise<void> => {
-    this.telegrafReply = new TelegramReplyService(ctx);
-
+  protected handleAction = async (ctx: AppContext): Promise<void> => {
     const newHunters: User[] = this.getNewHunters(ctx);
 
     for (const hunter of newHunters) {
       const result: ActionResult = await this.usersController.isUserInGame(ctx.chat.id, hunter.id);
 
       if (result.ok) {
-        await this.telegrafReply.greetBackOldHunter();
+        await this.replyService.greetBackOldHunter();
       } else {
         await this.usersController.addUserToGame(ctx.chat.id, hunter);
       }

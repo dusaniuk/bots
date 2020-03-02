@@ -43,7 +43,7 @@ export class MoreBot implements Bot {
 
     this.bot.use(session());
     this.bot.use(i18n.middleware());
-    this.bot.use(actionsLogger());
+    this.bot.use(actionsLogger()); // TODO: move logging from middleware into base class of actions handler
 
     this.bindActionHandlersToCommands();
     this.bindActionHandlersToUpdateTypes();
@@ -57,21 +57,21 @@ export class MoreBot implements Bot {
   };
 
   private bindActionHandlersToCommands = (): void => {
-    this.bot.command(['reg', 'register'], this.registerHandler.handleAction);
-    this.bot.command('update', this.updateHandler.handleAction);
-    this.bot.command('score', this.scoreHandler.handleAction);
+    this.bot.command(['reg', 'register'], this.registerHandler.execute);
+    this.bot.command('update', this.updateHandler.execute);
+    this.bot.command('score', this.scoreHandler.execute);
 
-    this.bot.command(['catch', 'c'], this.catchHandler.handleAction);
-    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.approveCatchHandler.handleAction);
-    this.bot.action(this.checkForAction(Actions.RejectCatch), this.rejectCatchHandler.handleAction);
+    this.bot.command(['catch', 'c'], this.catchHandler.execute);
+    this.bot.action(this.checkForAction(Actions.ApproveCatch), this.approveCatchHandler.execute);
+    this.bot.action(this.checkForAction(Actions.RejectCatch), this.rejectCatchHandler.execute);
 
-    this.bot.command('ping', this.pingHandler.handleAction);
-    this.bot.help(this.helpHandler.handleAction);
+    this.bot.command('ping', this.pingHandler.execute);
+    this.bot.help(this.helpHandler.execute);
   };
 
   private bindActionHandlersToUpdateTypes = (): void => {
-    this.bot.on('new_chat_members', this.newMemberHandler.handleAction);
-    this.bot.on('left_chat_member', this.leftMemberHandler.handleAction);
+    this.bot.on('new_chat_members', this.newMemberHandler.execute);
+    this.bot.on('left_chat_member', this.leftMemberHandler.execute);
   };
 
   private checkForAction = (action: Actions) => {

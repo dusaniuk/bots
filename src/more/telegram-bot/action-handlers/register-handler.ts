@@ -9,23 +9,21 @@ import { AlreadyInGameError } from '../../core/errors';
 import { ActionResult } from '../../core/models/action-result';
 import { IUsersController } from '../../core/interfaces/controllers';
 
-import { ContextParser, TelegramReplyService } from '../services';
+import { ContextParser } from '../services';
 import { ChatType } from '../constants/chat-type';
-import { ActionHandler } from '../interfaces/action-handler';
+import { BaseActionHandler } from './base/base-action-handler';
 
 
 @injectable()
-export class RegisterHandler implements ActionHandler {
-  private replyService: TelegramReplyService;
-
+export class RegisterHandler extends BaseActionHandler {
   constructor(
     @inject(TYPES.CONTEXT_PARSER) private parser: ContextParser,
     @inject(TYPES.USERS_CONTROLLER) private usersController: IUsersController,
-  ) {}
+  ) {
+    super();
+  }
 
-  handleAction = async (ctx: AppContext): Promise<any> => {
-    this.replyService = new TelegramReplyService(ctx);
-
+  protected handleAction = async (ctx: AppContext): Promise<any> => {
     if (this.isChatPrivate(ctx)) {
       Logger.warn(`[more] user ${ctx.from.first_name} (${ctx.from.id}) tries to register in private chat`);
       return this.replyService.rejectRegistrationInPrivateChat();

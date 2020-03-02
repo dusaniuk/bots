@@ -7,19 +7,19 @@ import { ActionResult } from '../../core/models/action-result';
 import { NotInGameError } from '../../core/errors';
 import { IUsersController } from '../../core/interfaces/controllers';
 
-import { ActionHandler } from '../interfaces/action-handler';
 import { TelegramReplyService } from '../services';
+import { BaseActionHandler } from './base/base-action-handler';
 
 
 @injectable()
-export class UpdateHandler implements ActionHandler {
-  private replyService: TelegramReplyService;
-
+export class UpdateHandler extends BaseActionHandler {
   constructor(
     @inject(TYPES.USERS_CONTROLLER) private usersController: IUsersController,
-  ) {}
+  ) {
+    super();
+  }
 
-  handleAction = async (ctx: AppContext): Promise<any> => {
+  protected handleAction = async (ctx: AppContext): Promise<void> => {
     this.replyService = new TelegramReplyService(ctx);
 
     const { from, chat }: AppContext = ctx;

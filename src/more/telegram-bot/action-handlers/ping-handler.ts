@@ -1,18 +1,11 @@
 import { injectable } from 'inversify';
 
-import { AppContext } from '../../../shared/interfaces';
-
-import { ActionHandler } from '../interfaces/action-handler';
-import { TelegramReplyService } from '../services';
+import { BaseActionHandler } from './base/base-action-handler';
 
 
 @injectable()
-export class PingHandler implements ActionHandler {
-  private telegrafReply: TelegramReplyService;
-
-  handleAction = (ctx: AppContext): Promise<any> => {
-    this.telegrafReply = new TelegramReplyService(ctx);
-
-    return this.telegrafReply.ping();
+export class PingHandler extends BaseActionHandler {
+  protected handleAction = (): Promise<any> => {
+    return this.replyService.ping();
   };
 }

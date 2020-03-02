@@ -17,7 +17,7 @@ describe('UtilsHandler', () => {
 
   describe('getHelp', () => {
     it('should reply with game rules', async () => {
-      await handler.handleAction(ctx);
+      await handler.execute(ctx);
 
       expect(ctx.replyWithMarkdown).toHaveBeenCalledWith('other.rules');
     });
