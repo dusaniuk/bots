@@ -1,17 +1,17 @@
 import { inject, injectable } from 'inversify';
 
-import { AppContext } from '../../../shared/interfaces';
-import { TYPES } from '../../types';
+import { AppContext } from '../../../../shared/interfaces';
+import { TYPES } from '../../../types';
 
-import { ICatchController } from '../../core/interfaces/controllers';
-import { CatchResultContextData, CatchResult } from '../../core/interfaces/catch';
+import { ICatchController } from '../../../core/interfaces/controllers';
+import { CatchResult } from '../../../core/interfaces/catch';
 
-import { ContextParser } from '../services';
-import { BaseActionHandler } from './base/base-action-handler';
+import { ContextParser } from '../../services';
+import { BaseAdminCatchDecisionHandler } from './base-desition';
 
 
 @injectable()
-export class ApproveCatchHandler extends BaseActionHandler {
+export class ApproveCatchHandler extends BaseAdminCatchDecisionHandler {
   constructor(
     @inject(TYPES.CONTEXT_PARSER) private parser: ContextParser,
     @inject(TYPES.CATCH_CONTROLLER) private catchController: ICatchController,
@@ -20,18 +20,9 @@ export class ApproveCatchHandler extends BaseActionHandler {
   }
 
   protected handleAction = async (ctx: AppContext): Promise<void> => {
-    const { catchId, chatId } = this.getCatchResultData(ctx);
+    const { catchId, chatId } = this.getCatchDataFromCallbackQuery(ctx.callbackQuery);
 
     await this.approveCatch(catchId, chatId);
-  };
-
-  private getCatchResultData = (ctx: AppContext): CatchResultContextData => {
-    const [, catchId, chatId] = ctx.callbackQuery.data.split(' ');
-
-    return {
-      chatId: +chatId,
-      catchId,
-    };
   };
 
   private approveCatch = async (catchId: string, chatId: number): Promise<void> => {
@@ -39,12 +30,12 @@ export class ApproveCatchHandler extends BaseActionHandler {
 
     const catchResult: CatchResult = await this.catchController.approveCatch(chatId, catchId);
 
+    // TODO: move this in one function of reply service
     await this.replyService.sayAboutSucceededCatch(
       chatId,
       catchResult.hunter,
       catchResult.earnedPoints,
     );
-
     await this.replyService.notifyAdminAboutHandledCatch();
   };
 }
