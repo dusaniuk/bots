@@ -1,6 +1,6 @@
 import { ContainerModule, interfaces } from 'inversify';
 
-import { Bot } from '../shared/interfaces';
+import { Bot, Database } from '../shared/interfaces';
 import { TYPES } from './types';
 
 import { ActivitiesStore, MessageStore, UsersStore } from './core/interfaces/store';
@@ -8,6 +8,7 @@ import { ActivitiesStore, MessageStore, UsersStore } from './core/interfaces/sto
 import { ActivitiesFirestore } from './database/activities.firestore';
 import { UsersFirestore } from './database/users.firestore';
 import { MessagingFirestore } from './database/messaging.firestore';
+import { createDbConnection } from './database/firestore.connection';
 
 import { NbrBot } from './telegram-bot/nbr.bot';
 import { SceneFactory } from './telegram-bot/services/scene-factory';
@@ -27,6 +28,7 @@ export const nbrDependencies = new ContainerModule((bind: interfaces.Bind) => {
   bind<TelegramScene>(TYPES.DELETE_ANNOUNCE_SCENE).to(DeleteAnnounceScene);
 
   // DB interaction
+  bind<Database>(TYPES.DATABASE).toConstantValue(createDbConnection());
   bind<ActivitiesStore>(TYPES.ACTIVITIES_STORE).to(ActivitiesFirestore);
   bind<MessageStore>(TYPES.MESSAGE_STORE).to(MessagingFirestore);
   bind<UsersStore>(TYPES.USERS_STORE).to(UsersFirestore);

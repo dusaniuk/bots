@@ -1,6 +1,6 @@
 import { credential, initializeApp } from 'firebase-admin';
 
-import { createDatabase } from './firestore.database';
+import { createDbConnection } from './firestore.connection';
 import { CONFIG } from '../../config';
 
 jest.mock('firebase-admin', () => ({
@@ -10,19 +10,19 @@ jest.mock('firebase-admin', () => ({
   },
 }));
 
-describe('firestore.database', () => {
+describe('firestore.connection', () => {
   describe('createDatabase', () => {
     it('should initialize app with props from env', () => {
-      createDatabase();
+      createDbConnection();
 
       expect(initializeApp).toHaveBeenCalledWith({
         credential: credential.cert({
-          privateKey: CONFIG.more.database.privateKey,
-          clientEmail: CONFIG.more.database.clientEmail,
-          projectId: CONFIG.more.database.projectId,
+          privateKey: CONFIG.nbr.database.privateKey,
+          clientEmail: CONFIG.nbr.database.clientEmail,
+          projectId: CONFIG.nbr.database.projectId,
         }),
-        databaseURL: CONFIG.more.database.databaseURL,
-      });
+        databaseURL: CONFIG.nbr.database.databaseURL,
+      }, expect.any(String));
     });
   });
 });

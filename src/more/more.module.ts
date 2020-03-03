@@ -2,7 +2,7 @@ import { ContainerModule, interfaces } from 'inversify';
 
 import { TYPES } from './types';
 
-import { Bot } from '../shared/interfaces';
+import { Bot, Database } from '../shared/interfaces';
 
 import { MoreBot } from './telegram-bot/more.bot';
 import {
@@ -25,6 +25,7 @@ import { CatchController, ScoreController, UsersController } from './core/contro
 import { CatchService, MentionsService, ScoreService } from './core/service';
 import { CatchStore, UsersStore } from './core/interfaces/store';
 
+import { createDbConnection } from './database/firestore.connection';
 import { CatchFirestore } from './database/catch.firestore';
 import { UsersFirestore } from './database/users.firestore';
 
@@ -54,6 +55,7 @@ export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
   bind<ScoreService>(TYPES.SCORE_SERVICE).to(ScoreService);
 
   // database
+  bind<Database>(TYPES.DATABASE).toConstantValue(createDbConnection());
   bind<CatchStore>(TYPES.CATCH_STORE).to(CatchFirestore);
   bind<UsersStore>(TYPES.USERS_STORE).to(UsersFirestore);
 

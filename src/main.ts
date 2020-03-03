@@ -2,8 +2,9 @@ import 'reflect-metadata';
 
 import { CONFIG } from './config';
 import { Server } from './shared/server';
-import { container } from './shared/ioc';
 import { Bot } from './shared/interfaces';
+
+import { container } from './inversify.config';
 
 import { TYPES as NBR_TYPES } from './nbr/types';
 import { TYPES as MORE_TYPES } from './more/types';

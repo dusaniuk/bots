@@ -7,8 +7,13 @@ interface FeedSchedulerConfig {
   targetChat: number;
 }
 
+interface MoreBotConfig extends BotConfig {
+  database: DatabaseConfig;
+}
+
 interface NbrBotConfig extends BotConfig {
   whitelistedChats: number[];
+  database: DatabaseConfig;
 }
 
 interface DatabaseConfig {
@@ -23,7 +28,6 @@ export interface AppConfig {
   isDevMode: boolean;
   port: number;
   feedSchedule: FeedSchedulerConfig;
-  more: BotConfig;
+  more: MoreBotConfig;
   nbr: NbrBotConfig;
-  firebase: DatabaseConfig;
 }

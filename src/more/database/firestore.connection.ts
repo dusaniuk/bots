@@ -2,7 +2,9 @@ import { credential, firestore, initializeApp } from 'firebase-admin';
 
 import { CONFIG } from '../../config';
 
-export const createDatabase = (): firestore.Firestore => {
+export const createDbConnection = (): firestore.Firestore => {
+  const APP_NAME = 'MORE_BOT';
+
   const { database: moreDBConfig } = CONFIG.more;
 
   const app = initializeApp({
@@ -12,7 +14,7 @@ export const createDatabase = (): firestore.Firestore => {
       projectId: moreDBConfig.projectId,
     }),
     databaseURL: moreDBConfig.databaseURL,
-  });
+  }, APP_NAME);
 
   return app.firestore();
 };
