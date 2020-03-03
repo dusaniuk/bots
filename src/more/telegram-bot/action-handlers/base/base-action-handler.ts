@@ -3,7 +3,13 @@ import { injectable } from 'inversify';
 import { AppContext } from '../../../../shared/interfaces';
 import { Logger } from '../../../../shared/logger';
 
-import { CatchHimselfError, NoCatchError, UnverifiedMentionsError } from '../../../core/errors';
+import {
+  AlreadyInGameError,
+  CatchHimselfError,
+  NoCatchError,
+  NotInGameError,
+  UnverifiedMentionsError
+} from '../../../core/errors';
 import { ActionHandler } from '../../interfaces/action-handler';
 import { TelegramReplyService } from '../../services';
 
@@ -36,6 +42,14 @@ export abstract class BaseActionHandler implements ActionHandler {
 
     if (error instanceof UnverifiedMentionsError) {
       return this.replyService.showUnverifiedMentions(error.unverifiedMentions);
+    }
+
+    if (error instanceof AlreadyInGameError) {
+      return this.replyService.showAlreadyInGameError();
+    }
+
+    if (error instanceof NotInGameError) {
+      return this.replyService.showNotInGameError();
     }
 
     return this.replyService.showUnexpectedError();

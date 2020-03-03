@@ -2,7 +2,6 @@ import * as faker from 'faker';
 
 import { User } from '../interfaces/user';
 import { UsersStore } from '../interfaces/store';
-import { ActionResult } from '../models/action-result';
 import { AlreadyInGameError, NotInGameError } from '../errors';
 
 import { UsersController } from './users.controller';
@@ -20,39 +19,6 @@ describe('UsersController', () => {
     } as any;
 
     controller = new UsersController(usersStore);
-  });
-
-  describe('isUserInGame', () => {
-    let chatId: number;
-    let userId: number;
-
-    beforeEach(() => {
-      chatId = faker.random.number();
-      userId = faker.random.number();
-    });
-
-    it('should call store to check if user is in chat', async () => {
-      await controller.isUserInGame(chatId, userId);
-
-      expect(usersStore.isUserInChat).toHaveBeenCalledWith(chatId, userId);
-    });
-
-    it('should return success response', async () => {
-      usersStore.isUserInChat = jest.fn().mockResolvedValue(true);
-
-      const result: ActionResult = await controller.isUserInGame(chatId, userId);
-
-      expect(result.ok).toBeTruthy();
-    });
-
-    it('should return NotInGameError if user is not registered in a game', async () => {
-      usersStore.isUserInChat = jest.fn().mockResolvedValue(false);
-
-      const result: ActionResult = await controller.isUserInGame(chatId, userId);
-
-      expect(result.ok).toBeFalsy();
-      expect(result.error instanceof NotInGameError).toBeTruthy();
-    });
   });
 
   describe('addUserToGame', () => {
@@ -80,21 +46,13 @@ describe('UsersController', () => {
       expect(usersStore.addUserInChat).toHaveBeenCalledWith(chatId, user);
     });
 
-    it('should return success response if user is new for a chat', async () => {
-      usersStore.isUserInChat = jest.fn().mockResolvedValue(false);
-
-      const result: ActionResult = await controller.addUserToGame(chatId, user);
-
-      expect(result.ok).toBeTruthy();
-    });
-
-    it('should return AlreadyInGameError if user was already registered in a game', async () => {
+    it('should throw AlreadyInGameError if user was already registered in a game', async () => {
       usersStore.isUserInChat = jest.fn().mockResolvedValue(true);
 
-      const result: ActionResult = await controller.addUserToGame(chatId, user);
+      const action: Promise<any> = controller.addUserToGame(chatId, user);
 
-      expect(result.ok).toBeFalsy();
-      expect(result.error instanceof AlreadyInGameError).toBeTruthy();
+      const expectedMessage = `user ${user.id} is already in chat ${chatId}`;
+      await expect(action).rejects.toEqual(new AlreadyInGameError(expectedMessage));
     });
   });
 
@@ -125,21 +83,13 @@ describe('UsersController', () => {
       expect(usersStore.updateUser).toHaveBeenCalledWith(chatId, userId, { ...props });
     });
 
-    it('should return success response if user was updated successfully', async () => {
-      usersStore.isUserInChat = jest.fn().mockResolvedValue(true);
-
-      const result: ActionResult = await controller.updateUserDataInChat(chatId, userId, props);
-
-      expect(result.ok).toBeTruthy();
-    });
-
     it('should return NotInGameError if user is not registered in a game', async () => {
       usersStore.isUserInChat = jest.fn().mockResolvedValue(false);
 
-      const result: ActionResult = await controller.updateUserDataInChat(chatId, userId, props);
+      const action: Promise<any> = controller.updateUserDataInChat(chatId, userId, props);
 
-      expect(result.ok).toBeFalsy();
-      expect(result.error instanceof NotInGameError).toBeTruthy();
+      const expectedMessage = `can't find and update user ${userId} in chat ${chatId}`;
+      await expect(action).rejects.toEqual(new NotInGameError(expectedMessage));
     });
   });
 });

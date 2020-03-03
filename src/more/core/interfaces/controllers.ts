@@ -1,14 +1,11 @@
-import { ActionResult } from '../models/action-result';
 import { CatchResult, CatchSummary, Mention } from './catch';
 import { User, Score } from './user';
 
 
 export interface IUsersController {
-  isUserInGame(chatId: number, userId: number): Promise<ActionResult>;
+  addUserToGame(chatId: number, user: User): Promise<void>;
 
-  addUserToGame(chatId: number, user: User): Promise<ActionResult>;
-
-  updateUserDataInChat(chatId: number, userId: number, props: Omit<User, 'id'>): Promise<ActionResult>;
+  updateUserDataInChat(chatId: number, userId: number, props: Omit<User, 'id'>): Promise<void>;
 }
 
 export interface IScoreController {

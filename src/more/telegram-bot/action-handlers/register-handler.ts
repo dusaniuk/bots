@@ -5,8 +5,6 @@ import { Logger } from '../../../shared/logger';
 import { TYPES } from '../../types';
 
 import { User } from '../../core/interfaces/user';
-import { AlreadyInGameError } from '../../core/errors';
-import { ActionResult } from '../../core/models/action-result';
 import { IUsersController } from '../../core/interfaces/controllers';
 
 import { ContextParser } from '../services';
@@ -30,11 +28,7 @@ export class RegisterHandler extends BaseActionHandler {
     }
 
     const hunter: User = this.parser.mapToUserEntity(ctx.from);
-    const result: ActionResult = await this.usersController.addUserToGame(ctx.chat.id, hunter);
-
-    if (result.failed) {
-      return this.handleAddHunterToGameError(result.error);
-    }
+    await this.usersController.addUserToGame(ctx.chat.id, hunter);
 
     Logger.info(`[more] user ${ctx.from.first_name} (${ctx.from.id}) has been added to the game in chat ${ctx.chat.title} (${ctx.chat.id})`);
     return this.replyService.greetNewHunter(hunter);
@@ -43,15 +37,5 @@ export class RegisterHandler extends BaseActionHandler {
 
   private isChatPrivate = (ctx: AppContext): boolean => {
     return ctx.chat?.type === ChatType.private;
-  };
-
-  private handleAddHunterToGameError = (error: Error): Promise<void> => {
-    Logger.error('[more] register action error: ', error);
-
-    if (error instanceof AlreadyInGameError) {
-      return this.replyService.showAlreadyInGameError();
-    }
-
-    return this.replyService.showUnexpectedError();
   };
 }

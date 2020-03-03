@@ -2,14 +2,13 @@ import { inject, injectable } from 'inversify';
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
 import { AppContext } from '../../../shared/interfaces';
+import { AlreadyInGameError } from '../../core/errors';
 import { TYPES } from '../../types';
 
 import { User } from '../../core/interfaces/user';
-import { ActionResult } from '../../core/models/action-result';
 import { IUsersController } from '../../core/interfaces/controllers';
 
-import { ContextParser, TelegramReplyService } from '../services';
-import { ActionHandler } from '../interfaces/action-handler';
+import { ContextParser } from '../services';
 import { BaseActionHandler } from './base/base-action-handler';
 
 
@@ -26,12 +25,18 @@ export class NewMemberHandler extends BaseActionHandler {
     const newHunters: User[] = this.getNewHunters(ctx);
 
     for (const hunter of newHunters) {
-      const result: ActionResult = await this.usersController.isUserInGame(ctx.chat.id, hunter.id);
+      await this.tryToAddHunterToTheGame(ctx.chat.id, hunter);
+    }
+  };
 
-      if (result.ok) {
+  private tryToAddHunterToTheGame = async (chatId: number, hunter: User): Promise<void> => {
+    try {
+      await this.usersController.addUserToGame(chatId, hunter);
+    } catch (error) {
+      if (error instanceof AlreadyInGameError) {
         await this.replyService.greetBackOldHunter();
       } else {
-        await this.usersController.addUserToGame(ctx.chat.id, hunter);
+        throw error;
       }
     }
   };
