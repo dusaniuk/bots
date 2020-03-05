@@ -16,10 +16,10 @@ export const CONFIG: AppConfig = {
   more: {
     botToken: process.env.MORE_BOT_TOKEN,
     database: {
-      clientEmail: process.env.CLIENT_EMAIL,
-      privateKey: process.env.PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      databaseURL: process.env.FIREBASE_DATABASE_URL,
-      projectId: process.env.PROJECT_ID,
+      clientEmail: process.env.MORE_DB_CLIENT_EMAIL,
+      privateKey: process.env.MORE_DB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      databaseURL: process.env.MORE_DB_DATABASE_URL,
+      projectId: process.env.MORE_DB_PROJECT_ID,
     },
   },
 
