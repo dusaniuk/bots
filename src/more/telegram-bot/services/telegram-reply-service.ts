@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 
 import { AppContext } from '../../../shared/interfaces';
+import { BaseReplyService } from '../../../shared/services';
 import { Logger } from '../../../shared/logger';
 
 import { CatchSummary, Mention } from '../../core/interfaces/catch';
@@ -8,7 +9,6 @@ import { Score, User, UserWithScore } from '../../core/interfaces/user';
 
 import * as utils from '../utils/helpers';
 import { getApproveKeyboard } from '../keyboards/approve.keyboard';
-import { BaseReplyService } from './reply-service/base-reply-service';
 
 
 @injectable()

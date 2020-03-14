@@ -1,12 +1,5 @@
-import { ExtraReplyMessage } from 'telegraf/typings/telegram-types';
+import { AppContext, ReplyData } from '../interfaces';
 
-import { AppContext } from '../../../../shared/interfaces';
-
-
-export interface ReplyData {
-  templateData?: object;
-  extra?: ExtraReplyMessage;
-}
 
 export abstract class BaseReplyService {
   protected constructor(protected ctx: AppContext) { }
@@ -25,7 +18,7 @@ export abstract class BaseReplyService {
     const message: string = this.getMessageByKey(resourceKey, replyData?.templateData);
 
     if (replyData?.extra) {
-      await this.ctx.telegram.sendMessage(chatId, message, replyData?.extra);
+      await this.ctx.telegram.sendMessage(chatId, message, replyData.extra);
     } else {
       await this.ctx.telegram.sendMessage(chatId, message);
     }

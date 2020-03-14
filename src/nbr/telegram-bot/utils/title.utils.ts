@@ -1,4 +1,4 @@
-import { AppContext } from '../../../shared/interfaces/appContext';
+import { AppContext } from '../../../shared/interfaces/app-context';
 import { Actions, Activity } from '../constants/enums';
 
 export const getTitleWithEmoji = (ctx: AppContext, key: Actions | Activity | string): string => {

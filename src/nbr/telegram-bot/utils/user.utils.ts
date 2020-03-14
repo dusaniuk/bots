@@ -1,6 +1,6 @@
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
-import { AppContext } from '../../../shared/interfaces/appContext';
+import { AppContext } from '../../../shared/interfaces/app-context';
 
 const getUserFullName = (user: TelegrafUser): string => {
   return `${user.first_name} ${user.last_name || ''}`.trimRight();

@@ -1,4 +1,4 @@
-import { AppContext } from '../../../shared/interfaces/appContext';
+import { AppContext } from '../../../shared/interfaces/app-context';
 import { getTitle } from './title.utils';
 import { Activity } from '../constants/enums';
 import { ActivitiesPreferences } from '../../core/interfaces/activities';

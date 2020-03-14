@@ -1,16 +1,16 @@
-import { AppContext } from '../../../shared/interfaces/appContext';
+import { AppContext } from '../../../shared/interfaces';
+
+import { createMockContext } from '../../../../test/context.mock';
+
 import { getTitle, getTitleWithEmoji } from './title.utils';
+
 
 describe('title.utils', () => {
   let mockContext: AppContext;
   let key: string;
 
   beforeEach(() => {
-    mockContext = {
-      i18n: {
-        t: jest.fn().mockImplementation(pattern => pattern) as any,
-      },
-    } as AppContext;
+    mockContext = createMockContext();
 
     key = 'some string 🥺';
   });

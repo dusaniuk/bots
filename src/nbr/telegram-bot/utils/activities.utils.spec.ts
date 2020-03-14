@@ -1,6 +1,6 @@
 import { Activity } from '../constants/enums';
 import { extractSelectedActivities, getActivitiesKeys, stringifySelectedActivities } from './activities.utils';
-import { AppContext } from '../../../shared/interfaces/appContext';
+import { AppContext } from '../../../shared/interfaces/app-context';
 import { ActivitiesPreferences } from '../../core/interfaces/activities';
 
 jest.mock('./title.utils', () => ({

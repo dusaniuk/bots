@@ -1,7 +1,7 @@
 import * as faker from 'faker';
 import { User as TelegrafUser } from 'telegraf/typings/telegram-types';
 
-import { AppContext } from '../../../shared/interfaces/appContext';
+import { AppContext } from '../../../shared/interfaces/app-context';
 import { stringifyUserGreeting, stringifyUsers } from './user.utils';
 
 describe('user.utils', () => {
