@@ -49,7 +49,7 @@ export class NbrBot implements Bot {
     this.bot.use(session());
     this.bot.use(i18n.middleware());
     this.bot.use(this.stage.middleware());
-    // this.bot.use(useFeedSchedule()); TODO: uncomment after quarantine
+    this.bot.use(useFeedSchedule());
     this.bot.use(commandsInPrivateOnly());
 
     this.useScenes();
