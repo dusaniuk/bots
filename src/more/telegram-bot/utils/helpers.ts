@@ -1,11 +1,7 @@
 import { User } from '../../core/interfaces/user';
 
 
-export const getGreetingNameForUser = ({ username, firstName, lastName }: User): string => {
-  if (username) {
-    return `@${username}`;
-  }
-
+export const getGreetingNameForUser = ({ firstName, lastName }: User): string => {
   const name = [firstName];
   if (lastName) {
     name.push(lastName);

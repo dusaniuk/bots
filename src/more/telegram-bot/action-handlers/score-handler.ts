@@ -18,7 +18,7 @@ export class ScoreHandler extends BaseActionHandler {
   }
 
   protected handleAction = async (ctx: AppContext): Promise<void> => {
-    this.tryToReplyWithScore(ctx.chat.id);
+    await this.tryToReplyWithScore(ctx.chat.id);
   };
 
   private tryToReplyWithScore = async (chatId: number): Promise<void> => {
