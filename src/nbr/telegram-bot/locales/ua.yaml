@@ -100,6 +100,7 @@ deleteAnnounce:
 # all title should be with emoji in the end in order not to break buttons
 title:
   run: 'Біг 🏃‍'
+  runPro: 'Біг Про 🏃‍'
   ocr: 'OCR 🧗🏾‍'
   swim: 'Плавання 🏊‍'
   stretch: 'Стретчінг 🤸‍'
