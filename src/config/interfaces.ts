@@ -11,11 +11,6 @@ interface MoreBotConfig extends BotConfig {
   database: DatabaseConfig;
 }
 
-interface NbrBotConfig extends BotConfig {
-  whitelistedChats: number[];
-  database: DatabaseConfig;
-}
-
 interface DatabaseConfig {
   clientEmail: string;
   privateKey: string;
@@ -29,5 +24,4 @@ export interface AppConfig {
   port: number;
   feedSchedule: FeedSchedulerConfig;
   more: MoreBotConfig;
-  nbr: NbrBotConfig;
 }

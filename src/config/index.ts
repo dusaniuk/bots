@@ -22,15 +22,4 @@ export const CONFIG: AppConfig = {
       projectId: process.env.MORE_DB_PROJECT_ID,
     },
   },
-
-  nbr: {
-    botToken: process.env.NBR_BOT_TOKEN,
-    whitelistedChats: process.env.NBR_WHITELISTED_CHATS?.split(' ').map((id: string) => +id),
-    database: {
-      clientEmail: process.env.NBR_DB_CLIENT_EMAIL,
-      privateKey: process.env.NBR_DB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      databaseURL: process.env.NDB_DB_DATABASE_URL,
-      projectId: process.env.NBR_DB_PROJECT_ID,
-    },
-  },
 };

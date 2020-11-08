@@ -6,14 +6,11 @@ import { Bot } from './shared/interfaces';
 
 import { container } from './inversify.config';
 
-import { TYPES as MORE_TYPES } from './more/types';
+import { TYPES as MORE_TYPES } from './bot/types';
 
 if (CONFIG.environment !== 'test') {
-  const bots: Bot[] = [
-    container.get<Bot>(MORE_TYPES.MORE_BOT),
-  ];
-
-  bots.forEach((bot: Bot) => bot.start());
+  const bot: Bot = container.get<Bot>(MORE_TYPES.MORE_BOT);
+  bot.start();
 
   const server: Server = new Server();
   server.run();
