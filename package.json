@@ -7,8 +7,8 @@
     "start": "nodemon",
     "start:dev": "ENVIRONMENT=dev nodemon",
     "test": "ENVIRONMENT=test jest",
-    "test:coverage": "yarn test --collectCoverage",
-    "tdd": "yarn test --watch",
+    "test:coverage": "npm run test --collectCoverage",
+    "tdd": "npm run test --watch",
     "lint": "./node_modules/.bin/eslint **/*.ts"
   },
   "repository": {
