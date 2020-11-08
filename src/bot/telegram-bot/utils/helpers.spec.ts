@@ -6,18 +6,7 @@ import * as helpers from './helpers';
 
 describe('helpers', () => {
   describe('getGreetingNameForUser', () => {
-    it('should return username as user name if it has been set', () => {
-      const user: User = {
-        username: faker.internet.userName(),
-        firstName: faker.name.firstName(),
-      } as User;
-
-      const name = helpers.getGreetingNameForUser(user);
-
-      expect(name).toEqual(`@${user.username}`);
-    });
-
-    it("should return user's first name if username is not set", () => {
+    it("should return user's first name", () => {
       const user: User = {
         firstName: faker.name.firstName(),
       } as User;
