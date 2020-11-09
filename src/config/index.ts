@@ -8,6 +8,11 @@ export const CONFIG: AppConfig = {
   environment: process.env.ENVIRONMENT,
   isDevMode: process.env.ENVIRONMENT === 'dev',
   port: +(process.env.PORT ?? 8080),
+  info: {
+    version: process.env.npm_package_version ?? 'NaN',
+    name: process.env.npm_package_name ?? '',
+    description: process.env.npm_package_description ?? '',
+  },
 
   more: {
     botToken: process.env.BOT_TOKEN,

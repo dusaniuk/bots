@@ -4,8 +4,6 @@ import express from 'express';
 import { CONFIG } from '../config';
 import { Logger } from './logger';
 
-const packageInfo = require('../../package.json');
-
 export class Server {
   private app;
 
@@ -25,8 +23,9 @@ export class Server {
   private setRoutes = (): void => {
     this.app.get('/', (req, res) => {
       res.send({
-        description: packageInfo.description,
-        version: packageInfo.version,
+        description: CONFIG.info.description,
+        version: CONFIG.info.version,
+        name: CONFIG.info.name,
       });
     });
   };
