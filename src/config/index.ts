@@ -10,12 +10,12 @@ export const CONFIG: AppConfig = {
   port: +(process.env.PORT ?? 8080),
 
   more: {
-    botToken: process.env.MORE_BOT_TOKEN,
+    botToken: process.env.BOT_TOKEN,
     database: {
-      clientEmail: process.env.MORE_DB_CLIENT_EMAIL,
-      privateKey: process.env.MORE_DB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-      databaseURL: process.env.MORE_DB_DATABASE_URL,
-      projectId: process.env.MORE_DB_PROJECT_ID,
+      clientEmail: process.env.DB_CLIENT_EMAIL,
+      privateKey: process.env.DB_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+      databaseURL: process.env.DB_DATABASE_URL,
+      projectId: process.env.DB_PROJECT_ID,
     },
   },
 };

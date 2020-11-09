@@ -29,7 +29,6 @@ import { createDbConnection } from './database/firestore.connection';
 import { CatchFirestore } from './database/catch.firestore';
 import { UsersFirestore } from './database/users.firestore';
 
-
 export const moreDependencies = new ContainerModule((bind: interfaces.Bind) => {
   // action handlers
   bind<ActionHandler>(TYPES.REGISTER_HANDLER).to(RegisterHandler);
