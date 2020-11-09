@@ -8,10 +8,6 @@ export const CONFIG: AppConfig = {
   environment: process.env.ENVIRONMENT,
   isDevMode: process.env.ENVIRONMENT === 'dev',
   port: +(process.env.PORT ?? 8080),
-  feedSchedule: {
-    pattern: process.env.FEED_PATTERN,
-    targetChat: +process.env.FEED_TARGET,
-  },
 
   more: {
     botToken: process.env.MORE_BOT_TOKEN,

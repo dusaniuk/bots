@@ -2,11 +2,6 @@ interface BotConfig {
   botToken: string;
 }
 
-interface FeedSchedulerConfig {
-  pattern: string;
-  targetChat: number;
-}
-
 interface MoreBotConfig extends BotConfig {
   database: DatabaseConfig;
 }
@@ -22,6 +17,5 @@ export interface AppConfig {
   environment: string;
   isDevMode: boolean;
   port: number;
-  feedSchedule: FeedSchedulerConfig;
   more: MoreBotConfig;
 }
